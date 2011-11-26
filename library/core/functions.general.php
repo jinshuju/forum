@@ -835,7 +835,7 @@ function _FormatStringCallback($Match, $SetArgs = FALSE) {
    // Parse out the field and format.
    $Parts = explode(',', $Match);
    $Field = trim($Parts[0]);
-   $Format = strtolower(trim(GetValue(1, $Parts, '')));
+   $Format = trim(GetValue(1, $Parts, ''));
    $SubFormat = strtolower(trim(GetValue(2, $Parts, '')));
    $FomatArgs = GetValue(3, $Parts, '');
 
@@ -898,6 +898,9 @@ function _FormatStringCallback($Match, $SetArgs = FALSE) {
          case 'rawurlencode':
             $Result = rawurlencode($Value);
             break;
+         case 'text':
+            $Result = Gdn_Format::Text($Value, FALSE);
+            break;
          case 'time':
             $Result = Gdn_Format::Date($Value, '%l:%M%p');
             break;
@@ -913,6 +916,37 @@ function _FormatStringCallback($Match, $SetArgs = FALSE) {
             break;
          case 'urlencode':
             $Result = urlencode($Value);
+            break;
+         case 'user':
+         case 'you':
+         case 'his':
+         case 'her':
+         case 'your':
+            $Result = print_r($Value, TRUE);
+            $ArgsBak = $Args;
+            if (is_array($Value) && count($Value) == 1)
+               $Value = array_shift($Value);
+            
+            if (is_array($Value)) {
+               $Result = '';
+               for ($i = 0; $i < count($Value); $i++) {
+                  $User = Gdn::UserModel()->GetID($Value[$i]);
+                  $User->Name = FormatUsername($User, $Format, Gdn::Session()->UserID);
+                  
+                  if ($i == count($Value) - 1)
+                     $Result .= ' '.T('sep and', 'and').' ';
+                  elseif ($i > 0)
+                     $Result .= ', ';
+                  $Result .= UserAnchor($User);
+               }
+            } else {
+               $User = Gdn::UserModel()->GetID($Value);
+               $User->Name = FormatUsername($User, $Format, Gdn::Session()->UserID);
+               
+               $Result = UserAnchor($User);
+            }
+               
+            $Args = $ArgsBak;
             break;
          default:
             $Result = $Value;
