@@ -276,9 +276,9 @@ class VanillaHooks implements Gdn_IPlugin {
    public function UserInfoModule_OnBasicInfo_Handler($Sender) {
       $UserID = $Sender->User->UserID;
       echo Wrap(T('Discussions'), 'dt', array('class' => 'CountDiscussions'));
-      echo Wrap(CountString(GetValueR('User.CountDiscussions', $Sender, NULL), "/profile/count/discussions?userid=$UserID"), 'dd', array('class' => 'CountDiscussions'));
+      echo Wrap(GetValueR('User.CountDiscussions', $Sender, 0), 'dd', array('class' => 'CountDiscussions'));
       echo Wrap(T('Comments'), 'dt', array('class' => 'CountComments'));
-      echo Wrap(CountString(GetValueR('User.CountComments', $Sender, NULL), "/profile/count/comments?userid=$UserID"), 'dd', array('class' => 'CountComments'));
+      echo Wrap(GetValueR('User.CountComments', $Sender, 0), 'dd', array('class' => 'CountComments'));
    }
 	
 	/**

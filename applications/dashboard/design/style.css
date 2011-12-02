@@ -1301,12 +1301,6 @@ body.Profile #Panel {
    background: #cfecff;
 }
 */
-.About .Count {
-   background: none;
-   color: inherit;
-   font-size: inherit;
-   padding: inherit;
-}
 .User {
    line-height: 150%;
 }
