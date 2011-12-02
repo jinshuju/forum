@@ -134,4 +134,12 @@ jQuery(document).ready(function($) {
          return false;
       }
    });
+   
+   // Profile comment box
+   $('#Form_Comment').live('focus', function() {
+      $('#ProfileCommentSubmit').css('display', 'inline-block');
+      $('#Form_Comment').css('height', '80px');
+      $('#Form_Comment').css('min-height', '80px');
+      $('#Form_Comment').css('border-color', 'inherit');
+   });
 });

@@ -227,7 +227,7 @@ class VanillaHooks implements Gdn_IPlugin {
          // Add the discussion tab
          $DiscussionsLabel = T('Discussions');
          $CommentsLabel = T('Comments');
-         if (C('Vanilla.Profile.ShowCounts', TRUE)) {
+         if (C('Vanilla.Profile.ShowCounts', FALSE)) {
             $DiscussionsLabel .= CountString(GetValueR('User.CountDiscussions', $Sender, NULL), "/profile/count/discussions?userid=$UserID");
             $CommentsLabel .= CountString(GetValueR('User.CountComments', $Sender, NULL), "/profile/count/comments?userid=$UserID");
          }
@@ -262,6 +262,23 @@ class VanillaHooks implements Gdn_IPlugin {
          $Sender->Preferences['Notifications']['Email.NewComment'] = array(T('Notify me when people comment on a discussion.'), 'Meta');
 //      $Sender->Preferences['Notifications']['Popup.NewDiscussion'] = T('Notify me when people start new discussions.');
       }
+   }
+   
+   /**
+    * Adds discussion & comment totals to UserInfo module.
+    * 
+    * @since 2.1.0
+    * @package Vanilla
+    * 
+    * @param object $Sender ProfileController.
+    * @todo Put in a view.
+    */ 
+   public function UserInfoModule_OnBasicInfo_Handler($Sender) {
+      $UserID = $Sender->User->UserID;
+      echo Wrap(T('Discussions'), 'dt', array('class' => 'CountDiscussions'));
+      echo Wrap(CountString(GetValueR('User.CountDiscussions', $Sender, NULL), "/profile/count/discussions?userid=$UserID"), 'dd', array('class' => 'CountDiscussions'));
+      echo Wrap(T('Comments'), 'dt', array('class' => 'CountComments'));
+      echo Wrap(CountString(GetValueR('User.CountComments', $Sender, NULL), "/profile/count/comments?userid=$UserID"), 'dd', array('class' => 'CountComments'));
    }
 	
 	/**

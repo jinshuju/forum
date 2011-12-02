@@ -106,7 +106,7 @@ class ProfileController extends Gdn_Controller {
       $UserID = $this->User->UserID;
       $Username = $this->User->Name;
       
-      $this->SetTabView('Activity');
+      $this->SetTabView('Profile');
       $Comment = $this->Form->GetFormValue('Comment');
       
       if ($Session->UserID > 0 && $this->Form->AuthenticatedPostBack() 
@@ -972,9 +972,7 @@ class ProfileController extends Gdn_Controller {
             $this->AddProfileTab($Notifications, 'profile/notifications', 'Notifications', $NotificationsHtml);
          }
          
-         // Show activity?
-         if (C('Garden.Profile.ShowActivities', TRUE))
-            $this->AddProfileTab(T('Activity'), $ActivityUrl, 'Activity');
+         $this->AddProfileTab(T('Profile'), $ActivityUrl, 'Profile');
             
          $this->FireEvent('AddProfileTabs');
       }

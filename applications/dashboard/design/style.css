@@ -1051,8 +1051,8 @@ body.Activity h1 {
    margin: 0;
 }
 body.Profile ul.Activities {
-   margin-top: 10px;
-   border-top: 1px solid #ddd;
+   /* margin-top: 10px;
+   border-top: 1px solid #ddd; */
 }
 .Activities li.HasPhoto .Title {
 	padding: 0;
@@ -1301,6 +1301,12 @@ body.Profile #Panel {
    background: #cfecff;
 }
 */
+.About .Count {
+   background: none;
+   color: inherit;
+   font-size: inherit;
+   padding: inherit;
+}
 .User {
    line-height: 150%;
 }
@@ -1323,7 +1329,7 @@ body.Profile #Panel {
    -webkit-border-top-right-radius: 2px;
    background: #cfecff;
    margin: 0;
-   padding: 8px 8px 0;
+   padding: 8px;
    color: #999;
    font-weight: normal;
    line-height: 1.5;
@@ -1358,17 +1364,41 @@ body.Profile #Panel {
    width: 618px;
    margin-right: 2px;
 }
+.ProfileFields {
+   margin: 10px 0 40px 0;
+   line-height: 2.5;
+}
+.ProfileFields dl dt {
+   float: left;
+   width: 120px;
+   overflow: hidden;
+   white-space: nowrap;
+   border-bottom: 1px solid #BEC8CC;
+}
+.ProfileFields dl dd {
+   margin-left: 120px;
+   border-bottom: 1px solid #BEC8CC;
+}
+.ProfileActivityHeadline {
+   color: #888;
+}
 form.Activity {
    display: block;
-   padding: 10px 10px 0 10px;
+   padding: 0;
 	text-align: right;
 }
 form.Activity textarea {
    width: 100%;
    margin-bottom: 2px;
-   height: 60px;
-   min-height: 60px;
+   height: 30px;
+   min-height: 30px;
+   border-color: #BEC8CC;
 }
+form.Activity textarea:hover {
+   border-color: inherit;
+}
+#ProfileCommentSubmit {
+   display: none; } /* Reveal onclick */
 
 /* Invitations Form */
 #Form_Invitation table {
