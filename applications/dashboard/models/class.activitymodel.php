@@ -83,13 +83,16 @@ class ActivityModel extends Gdn_Model {
       if (is_string($Row['Data']))
          $Row['Data'] = @unserialize($Row['Data']);
       
+      $Row['PhotoUrl'] = Url($Row['Route'], TRUE);
       if (!$Row['Photo']) {
-         if (isset($Row['ActivityPhoto']))
+         if (isset($Row['ActivityPhoto'])) {
             $Row['Photo'] = $Row['ActivityPhoto'];
-         else {
+            $Row['PhotoUrl'] = UserUrl($Row, 'Activity');
+         } else {
             $User = Gdn::UserModel()->GetID($Row['ActivityUserID'], DATASET_TYPE_ARRAY);
             if ($User) {
                $Photo = $User['Photo'];
+               $Row['PhotoUrl'] = UserUrl($User);
                if (!$Photo || StringBeginsWith($Photo, 'http'))
                   $Row['Photo'] = $Photo;
                else
@@ -135,19 +138,7 @@ class ActivityModel extends Gdn_Model {
    public function Delete($ActivityID) {
       // Get the activity first
       $Activity = $this->GetID($ActivityID);
-      if (is_object($Activity)) {
-         $Users = array();
-         $Users[] = $Activity->ActivityUserID;
-         if (is_numeric($Activity->RegardingUserID) && $Activity->RegardingUserID > 0)
-            $Users[] = $Activity->RegardingUserID;
-            
-         // Update the user's dateupdated field so that profile pages will not
-         // be cached and will reflect this deletion.
-         $this->SQL->Update('User')
-            ->Set('DateUpdated', Gdn_Format::ToDateTime())
-            ->WhereIn('UserID', $Users)
-            ->Put();
-         
+      if ($Activity) {
          // Delete comments on the activity item
          $this->SQL->Delete('ActivityComment', array('ActivityID' => $ActivityID));
          // Delete the activity item
@@ -188,7 +179,7 @@ class ActivityModel extends Gdn_Model {
          ->OrderBy('a.DateUpdated', 'desc')
          ->Limit($Limit, $Offset)
          ->Get();
-      Gdn::UserModel()->JoinUsers($Result->ResultArray(), array('ActivityUserID', 'RegardingUserID'), array('Join' => array('Name', 'Email', 'Gender')));
+      Gdn::UserModel()->JoinUsers($Result->ResultArray(), array('ActivityUserID', 'RegardingUserID'), array('Join' => array('Name', 'Email', 'Gender', 'Photo')));
       
       $this->CalculateData($Result->ResultArray());
 
@@ -378,9 +369,11 @@ class ActivityModel extends Gdn_Model {
     */
    public function GetID($ActivityID) {
       $Activity = parent::GetID($ActivityID);
-      $this->CalculateRow($Activity);
-      $Activities = array($Activity);
-      self::JoinUsers($Activities);
+      if ($Activity) {
+         $this->CalculateRow($Activity);
+         $Activities = array($Activity);
+         self::JoinUsers($Activities);
+      }
       
       return $Activity;
    }
@@ -555,7 +548,7 @@ class ActivityModel extends Gdn_Model {
          $Notify = $SendEmail;
       
       $Preference = FALSE;
-      if ($Notify && $RegardingUserID) {
+      if (($ActivityTypeRow['Notify'] || !$ActivityTypeRow['Public']) && $RegardingUserID) {
          $Activity['NotifyUserID'] = $Activity['RegardingUserID'];
          $Preference = $ActivityType;
       } else {
@@ -563,8 +556,12 @@ class ActivityModel extends Gdn_Model {
       }
 
       // Otherwise let the decision to email lie with the $Notify setting.
-      if ($SendEmail == 'Force') {
+      if ($SendEmail == 'Force' || $Notify) {
          $Activity['Emailed'] = self::SENT_PENDING;
+      } elseif ($Notify) {
+         $Activity['Emailed'] = self::SENT_PENDING;
+      } elseif ($SendEmail === FALSE) {
+         $Activity['Emailed'] = self::SENT_ARCHIVE;
       }
       
       $Activity = $this->Save($Activity, $Preference);
@@ -631,8 +628,10 @@ class ActivityModel extends Gdn_Model {
     */
    public function SendNotification($ActivityID, $Story = '', $Force = FALSE) {
       $Activity = $this->GetID($ActivityID);
-      if (!is_object($Activity))
+      if (!$Activity)
          return;
+      
+      $Activity = (object)$Activity;
       
       $Story = Gdn_Format::Text($Story == '' ? $Activity->Story : $Story, FALSE);
       // If this is a comment on another activity, fudge the activity a bit so that everything appears properly.
@@ -688,7 +687,7 @@ class ActivityModel extends Gdn_Model {
       }
    }
    
-   public function Email(&$Activity) {
+   public function Email(&$Activity, $NoDelete = FALSE) {
       if (is_numeric($Activity)) {
          $ActivityID = $Activity;
          $Activity = $this->GetID($ActivityID);
@@ -706,12 +705,23 @@ class ActivityModel extends Gdn_Model {
          return FALSE;
       
       // Format the activity headline based on the user being emailed.
-      if ($Activity['HeadlineFormat']) {
+      if (GetValue('HeadlineFormat', $Activity)) {
          $SessionUserID = Gdn::Session()->UserID;
          Gdn::Session()->UserID = $User['UserID'];
          $Activity['Headline'] = FormatString($Activity['HeadlineFormat'], $Activity);
          Gdn::Session()->UserID = $SessionUserID;
       } else {
+         if (!isset($Activity['ActivityGender'])) {
+            $AT = self::GetActivityType($Activity['ActivityType']);
+            
+            $Data = array($Activity);
+            self::JoinUsers($Data);
+            $Activity = $Data[0];
+            $Activity['RouteCode'] = GetValue('RouteCode', $AT);
+            $Activity['FullHeadline'] = GetValue('FullHeadline', $AT);
+            $Activity['ProfileHeadline'] = GetValue('ProfileHeadline', $AT);
+         }
+         
          $Activity['Headline'] = Gdn_Format::ActivityHeadline($Activity, '', $User['UserID']);
       }
       
@@ -742,6 +752,15 @@ class ActivityModel extends Gdn_Model {
       try {
          $Email->Send();
          $Emailed = self::SENT_OK;
+         
+         // Delete the activity now that it has been emailed.
+         if (!$NoDelete && !$Activity['Notify']) {
+            if ($Activity['ActivityID']) {
+               $this->Delete($Activity['ActivityID']);
+            } else {
+               $Activity['_Delete'] = TRUE;
+            }
+         }
       } catch (phpmailerException $pex) {
          if ($pex->getCode() == PHPMailer::STOP_CRITICAL)
             $Emailed = self::SENT_FAIL;
@@ -750,7 +769,7 @@ class ActivityModel extends Gdn_Model {
       } catch (Exception $ex) {
          $Emailed = self::SENT_FAIL; // similar to http 5xx
       }
-      $Activity['Emaailed'] = $Emailed;
+      $Activity['Emailed'] = $Emailed;
       if ($ActivityID) {
          // Save the emailed flag back to the activity.
          $this->SQL->Put('Activity', array('Emailed' => $Emailed), array('ActivityID' => $ActivityID));
@@ -970,19 +989,23 @@ class ActivityModel extends Gdn_Model {
       // Check the user's preference.
       if ($Preference) {
          list($Popup, $Email) = self::NotificationPreference($Preference, $Activity['NotifyUserID'], 'both');
-         if (!$Popup && !$Email && !GetValue('Force', $Options))
-            return;
          
-         if ($Popup)
+         if ($Popup && !$Activity['Notified'])
             $Activity['Notified'] = self::SENT_PENDING;
-         if ($Email)
+         if ($Email && !$Activity['Emailed'])
             $Activity['Emailed'] = self::SENT_PENDING;
+         
+         if (!$Activity['Notified'] && !$Activity['Emailed'] && !GetValue('Force', $Options)) {
+            return;
+         }
       }
       
       $ActivityType = self::GetActivityType($Activity['ActivityType']);
       $Activity['ActivityTypeID'] = ArrayValue('ActivityTypeID', $ActivityType);
       
-      $NotificationInc = $Activity['NotifyUserID'] > 0 ? 1 : 0;
+      $NotificationInc = 0;
+      if ($Activity['NotifyUserID'] > 0 && $Activity['Notified'])
+         $NotificationInc = 1;
       
       if ($GroupBy = GetValue('GroupBy', $Options)) {
          $GroupBy = (array)$GroupBy;
@@ -1006,8 +1029,10 @@ class ActivityModel extends Gdn_Model {
          }
       }
       
+      $Delete = FALSE;
       if ($Activity['Emailed'] == self::SENT_PENDING) {
          $this->Email($Activity);
+         $Delete = GetValue('_Delete', $Activity);
       }
       
       $ActivityData = $Activity['Data'];
@@ -1020,10 +1045,12 @@ class ActivityModel extends Gdn_Model {
       
       $ActivityID = GetValue('ActivityID', $Activity);
       if (!$ActivityID) {
-         $this->AddInsertFields($Activity);
-         TouchValue('DateUpdated', $Activity, $Activity['DateInserted']);
-         $ActivityID = $this->SQL->Insert('Activity', $Activity);
-         $Activity['ActivityID'] = $ActivityID;
+         if (!$Delete) {
+            $this->AddInsertFields($Activity);
+            TouchValue('DateUpdated', $Activity, $Activity['DateInserted']);
+            $ActivityID = $this->SQL->Insert('Activity', $Activity);
+            $Activity['ActivityID'] = $ActivityID;
+         }
       } else {
          $Activity['DateUpdated'] = Gdn_Format::ToDateTime();
          unset($Activity['ActivityID']);
