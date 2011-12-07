@@ -727,6 +727,7 @@ class CommentModel extends VanillaModel {
 
          // Notify any users who were mentioned in the comment.
          $Usernames = GetMentions($Fields['Body']);
+         $this->EventArguments['MentionedUsers'] = $Usernames;
          $UserModel = Gdn::UserModel();
          $NotifiedUsers = array();
          foreach ($Usernames as $Username) {

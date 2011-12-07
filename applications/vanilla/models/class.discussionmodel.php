@@ -893,6 +893,7 @@ class DiscussionModel extends VanillaModel {
                
                $Usernames = array_merge(GetMentions($DiscussionName), GetMentions($Story));
                $Usernames = array_unique($Usernames);
+               $this->EventArguments['MentionedUsers'] = $Usernames;
                
                $NotifiedUsers = array();
                $UserModel = Gdn::UserModel();
