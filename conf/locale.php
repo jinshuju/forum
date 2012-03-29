@@ -658,3 +658,5 @@ $Definition['Flood Control'] ='频率控制';
 $Definition['Statistics'] ='统计';
 $Definition['Spam Queue'] ='垃圾信息审核';
 $Definition['Moderation Queue'] ='问题内容审核';
+$Definition['Email/Username'] ='电邮/用户名';
+$Definition['Enter your Email address or username'] ='填写你的电邮/用户名';
