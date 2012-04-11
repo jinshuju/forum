@@ -732,7 +732,7 @@ class UserModel extends Gdn_Model {
     * @param $Key string relative user meta key.
     * @return array results or $Default
     */
-   public static function GetMeta($UserID, $Key, $Prefix = '') {;
+   public static function GetMeta($UserID, $Key, $Prefix = '', $Default = '') {
       $Sql = Gdn::SQL()
          ->Select('*')
          ->From('UserMeta u');
@@ -2232,11 +2232,7 @@ class UserModel extends Gdn_Model {
     */
    public function SaveAbout($UserID, $About) {
       $About = substr($About, 0, 1000);
-      $this->SQL->Update($this->Name)->Set('About', $About)->Where('UserID', $UserID)->Put();
-      if (strlen($About) > 500)
-         $About = SliceString($About, 500) . '...';
-      
-      
+      $this->SetField($UserID, 'About', $About);
    }
 
    /**
