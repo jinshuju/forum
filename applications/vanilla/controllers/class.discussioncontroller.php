@@ -117,19 +117,17 @@ class DiscussionController extends VanillaController {
       if ($this->Offset < 0)
          $this->Offset = 0;
       
-      $this->SetData('_LatestItem', $this->Discussion->CountCommentWatch);
-      
-      // Set the canonical url to have the proper page title.
+            // Set the canonical url to have the proper page title.
       $this->CanonicalUrl(DiscussionUrl($this->Discussion, PageNumber($this->Offset, $Limit, FALSE)));
       
+//      Url(ConcatSep('/', 'discussion/'.$this->Discussion->DiscussionID.'/'. Gdn_Format::Url($this->Discussion->Name), PageNumber($this->Offset, $Limit, TRUE, Gdn::Session()->UserID != 0)), TRUE), Gdn::Session()->UserID == 0);
+
       // Load the comments
       $this->SetData('CommentData', $this->CommentModel->Get($DiscussionID, $Limit, $this->Offset), TRUE);
       $this->SetData('Comments', $this->CommentData);
       
       $PageNumber = PageNumber($this->Offset, $Limit);
       $this->SetData('Page', $PageNumber);
-      $this->_SetOpenGraph();
-      
       
       include_once(PATH_LIBRARY.'/vendors/simplehtmldom/simple_html_dom.php');
       if ($PageNumber == 1) {
@@ -683,6 +681,10 @@ ul.MessageList li.Item.Mine { background: #E3F4FF; }
       $Offset = GetIncomingValue('Offset', $Offset);
       $Limit = GetIncomingValue('Limit', $Limit);
       $vanilla_identifier = GetIncomingValue('vanilla_identifier', '');
+      // Only allow vanilla identifiers of 32 chars or less - md5 if larger
+      if (strlen($vanilla_identifier) > 32) {
+         $vanilla_identifier = md5($vanilla_identifier);
+      }
       $vanilla_type = GetIncomingValue('vanilla_type', 'blog');
       $vanilla_url = GetIncomingValue('vanilla_url', '');
       $vanilla_category_id = GetIncomingValue('vanilla_category_id', '');
@@ -789,7 +791,7 @@ ul.MessageList li.Item.Mine { background: #E3F4FF; }
          $this->Form->SetFormValue('Body', $Draft->Body);
       else {
          // Look in the session stash for a comment
-         $StashComment = $Session->Stash('CommentForForeignID_'.$ForeignSource['vanilla_identifier'], '', FALSE);
+         $StashComment = $Session->Stash('CommentForForeignID_'.$ForeignSource['vanilla_identifier'], '', FALSE); 
          if ($StashComment)
             $this->Form->SetFormValue('Body', $StashComment);
       }
@@ -810,11 +812,5 @@ ul.MessageList li.Item.Mine { background: #E3F4FF; }
       
       $this->FireEvent('BeforeDiscussionRender');
       $this->Render();
-   }
-   
-   protected function _SetOpenGraph() {
-      if (!$this->Head)
-         return;
-      $this->Head->AddTag('meta', array('property' => 'og:type', 'content' => 'article'));
    }
 }

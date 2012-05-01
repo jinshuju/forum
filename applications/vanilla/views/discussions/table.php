@@ -42,7 +42,7 @@ function WriteDiscussionRow($Discussion, &$Sender, &$Session, $Alt2) {
 	$Discussion->CountPages = ceil($Discussion->CountComments / $Sender->CountCommentsPerPage);
 
    $FirstPageUrl = DiscussionUrl($Discussion, 1);
-   $LastPageUrl = DiscussionUrl($Discussion, FALSE).'#latest';	
+   $LastPageUrl = DiscussionUrl($Discussion, FALSE, '#Item_'.$Discussion->CountCommentWatch);	
 	$Discussion->CountReplies = $Discussion->CountComments - 1;
 
 ?>
@@ -138,7 +138,7 @@ echo '<h1 class="HomepageTitle">'.$this->Data('Title').'</h1>';
 
 echo '<div class="P PageDescription">';
 echo PagerModule::Write($PagerOptions);
-echo $this->Data('_Description', '&#160;');
+echo $this->Data('_Description');
 echo '</div>';
 
 
@@ -177,7 +177,9 @@ if ($this->DiscussionData->NumRows() > 0 || (isset($this->AnnounceData) && is_ob
 </table>
 </div>
 <?php
+   echo '<div class="P ClearFix">';
    PagerModule::Write($PagerOptions);
+   echo '</div>';
 } else {
    ?>
    <div class="Empty"><?php echo T('No discussions were found.'); ?></div>

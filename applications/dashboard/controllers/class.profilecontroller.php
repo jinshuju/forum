@@ -259,14 +259,12 @@ class ProfileController extends Gdn_Controller {
     */
    public function Edit($UserReference = '', $Username = '') {
       $this->Permission('Garden.SignIn.Allow');
-      $this->GetUserInfo($UserReference, $Username);
+      $this->GetUserInfo($UserReference, $Username, '', TRUE);
       $Session = Gdn::Session();
-      if ($Session->UserID != $this->User->UserID)
-         $this->Permission('Garden.Users.Edit');
       
       // Decide if they have ability to edit the username
       $this->CanEditUsername = C("Garden.Profile.EditUsernames");
-      $this->CanEditUsername = $this->CanEditUsername | $Session->CheckPermission('Garden.Users.Edit');
+      $this->CanEditUsername = $this->CanEditUsername || $Session->CheckPermission('Garden.Users.Edit');
          
       $UserModel = Gdn::UserModel();
       $User = $UserModel->GetID($this->User->UserID);
@@ -342,7 +340,7 @@ class ProfileController extends Gdn_Controller {
    public function Invitations($UserReference = '', $Username = '', $UserID = '') {
       $this->Permission('Garden.SignIn.Allow');
       $this->EditMode(FALSE);
-      $this->GetUserInfo($UserReference, $Username, $UserID);
+      $this->GetUserInfo($UserReference, $Username, $UserID, $this->Form->AuthenticatedPostBack());
       $this->SetTabView('Invitations');
       
       $InvitationModel = new InvitationModel();
@@ -447,8 +445,21 @@ class ProfileController extends Gdn_Controller {
    public function Password() {
       $this->Permission('Garden.SignIn.Allow');
       
+      // Don't allow password editing if using SSO Connect ONLY. 
+      // This is for security. We encountered the case where a customer charges 
+      // for membership using their external application and use SSO to let 
+      // their customers into Vanilla. If you allow those people to change their 
+      // password in Vanilla, they will then be able to log into Vanilla using 
+      // Vanilla's login form regardless of the state of their membership in the 
+      // external app.
+      if (C('Garden.Registration.Method') == 'Connect') {
+         Gdn::Dispatcher()->Dispatch('DefaultPermission');
+         exit();
+      }
+      
       // Get user data and set up form
       $this->GetUserInfo();
+      
       $this->Form->SetModel($this->UserModel);
       $this->Form->AddHidden('UserID', $this->User->UserID);
       
@@ -483,7 +494,7 @@ class ProfileController extends Gdn_Controller {
     * @param mixed $UserReference Unique identifier, possible username or ID.
     * @param string $Username.
     */
-   public function Picture($UserReference = '', $Username = '') {
+   public function Picture($UserReference = '', $Username = '', $UserID = '') {
       // Permission checks
       $this->Permission('Garden.Profiles.Edit');
       $Session = Gdn::Session();
@@ -502,8 +513,9 @@ class ProfileController extends Gdn_Controller {
          throw new Exception(sprintf(T("Unable to detect PHP GD installed on this system. Vanilla requires GD version 2 or better.")));
       }
       
-      // Get user data & prep form
-      $this->GetUserInfo($UserReference, $Username);
+      // Get user data & prep form.
+      $this->GetUserInfo($UserReference, $Username, $UserID, TRUE);
+      
       $this->Form->SetModel($this->UserModel);
       $this->Form->AddHidden('UserID', $this->User->UserID);
       
@@ -610,7 +622,7 @@ class ProfileController extends Gdn_Controller {
       $this->Permission('Garden.SignIn.Allow');
       
       // Get user data
-      $this->GetUserInfo($UserReference, $Username, $UserID);
+      $this->GetUserInfo($UserReference, $Username, $UserID, TRUE);
 		$UserPrefs = Gdn_Format::Unserialize($this->User->Preferences);
       if ($this->User->UserID != $Session->UserID)
          $this->Permission('Garden.Users.Edit');
@@ -737,7 +749,7 @@ class ProfileController extends Gdn_Controller {
          $this->Form->AddError('You must be authenticated in order to use this form.');
       
       // Get user data & another permission check
-      $this->GetUserInfo($UserReference, $Username);
+      $this->GetUserInfo($UserReference, $Username, '', TRUE);
       $RedirectUrl = 'dashboard/profile/picture/'.$this->ProfileUrl();
       if ($Session->ValidateTransientKey($TransientKey)
          && is_object($this->User)
@@ -826,7 +838,7 @@ class ProfileController extends Gdn_Controller {
       $this->AddJsFile('jquery.jcrop.pack.js');
       $this->AddJsFile('profile.js');
                
-      $this->GetUserInfo($UserReference, $Username);
+      $this->GetUserInfo($UserReference, $Username, '', TRUE);
       
       // Permission check (correct user)
       if ($this->User->UserID != $Session->UserID && !$Session->CheckPermission('Garden.Users.Edit'))
@@ -1039,7 +1051,14 @@ class ProfileController extends Gdn_Controller {
 		} else {
 			// Add profile options for the profile owner
 			// Don't allow account editing if it has been turned off.
-			if (Gdn::Config('Garden.UserAccount.AllowEdit')) {
+         // Don't allow password editing if using SSO Connect ONLY. 
+         // This is for security. We encountered the case where a customer charges 
+         // for membership using their external application and use SSO to let 
+         // their customers into Vanilla. If you allow those people to change their 
+         // password in Vanilla, they will then be able to log into Vanilla using 
+         // Vanilla's login form regardless of the state of their membership in the 
+         // external app.
+			if (Gdn::Config('Garden.UserAccount.AllowEdit') && C('Garden.Registration.Method') != 'Connect') {
 				$Module->AddLink('Options', Sprite('SpEdit').T('Edit My Profile'), '/profile/edit', FALSE, array('class' => 'Popup EditAccountLink'));
 					
 				// No password may have been set if they have only signed in with a connect plugin
@@ -1157,14 +1176,15 @@ class ProfileController extends Gdn_Controller {
     * @param mixed $UserReference Unique identifier, possibly username or ID.
     * @param string $Username.
     * @param int $UserID Unique ID.
+    * @param bool $CheckPermissions Whether or not to check user permissions.
     * @return bool Always true.
     */
-   public function GetUserInfo($UserReference = '', $Username = '', $UserID = '') {
+   public function GetUserInfo($UserReference = '', $Username = '', $UserID = '', $CheckPermissions = FALSE) {
 		if ($this->_UserInfoRetrieved)
 			return;
 		
       if (!C('Garden.Profile.Public') && !Gdn::Session()->IsValid())
-         Redirect('dashboard/home/permission');
+         throw PermissionException();
       
 		// If a UserID was provided as a querystring parameter, use it over anything else:
 		if ($UserID) {
@@ -1193,6 +1213,9 @@ class ProfileController extends Gdn_Controller {
 			$this->SetData('Profile', $this->User);
 			$this->SetData('UserRoles', $this->Roles);
       }
+      
+      if ($CheckPermissions && Gdn::Session()->UserID != $this->User->UserID)
+         $this->Permission('Garden.Users.Edit');
       
       $this->AddSideMenu();
 		$this->_UserInfoRetrieved = TRUE;

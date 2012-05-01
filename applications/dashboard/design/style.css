@@ -1785,6 +1785,14 @@ tr.CategoryHeading td {
 .SpNewConversation { background-position: -64px -68px; }
 .SpAskQuestion { background-position: -48px -68px; }
 .SpNewPoll { background-position: -32px -68px; }
+.SpRSS {
+   background: url("images/sprites.png") no-repeat -27px -46px transparent;
+   display: inline-block;
+   height: 14px;
+   vertical-align: middle;
+   width: 14px;
+}
+
 .FormType {
 	margin: 0 0 10px;
 }
@@ -2043,6 +2051,8 @@ span.Incorrect {
 }
 .MultipleEntryMethods .MainForm {
    float: left;
+   /* Fix mainform from shoving the other entry methods down when an error occurs during login */
+   width: 300px;
 }
 .MultipleEntryMethods .Methods {
  	padding: 0 15px 5px;

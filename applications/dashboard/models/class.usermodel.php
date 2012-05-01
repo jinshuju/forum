@@ -237,9 +237,6 @@ class UserModel extends Gdn_Model {
          unset($Data['Name']);
       }
       
-//      decho($Data);
-//      die();
-      
       return $Data;
       
    }
@@ -1077,10 +1074,17 @@ class UserModel extends Gdn_Model {
                         $PhotoUrl = Gdn_Upload::Url(ChangeBasename($Photo, 'n%s'));
 
                      $ActivityModel = new ActivityModel();
+                     if ($UserID == Gdn::Session()->UserID) {
+                        $HeadlineFormat = T('HeadlineFormat.PictureChange', '{RegardingUserID,You} changed {ActivityUserID,your} profile picture.');
+                     } else {
+                        $HeadlineFormat = T('HeadlineFormat.PictureChange.ForUser', '{RegardingUserID,You} changed the profile picture for {ActivityUserID,user}.');
+                     }
+                     
                      $ActivityModel->Save(array(
                          'ActivityUserID' => $UserID,
+                         'RegardingUserID' => Gdn::Session()->UserID,
                          'ActivityType' => 'PictureChange',
-                         'HeadlineFormat' => T('HeadlineFormat.PictureChange', '{ActivityUserID,You} changed {ActivityUserID,your} profile picture.'),
+                         'HeadlineFormat' => $HeadlineFormat,
                          'Story' => Img($PhotoUrl, array('alt' => T('Thumbnail')))
                          ));
                   }
@@ -1141,6 +1145,7 @@ class UserModel extends Gdn_Model {
             $UserID = FALSE;
          }
       } else {
+//         decho($this->Validation->ResultsText());
          $UserID = FALSE;
       }
       
@@ -1578,6 +1583,10 @@ class UserModel extends Gdn_Model {
       $RoleIDs = Gdn::Config('Garden.Registration.DefaultRoles');
       if (!is_array($RoleIDs) || count($RoleIDs) == 0)
          throw new Exception(T('The default role has not been configured.'), 400);
+      
+      if (GetValue('SaveRoles', $Options)) {
+         $RoleIDs = GetValue('RoleID', $FormPostValues);
+      }
 
       $UserID = FALSE;
 

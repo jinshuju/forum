@@ -80,7 +80,7 @@ $CountBookmarksExists = $Construct->ColumnExists('CountBookmarks');
 $Construct
    ->PrimaryKey('DiscussionID')
    ->Column('Type', 'varchar(10)', TRUE, 'index')
-   ->Column('ForeignID', 'varchar(200)', TRUE, 'index') // For relating foreign records to discussions
+   ->Column('ForeignID', 'varchar(32)', TRUE, 'index') // For relating foreign records to discussions
    ->Column('CategoryID', 'int', FALSE, 'key')
    ->Column('InsertUserID', 'int', FALSE, 'key')
    ->Column('UpdateUserID', 'int')
@@ -105,7 +105,6 @@ $Construct
 	->Column('Score', 'float', NULL)
    ->Column('Attributes', 'text', TRUE)
    ->Column('RegardingID', 'int(11)', TRUE, 'index')
-   ->Column('Source', 'varchar(20)', TRUE)
    ->Set($Explicit, $Drop);
 
 if ($DiscussionExists && !$FirstCommentIDExists) {
@@ -142,8 +141,6 @@ else
 
 $Construct->PrimaryKey('CommentID')
 	->Column('DiscussionID', 'int', FALSE, 'index.1')
-   ->Column('Type', 'varchar(10)', TRUE)
-   ->Column('ForeignID', 'varchar(200)', TRUE, 'index') // For relating foreign records to discussions
 	->Column('InsertUserID', 'int', TRUE, 'key')
 	->Column('UpdateUserID', 'int', TRUE)
 	->Column('DeleteUserID', 'int', TRUE)
@@ -157,7 +154,6 @@ $Construct->PrimaryKey('CommentID')
 	->Column('Flag', 'tinyint', 0)
 	->Column('Score', 'float', NULL)
 	->Column('Attributes', 'text', TRUE)
-   ->Column('Source', 'varchar(20)', TRUE)
 	->Set($Explicit, $Drop);
 
 if (isset($CommentIndexes['FK_Comment_DiscussionID'])) {
