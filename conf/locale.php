@@ -544,6 +544,7 @@ $Definition['Unbookmark'] = '取消关注';
 $Definition['Undo Follow'] = '取消关注';
 $Definition['Uninvite'] = '取消邀请';
 $Definition['Unlimited'] = '无限制';
+$Definition['Unspecified'] = '保密';
 $Definition['Unsink'] = '取消下沉';
 $Definition['Upload'] = '上传';
 $Definition['Uploading...'] = '正在上传...';
