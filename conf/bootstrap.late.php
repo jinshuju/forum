@@ -16,7 +16,7 @@ public static function GetMentions($String) {
 public static function FormatMentions($Mixed) {
 		if(C('Garden.Format.Mentions')) {
 		    $Mixed = preg_replace(
-						'/(^|[\s,\.])@([\S]{1,20})(?=[\s,\.!?]|$)/i',
+						'/(^|[\s,\.])@([\S]{1,25})(?=[\s,\.!?]|$)/i',
 		        '\1'.Anchor('@\2', '/profile/\\2'),
 		       $Mixed
 		    );
