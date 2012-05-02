@@ -10,3 +10,9 @@ class OrchidThemeHooks extends Gdn_Plugin {
 				.'<img class="ProfilePhotoMedium" src="'.$photoURL.'" />'.'</a>';
 	}
 }
+
+if (!function_exists('UserPhotoDefaultUrl')) {
+   function UserPhotoDefaultUrl($User) {
+      return Url('/themes/orchid/design/default-avatar.jpg',TRUE);
+   }
+}
