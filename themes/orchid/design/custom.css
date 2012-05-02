@@ -84,6 +84,9 @@ h1.HomepageTitle {
   color: #4D4D4D;
   font-weight: normal;
   font-size: 130%;
+  padding: 5px 10px;
+  margin: 0;
+  background: #F2F2F2;
 }
 .Discussion .Title a {
   color: #333;
@@ -91,10 +94,8 @@ h1.HomepageTitle {
 .Discussion .Meta a {
   color: #8B920A;
 }
-h1.HomepageTitle {
-  padding: 5px 10px;
-  margin: 0;
-  background: #F2F2F2;
+.Discussion .PageTitle h1 {
+  font-weight: normal;
 }
 #Panel .FilterMenu li,
 .PanelInfo li {
