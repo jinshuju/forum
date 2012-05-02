@@ -16,19 +16,29 @@ a {
   margin-bottom: 25px;
   border-bottom: 1px solid #C8C8C8;
 }
+#Head .Row {
+  overflow: hidden;
+}
 #Head a {
   color: #333;
   font-weight: normal;
 }
-#Head .SiteTitle {
-  font-size: 20px;
-  font-family: Tahoma, Arial, Helvetica, STHeiti;
-}
 #Head .SiteTitle a {
   color: #E65E8D;
+  float: left;
+  width: 149px;
+  height: 31px;
+  background-image: url(logo.png);
+  display: inline-block;
+  text-indent: -9999px;
+  font-size: 0;
+  line-height: 0;
+  font-family: Tahoma, Arial, Helvetica, STHeiti;
 }
 #Head .SiteMenu {
-  margin-left: 10px;
+  margin-left: 20px;
+  padding-top: 9px;
+  float: left;
 }
 #Head .SiteMenu a {
   font-size: 14px;
