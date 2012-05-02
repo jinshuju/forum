@@ -375,6 +375,7 @@ $Definition['My Invitations'] = '我的邀请';
 $Definition['My Preferences'] = '我的偏好设置';
 $Definition['Name'] = '名字';
 $Definition['Name Unavailable'] = '名字不可用';
+$Definition['New Discussion'] = '发起新讨论';
 $Definition['New Password'] = '新密码';
 $Definition['New comments in the last day'] = '最近一天评论数';
 $Definition['New comments in the last week'] = '最近一周评论数';
@@ -388,7 +389,7 @@ $Definition['New users are reviewed and approved by an administrator (that\'s yo
 $Definition['New users fill out a simple form and are granted access immediately.'] = 'New users fill out a simple form and are granted access immediately.';
 $Definition['New users in the last day'] = '最近一天新用户数';
 $Definition['New users in the last week'] = '最近一周新用户数';
-$Definition['No discussions were found.'] = '木有找到讨论.';
+$Definition['No discussions were found.'] = '暂时没有讨论';
 $Definition['None'] = '无';
 $Definition['Not Authorized (401)'] = '没有权限 (401)';
 $Definition['Not Found (404)'] = '没有找到 (404)';
