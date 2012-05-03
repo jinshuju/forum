@@ -137,6 +137,8 @@ $Definition['Comments'] = '评论';
 $Definition['Comments per Page'] = '每页显示评论条数';
 $Definition['Configure an Authenticator'] = 'Configure an Authenticator';
 $Definition['Confirm'] = '确认';
+$Definition['ConfirmText'] = '你确定要这么做?';
+$Definition['ConfirmHeading'] = '确认';
 $Definition['Confirm Email'] = '确认 Email';
 $Definition['Confirm Password'] = '确认密码';
 $Definition['Connect'] = '连接';
@@ -201,66 +203,66 @@ $Definition['EmailInvitation'] = '你好!
 	  %3$s
 
 	  祝你开心每一天!';
-$Definition['EmailMembershipApproved'] = 'Hello %1$s,
+$Definition['EmailMembershipApproved'] = '你好 %1$s,
 
-	You have been approved for membership. Sign in now at the following link:
+	你已经被批准加入. 请通过以下链接登录:
 
 	  %2$s
 	    
-	  Have a great day!';
+	  祝你开心每一天!';
 $Definition['EmailNotification'] = '%1$s
 
-	Follow the link below to check it out:
+	点击以下链接查看:
 	%2$s
 
-	Have a great day!';
-$Definition['EmailPassword'] = 'Hello %1$s,
+	祝你开心每一天!';
+$Definition['EmailPassword'] = '你好 %1$s,
 
-	%2$s has reset your password at %3$s. Your login credentials are now:
+	%2$s 在 %3$s 重置了密码. 你的登录信息如下:
 
 	  Email: %6$s
 	    Password: %5$s
 	      Url: %4$s
 
-	      Have a great day!';
+	      祝你开心每一天!';
 $Definition['EmailStoryNotification'] = '%1$s
 
 	%3$s
 
 	---
-	Follow the link below to check it out:
+	点击以下链接查看:
 	%2$s
 
-	Have a great day!';
+	祝你开心每一天!';
 $Definition['EmailWelcome'] = 'Hello %1$s,
 
-	%2$s has created an account for you at %3$s. Your login credentials are:
+	%2$s 在 %3$s 为你注册了账号. 你的登陆信息如下:
 
 	  Email: %6$s
 	    Password: %5$s
 	      Url: %4$s
 
-	      Have a great day!';
-$Definition['EmailWelcomeConnect'] = 'Hello {User.Name},
+	      祝你开心每一天!';
+$Definition['EmailWelcomeConnect'] = '你好 {User.Name},
 
-	You have successfully connected to {Title}. Here is your information:
+	你已经成功连接到 {Title}. 你的信息如下:
 
 	  Username: {User.Name}
   Connected With: {ProviderName}
 
-You can access the site at {/,url,domain}.
+你可以通过此地址进入 {/,url,domain}.
 
-Have a great day!';
-$Definition['EmailWelcomeRegister'] = 'Hello {User.Name},
+祝你开心每一天!';
+$Definition['EmailWelcomeRegister'] = '你好 {User.Name},
 
-	You have successfully registered for an account at {Title}. Here is your information:
+	你已经成功注册了 {Title}. 这里是你的信息:
 
 	  Username: {User.Name}
   Email: {User.Email}
 
-You can access the site at {/,url,domain}.
+你可以通过此地址进入 {/,url,domain}.
 
-Have a great day!';
+祝你开心每一天!';
 $Definition['Enable'] = '启用';
 $Definition['Enable Google Sign In'] = '启用 Google 登陆';
 $Definition['Enable OpenID'] = '启用 OpenID';
@@ -307,8 +309,8 @@ $Definition['Generate Password'] = '生成密码';
 $Definition['Go'] = 'Go';
 $Definition['Google Sign In Settings'] = 'Google Sign In Settings';
 $Definition['Guest'] = '访客';
-$Definition['GuestModule.Message'] = '貌似这位同鞋你是新来的吧. 点下面的按钮可以加入我们!';
-$Definition['Howdy, Stranger!'] = '你好, 新同学!';
+$Definition['GuestModule.Message'] = '貌似这位朋友你是新来的吧. 点下面的按钮可以加入我们!';
+$Definition['Howdy, Stranger!'] = '你好, 新朋友!';
 $Definition['HeadlineFormat.Comment'] = '{ActivityUserID,user} 评论了 <a href="{Url,html}">{Data.Name,text}</a>';
 $Definition['HeadlineFormat.Mention'] = '{ActivityUserID,user} 在 <a href="{Url,html}">{Data.Name,text}</a> 中提到了你';
 $Definition['I agree to the <a id="TermsOfService" class="Popup" target="terms" href="%s">terms of service</a>'] = '我同意 <a id="TermsOfService" class="Popup" target="terms" href="%s">服务条款</a>';
@@ -321,6 +323,7 @@ $Definition['Inbox'] = '收件箱';
 $Definition['Information'] = '信息';
 $Definition['Insert Image'] = '插入图片';
 $Definition['Internal'] = '内部';
+$Definition['Invalid password.'] = '密码不正确';
 $Definition['Invitation Code'] = '邀请码';
 $Definition['Invitations can be sent from users\' profile pages.'] = 'When you use registration by invitation users will have a link called <a href="%s" class="Popup">My Invitations</a> on their profile pages.';
 $Definition['Invitations per month'] = '每月邀请数';
@@ -405,8 +408,8 @@ $Definition['Notify me when people mention me in comments.'] = '当有人在评�
 $Definition['Notify me when people mention me in discussion titles.'] = '当有人在讨论标题中提到我时通知我.';
 $Definition['Notify me when people reply to my wall comments.'] = '当有人回复了我的评论时通知我.';
 $Definition['Notify me when people write on my wall.'] = '当有人给我留言时通知我.';
-$Definition['OK'] = 'OK';
-$Definition['Okay'] = 'Okay';
+$Definition['OK'] = '确定';
+$Definition['Okay'] = '确定';
 $Definition['Old Password'] = '旧密码';
 $Definition['On'] = '时间';
 $Definition['Only Allow Each User To Post'] = '只允许每个用户发送';
