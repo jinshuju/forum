@@ -310,7 +310,7 @@ $Definition['Generate Password'] = '生成密码';
 $Definition['Go'] = 'Go';
 $Definition['Google Sign In Settings'] = 'Google Sign In Settings';
 $Definition['Guest'] = '访客';
-$Definition['GuestModule.Message'] = '貌似这位朋友你是新来的吧. 点下面的按钮可以加入我们!';
+$Definition['GuestModule.Message'] = '点下面的按钮可以加入我们!';
 $Definition['Howdy, Stranger!'] = '你好, 新朋友!';
 $Definition['HeadlineFormat.Comment'] = '{ActivityUserID,user} 评论了 <a href="{Url,html}">{Data.Name,text}</a>';
 $Definition['HeadlineFormat.Mention'] = '{ActivityUserID,user} 在 <a href="{Url,html}">{Data.Name,text}</a> 中提到了你';
