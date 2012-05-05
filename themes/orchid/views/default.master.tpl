@@ -39,5 +39,9 @@
   </div>
 </div>
 {event name="AfterBody"}
+<script type="text/javascript">
+var _bdhmProtocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3Fc2ffd5136ef2ac7f0803dbaa7de208a6' type='text/javascript'%3E%3C/script%3E"));
+</script>
 </body>
 </html>
