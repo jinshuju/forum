@@ -523,6 +523,20 @@ $Definition['Tagged'] = '标签';
 $Definition['Tags'] = '标签';
 $Definition['Target'] = '目标';
 $Definition['Temporary (302)'] = '临时移动 (302)';
+$Definition['TermsOfService'] = '服务条款';
+$Definition['TermsOfServiceText'] = "
+不得利用本站危害国家安全、泄露国家秘密，不得侵犯国家社会集体的和公民的合法权益，不得利用本站制作、复制和传播下列信息：<br>
+（1）煽动抗拒、破坏宪法和法律、行政法规实施的；<br>
+（2）煽动颠覆国家政权，推翻社会主义制度的；<br>
+（3）煽动分裂国家、破坏国家统一的；<br>
+（4）煽动民族仇恨、民族歧视，破坏民族团结的；<br>
+（5）捏造或者歪曲事实，散布谣言，扰乱社会秩序的；<br>
+（6）宣扬封建迷信、淫秽、色情、赌博、暴力、凶杀、恐怖、教唆犯罪的；<br>
+（7）公然侮辱他人或者捏造事实诽谤他人的，或者进行其他恶意攻击的；<br>
+（8）损害国家机关信誉的；<br>
+（9）其他违反宪法和法律行政法规的。<br>
+本论坛言论纯属发表者个人意见，与本论坛立场无关。如果您违反了上述事项的任何一项，您将承担一切因您的行为而直接或间接导致的民事或刑事法律责任。本站可向有关部门举报，同时禁止发贴者登陆或封IP地址。
+";
 $Definition['Thank You!'] = '谢谢!';
 $Definition['The %s Authenticator does not have any custom configuration options.'] = 'The %s Authenticator does not have any custom configuration options.';
 $Definition['The addon could not be enabled because it generated a fatal error: <pre>%s</pre>'] = 'The addon could not be enabled because it generated a fatal error: <pre>%s</pre>';
