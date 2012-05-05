@@ -144,6 +144,9 @@ h1.HomepageTitle {
 .Item .Author a {
   color: #777;
 }
+#dashboard_entry_signin #Content {
+  overflow: hidden;
+}
 /*a.Bookmarked, a.Bookmarked:hover {
 	background-position: -54px -28px;
 }*/
