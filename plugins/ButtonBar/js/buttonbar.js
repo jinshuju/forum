@@ -312,7 +312,7 @@ jQuery(document).ready(function($) {
       PrepareBBCode: function(ButtonBarObj, TextArea) {
          $("<div></div>")
             .addClass('ButtonBarMarkupHint')
-            .html('You can use <b><a href="http://en.wikipedia.org/wiki/BBCode" target="_new">BBCode</a></b> in your post.')
+            .html('你可以使用<b><a href="http://en.wikipedia.org/wiki/BBCode" target="_new">BBCode</a></b>格式')
             .insertAfter(TextArea);
       },
       
@@ -321,7 +321,7 @@ jQuery(document).ready(function($) {
          
          $("<div></div>")
             .addClass('ButtonBarMarkupHint')
-            .html('You can use <b><a href="http://htmlguide.drgrog.com/cheatsheet.php" target="_new">Simple Html</a></b> in your post.')
+            .html('你可以使用<b><a href="http://htmlguide.drgrog.com/cheatsheet.php" target="_new">Simple Html</a></b>')
             .insertAfter(TextArea);
       },
       
@@ -331,7 +331,7 @@ jQuery(document).ready(function($) {
          
          $("<div></div>")
             .addClass('ButtonBarMarkupHint')
-            .html('You can use <b><a href="http://en.wikipedia.org/wiki/Markdown" target="_new">Markdown</a></b> in your post.')
+            .html('你可以使用<b><a href="http://en.wikipedia.org/wiki/Markdown" target="_new">Markdown</a></b>格式')
             .insertAfter(TextArea);
       },
       
