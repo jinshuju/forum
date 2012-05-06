@@ -1,6 +1,9 @@
 body {
   background: #EEE;
 }
+code {
+  display: block;
+}
 a {
   color: #8B920A;
   font-weight: normal;
