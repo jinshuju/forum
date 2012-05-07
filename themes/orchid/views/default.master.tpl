@@ -34,7 +34,7 @@
   </div>
   <div id="Foot">
     <div class="Row">
-      powered by <a href="http://vanillaforums.org/">vanilla forums</a>
+      powered by <a href="http://vanillaforums.org/" target="_blank">vanilla forums</a>
 			{asset name="Foot"}
     </div>
   </div>
