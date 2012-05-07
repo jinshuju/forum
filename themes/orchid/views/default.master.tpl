@@ -5,7 +5,7 @@
 </head>
 
 <body id="{$BodyID}" class="{$BodyClass}">
-<a href="https://github.com/chuck911/vanilla4china"><img style="position: absolute; top: 0; right: 0; border: 0;" src="http://vanillaforums.cn/themes/orchid/design/github.png" alt="Fork me on GitHub"></a>
+<a href="https://github.com/chuck911/vanilla4china" target="_blank"><img style="position: absolute; top: 0; right: 0; border: 0;" src="http://vanillaforums.cn/themes/orchid/design/github.png" alt="Fork me on GitHub"></a>
 <div id="Frame">
  <div id="Head">
    <div class="Row">
