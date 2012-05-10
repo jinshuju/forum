@@ -86,6 +86,9 @@ a {
   box-shadow: 0 0 10px 0 #e2e2e2;
   border: 1px solid #DDD;
 }
+.PageDescription {
+  padding: 0 10px;
+}
 #Content {
   padding: 10px 10px;
   background: white;
