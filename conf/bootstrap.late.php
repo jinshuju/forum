@@ -3,7 +3,7 @@ class Chn_MentionsFormatter {
 public static function GetMentions($String) {
   // This one grabs mentions that start at the beginning of $String
   preg_match_all(
-		'/(?:^|[\s,\.])@([\S]{1,20})(?=[\s,\.!?]|$)/i',
+		'/@([0-9a-zA-Z_\x{4e00}-\x{9fa5}]+)/iu',
      $String,
      $Matches
   );
@@ -16,8 +16,8 @@ public static function GetMentions($String) {
 public static function FormatMentions($Mixed) {
 		if(C('Garden.Format.Mentions')) {
 		    $Mixed = preg_replace(
-						'/(.?)@([\S]{1,25})(?=[\s,\.!?]|$)/i',
-		        '\1'.Anchor('@\2', '/profile/\\2'),
+						'/@([0-9a-zA-Z_\x{4e00}-\x{9fa5}]+)/iu',
+		        Anchor('@\1', '/profile/\\1'),
 		       $Mixed
 		    );
 		}
