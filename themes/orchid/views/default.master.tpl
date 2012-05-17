@@ -40,7 +40,7 @@
 			</div>
 			<div id="friend-links">
 					友情链接：
-					<a href="http://aiqingda.com">爱青大BBS</a>
+					<a target="_blank" href="http://aiqingda.com">爱青大BBS</a>
 			</div>
     </div>
   </div>
