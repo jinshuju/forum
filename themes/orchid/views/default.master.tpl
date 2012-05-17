@@ -34,8 +34,14 @@
   </div>
   <div id="Foot">
     <div class="Row">
+			<div id="power-by">
       powered by <a href="http://vanillaforums.org/" target="_blank">vanilla forums</a>
 			{asset name="Foot"}
+			</div>
+			<div id="friend-links">
+					友情链接：
+					<a href="http://aiqingda.com">爱青大BBS</a>
+			</div>
     </div>
   </div>
 </div>

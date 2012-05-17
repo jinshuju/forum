@@ -187,6 +187,19 @@ h1.HomepageTitle {
 #dashboard_entry_signin #Content {
   overflow: hidden;
 }
+#Foot {
+  overflow: hidden;
+}
+#power-by {
+  float: left;
+}
+#friend-links {
+  float: right;
+  color: #CCC;
+}
+#friend-links a {
+  color: #B7B7B7;
+}
 /*a.Bookmarked, a.Bookmarked:hover {
 	background-position: -54px -28px;
 }*/
