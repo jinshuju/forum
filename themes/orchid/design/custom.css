@@ -173,6 +173,9 @@ h1.HomepageTitle {
 .Item .Author a {
   color: #777;
 }
+.Discussions .Item {
+  background: #FFF;
+}
 #dashboard_entry_signin #Content {
   overflow: hidden;
 }
