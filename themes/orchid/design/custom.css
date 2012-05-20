@@ -187,7 +187,6 @@ h1.HomepageTitle {
 #dashboard_entry_signin #Content {
   overflow: hidden;
 }
-<<<<<<< HEAD
 #Foot {
   overflow: hidden;
 }
@@ -200,12 +199,11 @@ h1.HomepageTitle {
 }
 #friend-links a {
   color: #B7B7B7;
-=======
+}
 h2.CommentHeading {
   border-radius: 3px;
   background: #EEE;
   padding: 3px 10px;
->>>>>>> master
 }
 /*a.Bookmarked, a.Bookmarked:hover {
 	background-position: -54px -28px;
