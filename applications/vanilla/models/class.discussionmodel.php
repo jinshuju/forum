@@ -51,6 +51,11 @@ class DiscussionModel extends VanillaModel {
             break;
          case 'DateLastComment':
             $this->Database->Query(DBAModel::GetCountSQL('max', 'Discussion', 'Comment', $Column, 'DateInserted'));
+            $this->SQL
+               ->Update('Discussion')
+               ->Set('DateLastComment', 'DateInserted', FALSE, FALSE)
+               ->Where('DateLastComment', NULL)
+               ->Put();
             break;
          case 'LastCommentUserID':
             if (!$Max) {
@@ -114,13 +119,9 @@ class DiscussionModel extends VanillaModel {
       
       // Buid main query
       $this->SQL
-         ->Select('d.Type')
+         ->Select('d.*')
          ->Select('d.InsertUserID', '', 'FirstUserID')
          ->Select('d.DateInserted', '', 'FirstDate')
-			->Select('d.CountBookmarks')
-         
-         ->Select('d.Body') // <-- Need these for rss!
-         ->Select('d.Format') // <-- Need these for rss!
          ->Select('d.DateLastComment', '', 'LastDate')
          ->Select('d.LastCommentUserID', '', 'LastUserID')
          ->From('Discussion d');
@@ -189,8 +190,6 @@ class DiscussionModel extends VanillaModel {
       $Session = Gdn::Session();
       $UserID = $Session->UserID > 0 ? $Session->UserID : 0;
       $this->DiscussionSummaryQuery($AdditionalFields, FALSE);
-      $this->SQL
-         ->Select('d.*');
          
       if ($UserID > 0) {
          $this->SQL
@@ -339,17 +338,32 @@ class DiscussionModel extends VanillaModel {
 				} else {
 					$Discussion->CountUnreadComments = 0;
 				}
-			} else {
+			} elseif ($Discussion->CountCommentWatch === NULL) {
+            // Allow for discussions to just be new.
+            $Discussion->CountUnreadComments = TRUE;
+         } else {
 				$Discussion->CountUnreadComments = $Discussion->CountComments - $Discussion->CountCommentWatch;
 			}
 			// Logic for incomplete comment count.
 			if ($Discussion->CountCommentWatch == 0 && $DateLastViewed = GetValue('DateLastViewed', $Discussion)) {
-				$Discussion->CountUnreadComments = 0;
-				if (Gdn_Format::ToTimestamp($DateLastViewed) >= Gdn_Format::ToTimestamp($Discussion->LastDate))
+            $Discussion->CountUnreadComments = TRUE;
+				if (Gdn_Format::ToTimestamp($DateLastViewed) >= Gdn_Format::ToTimestamp($Discussion->LastDate)) {
 					$Discussion->CountCommentWatch = $Discussion->CountComments;
+               $Discussion->CountUnreadComments = 0;
+            }
 			}
-			$Discussion->CountUnreadComments = is_numeric($Discussion->CountUnreadComments) ? $Discussion->CountUnreadComments : 0;
-			$Discussion->CountCommentWatch = is_numeric($Discussion->CountCommentWatch) ? $Discussion->CountCommentWatch : 0;
+         if ($Discussion->CountUnreadComments === NULL)
+            $Discussion->CountUnreadComments = 0;
+			elseif ($Discussion->CountUnreadComments < 0)
+            $Discussion->CountUnreadComments = 0;
+         
+         
+         $Discussion->CountCommentWatch = is_numeric($Discussion->CountCommentWatch) ? $Discussion->CountCommentWatch : 0;
+         
+         if ($Discussion->LastUserID == NULL) {
+            $Discussion->LastUserID = $Discussion->InsertUserID;
+            $Discussion->LastDate = $Discussion->DateInserted;
+         }
 		}
 	}
 	
@@ -390,21 +404,14 @@ class DiscussionModel extends VanillaModel {
       $UserID = $Session->UserID > 0 ? $Session->UserID : 0;
 
       // Get the discussion IDs of the announcements.
-      $CacheKey = FALSE;
-      if (!$Wheres)
-         $CacheKey = 'Announcements';
-      elseif (is_array($Wheres) && isset($Wheres['d.CategoryID'])) {
-         $CacheKey = 'Announcements_'.$Wheres['d.CategoryID'];
-      }
-      $this->SQL
+      $CacheKey = 'Announcements';
+      
+      $AnnouncementIDs = $this->SQL
          ->Cache($CacheKey)
          ->Select('d.DiscussionID')
          ->From('Discussion d')
-         ->Where('d.Announce >', '0');
-      if (is_array($Wheres) && count($Wheres) > 0)
-         $this->SQL->Where($Wheres);
+         ->Where('d.Announce >', '0')->Get()->ResultArray();
 
-      $AnnouncementIDs = $this->SQL->Get()->ResultArray();
       $AnnouncementIDs = ConsolidateArrayValuesByKey($AnnouncementIDs, 'DiscussionID');
 
       // Short circuit querying when there are no announcements.
@@ -412,8 +419,9 @@ class DiscussionModel extends VanillaModel {
          return new Gdn_DataSet();
 
       $this->DiscussionSummaryQuery(array(), FALSE);
-      $this->SQL
-         ->Select('d.*');
+      
+      if (!empty($Wheres))
+         $this->SQL->Where($Wheres);
 
       if ($UserID) {
          $this->SQL->Select('w.UserID', '', 'WatchUserID')
@@ -437,6 +445,8 @@ class DiscussionModel extends VanillaModel {
       // If we aren't viewing announcements in a category then only show global announcements.
       if (!$Wheres) {
          $this->SQL->Where('d.Announce', 1);
+      } else {
+         $this->SQL->Where('d.Announce >', 0);
       }
 
       // If we allow users to dismiss discussions, skip ones this user dismissed
@@ -539,6 +549,42 @@ class DiscussionModel extends VanillaModel {
       
       return self::$_CategoryPermissions;
    }
+   
+   public function FetchPageInfo($Url) {
+      $PageInfo = FetchPageInfo($Url);
+      
+      $Title = GetValue('Title', $PageInfo, '');
+      if ($Title == '')
+         $Title = FormatString(T('Undefined discussion subject.'), array('Url' => $Url));
+      else {
+         if ($Strip = C('Vanilla.Embed.StripPrefix'))
+            $Title = StringBeginsWith($Title, $Strip, TRUE, TRUE);
+         
+         if ($Strip = C('Vanilla.Embed.StripSuffix'))
+            $Title = StringEndsWith($Title, $Strip, TRUE, TRUE);
+      }
+      $Title = trim($Title);
+      
+      $Description = GetValue('Description', $PageInfo, '');
+      $Images = GetValue('Images', $PageInfo, array());
+      $Body = FormatString(T('EmbeddedDiscussionFormat'), array(
+          'Title' => $Title,
+          'Excerpt' => $Description,
+          'Image' => (count($Images) > 0 ? Img(GetValue(0, $Images), array('class' => 'LeftAlign')) : ''),
+          'Url' => $Url
+      ));
+      if ($Body == '')
+         $Body = $ForeignUrl;
+      if ($Body == '')
+         $Body = FormatString(T('EmbeddedNoBodyFormat.'), array('Url' => $Url));
+      
+      $Result = array(
+          'Name' => $Title,
+          'Body' => $Body,
+          'Format' => 'Html');
+          
+      return $Result;
+   }
 
    /**
     * Count how many discussions match the given criteria.
@@ -563,10 +609,16 @@ class DiscussionModel extends VanillaModel {
       if (!$Wheres || (count($Wheres) == 1 && isset($Wheres['d.CategoryID']))) {
          // Grab the counts from the faster category cache.
          if (isset($Wheres['d.CategoryID'])) {
-            if (is_array($Perms) && !in_array($Wheres['d.CategoryID'], $Perms)) {
+            $CategoryIDs = (array)$Wheres['d.CategoryID'];
+            if ($Perms === FALSE)
+               $CategoryIDs = array();
+            elseif (is_array($Perms))
+               $CategoryIDs = array_intersect($CategoryIDs, $Perms);
+            
+            if (count($CategoryIDs) == 0) {
                return 0;
             } else {
-               $Perms = array($Wheres['d.CategoryID']);
+               $Perms = $CategoryIDs;
             }
          }
          
@@ -839,7 +891,7 @@ class DiscussionModel extends VanillaModel {
       // Define the primary key in this model's table.
       $this->DefineSchema();
       
-      // Add & apply any extra validation rules:      
+      // Add & apply any extra validation rules:
       $this->Validation->ApplyRule('Body', 'Required');
       $MaxCommentLength = Gdn::Config('Vanilla.Comment.MaxLength');
       if (is_numeric($MaxCommentLength) && $MaxCommentLength > 0) {
@@ -889,7 +941,15 @@ class DiscussionModel extends VanillaModel {
 		$this->FireEvent('BeforeSaveDiscussion');
          
       // Validate the form posted values
-      if ($this->Validate($FormPostValues, $Insert)) {
+      $this->Validate($FormPostValues, $Insert);
+      $ValidationResults = $this->ValidationResults();
+      
+      // If the body is not required, remove it's validation errors.
+      $BodyRequired = C('Vanilla.DiscussionBody.Required', TRUE);
+      if (!$BodyRequired && array_key_exists('Body', $ValidationResults))
+         unset($ValidationResults['Body']);
+      
+      if (count($ValidationResults) == 0) {
          // If the post is new and it validates, make sure the user isn't spamming
          if (!$Insert || !$this->CheckForSpam('Discussion')) {
             // Get all fields on the form that relate to the schema
@@ -910,7 +970,7 @@ class DiscussionModel extends VanillaModel {
                
                // Clear the cache if necessary.
                if (GetValue('Announce', $Stored) != GetValue('Announce', $Fields)) {
-                  $CacheKeys = array('Announcements', 'Announcements_'.GetValue('CategoryID', $Fields));
+                  $CacheKeys = array('Announcements');
 
                   $Announce = GetValue('Announce', $Discussion);
                   $this->SQL->Cache($CacheKeys);
@@ -934,7 +994,7 @@ class DiscussionModel extends VanillaModel {
                
                // Clear the cache if necessary.
                if (GetValue('Announce', $Fields)) {
-                  $CacheKeys = array('Announcements', 'Announcements_'.GetValue('CategoryID', $Fields));
+                  $CacheKeys = array('Announcements');
 
                   $Announce = GetValue('Announce', $Discussion);
                   $this->SQL->Cache($CacheKeys);
@@ -1366,6 +1426,7 @@ class DiscussionModel extends VanillaModel {
                'DiscussionID' => $DiscussionID,
                'Bookmarked' => $State
             ));
+         $Discussion->Bookmarked = TRUE;
       } else {
          $State = ($Discussion->Bookmarked == '1' ? '0' : '1');
          $this->SQL
@@ -1374,6 +1435,7 @@ class DiscussionModel extends VanillaModel {
             ->Where('UserID', $UserID)
             ->Where('DiscussionID', $DiscussionID)
             ->Put();
+         $Discussion->Bookmarked = $State;
       }
 		
 		// Update the cached bookmark count on the discussion
