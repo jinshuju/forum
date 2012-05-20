@@ -176,6 +176,11 @@ h1.HomepageTitle {
 #dashboard_entry_signin #Content {
   overflow: hidden;
 }
+h2.CommentHeading {
+  border-radius: 3px;
+  background: #EEE;
+  padding: 3px 10px;
+}
 /*a.Bookmarked, a.Bookmarked:hover {
 	background-position: -54px -28px;
 }*/
