@@ -246,8 +246,20 @@ window.vanilla.embed = function(host) {
    if (!container)
       document.write('<div id="vanilla-comments"></div>');
    container = document.getElementById('vanilla-comments');
-   if (container)
-      container.appendChild(vanillaIframe);
+   
+   if (container) {
+      // If jQuery is present in the page, include our defer-until-visible script
+      if (typeof jQuery != 'undefined') {
+         jQuery.getScript('http://cdn.vanillaforums.com/js/jquery.appear.js', function() {
+            if (jQuery.fn.appear)
+               jQuery('#vanilla-comments').appear(function() {container.appendChild(vanillaIframe);});
+            else
+               container.appendChild(vanillaIframe); // fallback
+         });
+      } else {
+         container.appendChild(vanillaIframe); // fallback: just load it
+      }
+   }
 
    // Include our embed css into the page
    var vanilla_embed_css = document.createElement('link');
