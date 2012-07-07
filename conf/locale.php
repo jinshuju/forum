@@ -62,8 +62,8 @@ $Definition['Activity.PictureChange.FullHeadline'] = '%1$s 修改了 %6$s 资料
 $Definition['Activity.PictureChange.ProfileHeadline'] = '%1$s 修改了 %6$s 个人头像.';
 $Definition['Activity.RoleChange.FullHeadline'] = '%1$s 修改了 %4$s 权限.';
 $Definition['Activity.RoleChange.ProfileHeadline'] = '%1$s 修改了 %4$s 权限.';
-$Definition['Activity.SignIn.FullHeadline'] = '%1$s 登陆了.';
-$Definition['Activity.SignIn.ProfileHeadline'] = '%1$s 登陆了.';
+$Definition['Activity.SignIn.FullHeadline'] = '%1$s 登录了.';
+$Definition['Activity.SignIn.ProfileHeadline'] = '%1$s 登录了.';
 $Definition['Activity.WallComment.FullHeadline'] = '%1$s 在 %4$s %5$s 发表了内容.';
 $Definition['Activity.WallComment.ProfileHeadline'] = '%1$s 写道:';
 $Definition['Add'] = '添加';
@@ -165,7 +165,7 @@ $Definition['Delete Conversation'] = '删除会话';
 $Definition['Delete Discussion'] = '删除讨论';
 $Definition['Description'] = '描述';
 $Definition['Disable'] = '禁用';
-$Definition['Disable Google Sign In'] = '禁用 Google 登陆';
+$Definition['Disable Google Sign In'] = '禁用 Google 登录';
 $Definition['Disable OpenID'] = '禁用 OpenID';
 $Definition['Disabled <span>0</span>'] = '禁用 <span>0</span>';
 $Definition['Disabled <span>10</span>'] = '禁用 <span>10</span>';
@@ -236,7 +236,7 @@ $Definition['EmailStoryNotification'] = '%1$s
 	祝你开心每一天!';
 $Definition['EmailWelcome'] = 'Hello %1$s,
 
-	%2$s 在 %3$s 为你注册了账号. 你的登陆信息如下:
+	%2$s 在 %3$s 为你注册了账号. 你的登录信息如下:
 
 	  Email: %6$s
 	    Password: %5$s
@@ -264,7 +264,7 @@ $Definition['EmailWelcomeRegister'] = '你好 {User.Name},
 
 祝你开心每一天!';
 $Definition['Enable'] = '启用';
-$Definition['Enable Google Sign In'] = '启用 Google 登陆';
+$Definition['Enable Google Sign In'] = '启用 Google 登录';
 $Definition['Enable OpenID'] = '启用 OpenID';
 $Definition['Enabled <span>2</span>'] = '启用 <span>2</span>';
 $Definition['Enabled <span>4</span>'] = '启用 <span>4</span>';
@@ -337,11 +337,11 @@ $Definition['Invited by'] = '邀请人';
 $Definition['It is a good idea to keep the maximum number of characters allowed in a comment down to a reasonable size.'] = 'It is a good idea to keep the maximum number of characters allowed in a comment down to a reasonable size.';
 $Definition['Joined'] = '加入';
 $Definition['Just you!'] = '只有你!';
-$Definition['Keep me signed in'] = '记住我的登陆状态';
+$Definition['Keep me signed in'] = '记住我的登录状态';
 $Definition['Key Type'] = 'Key Type';
 $Definition['Key Value'] = 'Key Value';
 $Definition['Last Active'] = '最后活动';
-$Definition['Last IP'] = '上次登陆IP';
+$Definition['Last IP'] = '上次登录IP';
 $Definition['Last Visit'] = '最后访问';
 $Definition['Locale Developer'] = 'Locale Developer';
 $Definition['Locale Developer Settings %s.'] = 'Locale Developer Settings %s.';
@@ -351,7 +351,7 @@ $Definition['Locale info file settings.'] = '<p>When you generate the zip file y
 $Definition['Locales'] = '本地化';
 $Definition['Locales are in your %s folder.'] = 'Locales allow you to support other languages on your site. Once an locale has been added to your %s folder, you can enable or disable it here.';
 $Definition['Location'] = '位置';
-$Definition['Login with Facebook'] = '使用 Facebook 登陆';
+$Definition['Login with Facebook'] = '使用 Facebook 登录';
 $Definition['Male'] = '男';
 $Definition['Manage Applicants'] = '管理申请人';
 $Definition['Manage Applications'] = '管理应用';
@@ -500,6 +500,7 @@ $Definition['Save Comment'] = '保存评论';
 $Definition['Save Draft'] = '保存草稿';
 $Definition['Save Preferences'] = '保存偏好设置';
 $Definition['Search'] = '搜索';
+$Definition['Search by user or role.'] = '根据用户名或角色查询';
 $Definition['Select an image on your computer (2mb max)'] = '从电脑中选择一张图片(最大 2mb)';
 $Definition['Select the file to import'] = 'Select the file to import';
 $Definition['Send %s a Message'] = '给 %s 发送消息';
@@ -508,7 +509,7 @@ $Definition['Send Message'] = '发送消息';
 $Definition['Sent To'] = '发送给';
 $Definition['Settings'] = '设置';
 $Definition['Share'] = '分享';
-$Definition['Sign In'] = '登陆';
+$Definition['Sign In'] = '登录';
 $Definition['Sign In or Register to Comment.'] = '<a href="{SignInUrl,html}">登录</a> 或 <a href="{RegisterUrl,html}">注册</a> 加入讨论.';
 $Definition['Sign In with Google'] = '用Google账号登录';
 $Definition['Sign In with OpenID'] = '用OpenID帐号登录';
@@ -524,7 +525,6 @@ $Definition['Start your First Discussion'] = 'Start your First Discussion';
 $Definition['Started by %1$s'] = '发起人 %1$s';
 $Definition['Status'] = '状态';
 $Definition['Stop following'] = '取消关注';
-$Definition['Tagged'] = '标签';
 $Definition['Tags'] = '标签';
 $Definition['Target'] = '目标';
 $Definition['Temporary (302)'] = '临时移动 (302)';
@@ -540,7 +540,7 @@ $Definition['TermsOfServiceText'] = "
 （7）公然侮辱他人或者捏造事实诽谤他人的，或者进行其他恶意攻击的；<br>
 （8）损害国家机关信誉的；<br>
 （9）其他违反宪法和法律行政法规的。<br>
-本论坛言论纯属发表者个人意见，与本论坛立场无关。如果您违反了上述事项的任何一项，您将承担一切因您的行为而直接或间接导致的民事或刑事法律责任。本站可向有关部门举报，同时禁止发贴者登陆或封IP地址。
+本论坛言论纯属发表者个人意见，与本论坛立场无关。如果您违反了上述事项的任何一项，您将承担一切因您的行为而直接或间接导致的民事或刑事法律责任。本站可向有关部门举报，同时禁止发贴者登录或封IP地址。
 ";
 $Definition['Thank You!'] = '谢谢!';
 $Definition['The %s Authenticator does not have any custom configuration options.'] = 'The %s Authenticator does not have any custom configuration options.';
@@ -692,3 +692,7 @@ $Definition['Spam Queue'] ='垃圾信息审核';
 $Definition['Moderation Queue'] ='问题内容审核';
 $Definition['Email/Username'] ='电邮/用户名';
 $Definition['Enter your Email address or username'] ='填写你的电邮/用户名';
+
+/*plugins*/
+$Definition['Popular Tags'] ='热门标签';
+$Definition['Tagged'] = '标签';
