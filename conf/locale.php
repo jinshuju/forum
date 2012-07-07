@@ -184,6 +184,7 @@ $Definition['Edit'] = '编辑';
 $Definition['Edit Account'] = '编辑账号';
 $Definition['Edit Category'] = '编辑分类';
 $Definition['Edit Discussion'] = '编辑讨论';
+$Definition['Edit Comment'] = '编辑评论';
 $Definition['Edit My Account'] = '编辑我的账号';
 $Definition['Edit My Thumbnail'] = '编辑我的头像';
 $Definition['Edit Preferences'] = '编辑偏好设置';
