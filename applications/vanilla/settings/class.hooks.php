@@ -399,9 +399,9 @@ class VanillaHooks implements Gdn_IPlugin {
       
       $Limit = Gdn::Config('Vanilla.Discussions.PerPage', 30);
       $CommentModel = new CommentModel();
-      $Sender->CommentData = $CommentModel->GetByUser($Sender->User->UserID, $Limit, $Offset);
-      $CountComments = $Offset + $Sender->CommentData->NumRows();
-      if ($Sender->CommentData->NumRows() == $Limit)
+      $Comments = $Sender->SetData('Comments', $CommentModel->GetByUser($Sender->User->UserID, $Limit, $Offset));
+      $CountComments = $Offset + $Comments->NumRows();
+      if ($Comments->NumRows() == $Limit)
          $CountComments = $Offset + $Limit + 1;
       
       // Build a pager
@@ -508,48 +508,54 @@ class VanillaHooks implements Gdn_IPlugin {
       if (isset($Sender->RequiredAdminPermissions)) {
          $Sender->RequiredAdminPermissions[] = 'Vanilla.Settings.Manage';
          $Sender->RequiredAdminPermissions[] = 'Vanilla.Categories.Manage';
-         $Sender->RequiredAdminPermissions[] = 'Vanilla.Spam.Manage';
       }
    }
    
    public function Gdn_Statistics_Tick_Handler($Sender, $Args) {
       $Path = Gdn::Request()->Post('Path');
       $Args = Gdn::Request()->Post('Args');
-      $ResolvedPath = Gdn::Request()->Post('ResolvedPath');
-      
+      parse_str($Args, $Args);
+      $ResolvedPath = trim(Gdn::Request()->Post('ResolvedPath'), '/');
+      $ResolvedArgs = @json_decode(Gdn::Request()->Post('ResolvedArgs'));
       $DiscussionID = NULL;
+      $DiscussionModel = new DiscussionModel();
+      
+//      Gdn::Controller()->SetData('Path', $Path);
+//      Gdn::Controller()->SetData('Args', $Args);
+//      Gdn::Controller()->SetData('ResolvedPath', $ResolvedPath);
+//      Gdn::Controller()->SetData('ResolvedArgs', $ResolvedArgs);
       
       // Comment permalink
       if ($ResolvedPath == 'vanilla/discussion/comment') {
-         $Matched = preg_match('`discussion\/comment\/(\d+)`i', $Path, $Matches);
-         
-         if ($Matched) {
-            $CommentID = $Matches[1];
-            $CommentModel = new CommentModel();
-            $Comment = $CommentModel->GetID($CommentID);
-            $DiscussionID = GetValue('DiscussionID', $Comment);
-         }
+         $CommentID = GetValue('CommentID', $ResolvedArgs);
+         $CommentModel = new CommentModel();
+         $Comment = $CommentModel->GetID($CommentID);
+         $DiscussionID = GetValue('DiscussionID', $Comment);
       } 
       
       // Discussion link
       elseif ($ResolvedPath == 'vanilla/discussion/index') {
-         $Matched = preg_match('`discussion\/(\d+)`i', $Path, $Matches);
-         
-         if ($Matched)
-            $DiscussionID = $Matches[1];
-      } 
+         $DiscussionID = GetValue('DiscussionID', $ResolvedArgs, NULL);
+      }
       
       // Embedded discussion
       elseif ($ResolvedPath == 'vanilla/discussion/embed') {
-         $Matched = preg_match('`vanilla_discussion_id=(\d+)`i', $Args, $Matches);
-         if ($Matched)
-            $DiscussionID = $Matches[1];
+         $ForeignID = GetValue('vanilla_identifier', $Args);
+         if ($ForeignID) {
+            // This will be hit a lot so let's try caching it...
+            $Key = "DiscussionID.ForeignID.page.$ForeignID";
+            $DiscussionID = Gdn::Cache()->Get($Key);
+            if (!$DiscussionID) {
+               $Discussion = $DiscussionModel->GetForeignID($ForeignID, 'page');
+               $DiscussionID = GetValue('DiscussionID', $Discussion);
+               Gdn::Cache()->Store($Key, $DiscussionID, array(Gdn_Cache::FEATURE_EXPIRY, 1800));
+            }
+         }
       }
       
-      if (!empty($DiscussionID)) {
-         $DiscussionModel = new DiscussionModel();
-         $Discussion = $DiscussionModel->GetID($DiscussionID);
-         $DiscussionModel->AddView($DiscussionID, GetValue('CountViews', $Discussion));
+      if ($DiscussionID) {
+         $DiscussionModel->AddView($DiscussionID);
+         Gdn::Controller()->SetData('Discussion.CountViews', array('DiscussionID' => $DiscussionID, 'Inc' => 1));
       }
    }
    
@@ -563,7 +569,7 @@ class VanillaHooks implements Gdn_IPlugin {
 	 */
    public function Base_GetAppSettingsMenuItems_Handler($Sender) {
       $Menu = &$Sender->EventArguments['SideMenu'];
-      $Menu->AddLink('Moderation', T('Flood Control'), 'vanilla/settings/floodcontrol', 'Vanilla.Spam.Manage');
+      $Menu->AddLink('Moderation', T('Flood Control'), 'vanilla/settings/floodcontrol', 'Garden.Settings.Manage');
       $Menu->AddLink('Forum', T('Categories'), 'vanilla/settings/managecategories', 'Vanilla.Categories.Manage');
       $Menu->AddLink('Forum', T('Advanced'), 'vanilla/settings/advanced', 'Vanilla.Settings.Manage');
       $Menu->AddLink('Forum', T('Blog Comments'), 'dashboard/embed/comments', 'Garden.Settings.Manage');

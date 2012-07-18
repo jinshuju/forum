@@ -1,3 +1,7 @@
+body {
+   -webkit-text-size-adjust: 100%;
+}
+
 h1, h2, h3, h4, h5, h6 {
 	color:#1C2A47;
 	font-family: 'lucida grande','Lucida Sans Unicode', tahoma, sans-serif;
@@ -173,9 +177,6 @@ ul.Activities .Photo {
 ul.Activities .Excerpt a,
 ul.Activities .Meta a {
 	color: #3B5998;
-}
-ul.DataList .OptionButton {
-	display: none;
 }
 body.Profile .Loading {
 	background-color: #fff;
@@ -404,44 +405,9 @@ td.BigCount {
    display: none;
 }
 
-/* Turn the options flyouts into basic links on discussion page. There is a 
-herky-jerky jump to the bottom of the page otherwise. */
-body.Discussion .OptionsTitle {
+.CommentFormWrap .Author {
     display: none;
 }
-body.Discussion .OptionsMenu {
-    display: inline-block;
-}
-body.Discussion .OptionsMenu .Flyout {
-    top: auto;
-}
-body.Discussion .ToggleFlyout .Flyout {
-    position: relative;
-    top: auto;
-    right: 0;
-    display: inline-block;
-}
-body.Discussion .MenuItems {
-    border: none;
-    border-radius: 0;
-    -moz-border-radius: 0;
-    -webkit-border-radius: 0;
-    background: transparent;
-    min-width: 0;
-    font-size: 12px;
-}
-body.Discussion .MenuItems li {
-    display: inline;
-    margin: 0 4px;
-}
-body.Discussion .MenuItems a, 
-body.Discussion .MenuItems a:link, 
-body.Discussion .MenuItems a:visited, 
-body.Discussion .MenuItems a:active {
-    color: #3B5998;
-    display: inline;
-    padding: 0;
-}
-body.Discussion .MenuItems a:hover {
-   background: transparent;
+.CommentForm .FormWrapper {
+    padding: 10px;
 }

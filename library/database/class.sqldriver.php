@@ -297,7 +297,9 @@ abstract class Gdn_SQLDriver {
       }
       
       if(is_array($Value)) {
-         Deprecated('Gdn_SQL->ConditionExpr(VALUE, ARRAY)', 'Gdn_SQL->ConditionExpr(VALUE, VALUE)');
+         //$ValueStr = var_export($Value, TRUE);
+         $ValueStr = 'ARRAY';
+         Deprecated("Gdn_SQL->ConditionExpr(VALUE, {$ValueStr})", 'Gdn_SQL->ConditionExpr(VALUE, VALUE)');
          
          if ($EscapeValueSql)
             throw new Gdn_UserException('Invalid function call.');
@@ -901,10 +903,10 @@ abstract class Gdn_SQLDriver {
     * @param string $OrderFields A string of fields to be ordered.
     * @param string $OrderDirection The direction of the sort.
     * @param int    $Limit The number of records to limit the query to.
-    * @param int    $PageNumber The offset where the query results should begin.
+    * @param int    $Offset The offset where the query results should begin.
     * @return Gdn_DataSet The data returned by the query.
     */
-   public function GetWhere($Table = '', $Where = FALSE, $OrderFields = '', $OrderDirection = 'asc', $Limit = FALSE, $PageNumber = FALSE) {
+   public function GetWhere($Table = '', $Where = FALSE, $OrderFields = '', $OrderDirection = 'asc', $Limit = FALSE, $Offset = 0) {
       if ($Table != '') {
          //$this->MapAliases($Table);
          $this->From($Table);
@@ -915,14 +917,9 @@ abstract class Gdn_SQLDriver {
 
       if ($OrderFields != '')
          $this->OrderBy($OrderFields, $OrderDirection);
-
-      if ($Limit !== FALSE) {
-         if ($PageNumber == FALSE || $PageNumber < 1)
-            $PageNumber = 1;
-
-         $Offset = ($PageNumber - 1) * $Limit;
+      
+      if ($Limit !== FALSE)
          $this->Limit($Limit, $Offset);
-      }
 
       $Result = $this->Query($this->GetSelect());
       

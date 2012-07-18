@@ -74,8 +74,8 @@ class Gdn_Format {
       if ($ProfileUserID != $Activity->ActivityUserID) {
          // If we're not looking at the activity user's profile, link the name
          $ActivityNameD = urlencode($Activity->ActivityName);
-         $ActivityName = Anchor($ActivityName, '/profile/' . $Activity->ActivityUserID . '/' . $ActivityNameD);
-         $ActivityNameP = Anchor($ActivityNameP, '/profile/' . $Activity->ActivityUserID  . '/' . $ActivityNameD);
+         $ActivityName = Anchor($ActivityName, UserUrl($Activity, 'Activity'));
+         $ActivityNameP = Anchor($ActivityNameP, UserUrl($Activity, 'Activity'));
          $GenderSuffixCode = 'Third';
       }
 
@@ -117,12 +117,12 @@ class Gdn_Format {
          // If there is a regarding user and we're not looking at his/her profile, link the name.
          $RegardingNameD = urlencode($Activity->RegardingName);
          if (!$IsYou) {
-            $RegardingName = Anchor($RegardingName, '/profile/' . $Activity->RegardingUserID . '/' . $RegardingNameD);
-            $RegardingNameP = Anchor($RegardingNameP, '/profile/' . $Activity->RegardingUserID . '/' . $RegardingNameD);
+            $RegardingName = Anchor($RegardingName, UserUrl($Activity, 'Regarding'));
+            $RegardingNameP = Anchor($RegardingNameP, UserUrl($Activity, 'Regarding'));
             $GenderSuffixCode = 'Third';
             $GenderSuffixGender = $Activity->RegardingGender;
          }
-         $RegardingWallActivityPath = '/profile/activity/' . $Activity->RegardingUserID . '/' . $RegardingNameD;
+         $RegardingWallActivityPath = UserUrl($Activity, 'Regarding');
          $RegardingWallLink = Url($RegardingWallActivityPath);
          $RegardingWall = Anchor(T('wall'), $RegardingWallActivityPath);
       }
@@ -451,6 +451,8 @@ class Gdn_Format {
     * @return string
     */
    public static function Date($Timestamp = '', $Format = '') {
+      static $GuestHourOffset;
+      
       if ($Timestamp === NULL)
          return T('Null Date', '-');
 
@@ -467,8 +469,24 @@ class Gdn_Format {
       
       // Alter the timestamp based on the user's hour offset
       $Session = Gdn::Session();
+      $HourOffset = 0;
+      
       if ($Session->UserID > 0) {
-         $SecondsOffset = ($Session->User->HourOffset * 3600);
+         $HourOffset = $Session->User->HourOffset;
+      } elseif (class_exists('DateTimeZone')) {
+         if (!isset($GuestHourOffset)) {
+            $GuestTimeZone = C('Garden.GuestTimeZone');
+            if ($GuestTimeZone) {
+               $TimeZone = new DateTimeZone($GuestTimeZone);
+               $Offset = $TimeZone->getOffset(new DateTime('now', new DateTimeZone('UTC')));
+               $GuestHourOffset = floor($Offset / 3600);
+            }
+         }
+         $HourOffset = $GuestHourOffset;
+      }
+      
+      if ($HourOffset <> 0) {
+         $SecondsOffset = $HourOffset * 3600;
          $Timestamp += $SecondsOffset;
          $Now += $SecondsOffset;
       }
@@ -1099,6 +1117,15 @@ EOT;
 					$Mixed
 				);
 			}
+			
+			// Handle "/me does x" action statements
+         if(C('Garden.Format.MeActions')) {
+            $Mixed = preg_replace(
+               '/(^|[\n])(\/me)(\s[^(\n)]+)/i',
+               '\1'.Wrap(Wrap('\2', 'span', array('class' => 'MeActionName')).'\3', 'span', array('class' => 'AuthorAction')),
+               $Mixed
+            );
+         }
          
 //         $Mixed = preg_replace(
 //            '/([\s]+)(#([\d\w_]+))/si',
@@ -1396,6 +1423,28 @@ EOT;
          }
 
          return $Match[1];
+      }
+   }
+   
+   public static function Wysiwyg($Mixed) {
+      if (!is_string($Mixed)) {
+         return self::To($Mixed, 'Html');
+      } else {
+         // The text contains html and must be purified.
+         $Formatter = Gdn::Factory('HtmlFormatter');
+         if(is_null($Formatter)) {
+            // If there is no HtmlFormatter then make sure that script injections won't work.
+            return self::Display($Mixed);
+         }
+         
+         // Links
+         $Mixed = Gdn_Format::Links($Mixed);
+         // Mentions & Hashes
+         $Mixed = Gdn_Format::Mentions($Mixed);
+
+         $Result = $Formatter->Format($Mixed);
+         
+         return $Result;
       }
    }
    

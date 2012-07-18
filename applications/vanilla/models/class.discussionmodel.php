@@ -908,6 +908,7 @@ class DiscussionModel extends VanillaModel {
       $Data->Name = Gdn_Format::Text($Data->Name);
       $Data->Attributes = @unserialize($Data->Attributes);
       $Data->Url = DiscussionUrl($Data);
+      $Data->Tags = $this->FormatTags($Data->Tags);
       
       // Join in the category.
       $Category = CategoryModel::Categories($Data->CategoryID);
@@ -1084,6 +1085,10 @@ class DiscussionModel extends VanillaModel {
          $DiscussionID = $this->SQL->GetWhere('Discussion', ArrayTranslate($FormPostValues, array('Source', 'SourceID')))->Value('DiscussionID');
          if ($DiscussionID)
             $FormPostValues['DiscussionID'] = $DiscussionID;
+      } elseif (GetValue('ForeignID', $FormPostValues)) {
+         $DiscussionID = $this->SQL->GetWhere('Discussion', array('ForeignID' => $FormPostValues['ForeignID']))->Value('DiscussionID');
+         if ($DiscussionID)
+            $FormPostValues['DiscussionID'] = $DiscussionID;
       }
       
       $Insert = $DiscussionID == '' ? TRUE : FALSE;
@@ -1092,8 +1097,9 @@ class DiscussionModel extends VanillaModel {
       if ($Insert) {
          unset($FormPostValues['DiscussionID']);
          // If no categoryid is defined, grab the first available.
-         if (ArrayValue('CategoryID', $FormPostValues) === FALSE)
-            $FormPostValues['CategoryID'] = $this->SQL->Get('Category', 'CategoryID', '', 1)->FirstRow()->CategoryID;
+         if (!GetValue('CategoryID', $FormPostValues) && !C('Vanilla.Categories.Use')) {
+            $FormPostValues['CategoryID'] = GetValue('CategoryID', CategoryModel::DefaultCategory(), -1);
+         }
             
          $this->AddInsertFields($FormPostValues);
          // $FormPostValues['LastCommentUserID'] = $Session->UserID;
@@ -1537,21 +1543,20 @@ class DiscussionModel extends VanillaModel {
     *
     * @param int $DiscussionID Unique ID of discussion to get +1 view.
     */
-	public function AddView($DiscussionID, $Views = 0) {
-      $Views++;
+	public function AddView($DiscussionID) {
       if (C('Vanilla.Views.Denormalize', FALSE) && Gdn::Cache()->ActiveEnabled()) {
          $CacheKey = "QueryCache.Discussion.{$DiscussionID}.CountViews";
          
          // Increment. If not success, create key.
-         $Incremented = Gdn::Cache()->Increment($CacheKey);
-         if ($Incremented === Gdn_Cache::CACHEOP_FAILURE)
+         $Views = Gdn::Cache()->Increment($CacheKey);
+         if ($Views === Gdn_Cache::CACHEOP_FAILURE) {
+            $Views = $this->GetWhere(array('DiscussionID' => $DiscussionID))->Value('CountViews', 0);
             Gdn::Cache()->Store($CacheKey, $Views);
+         }
          
          // Every X views, writeback to Discussions
-         if (($Views % C('Vanilla.Views.DenormalizeWriteback',100)) == 0) {
-            Gdn::Database()->Query("UPDATE {$this->Database->DatabasePrefix}Discussion 
-            SET CountViews={$Views}
-            WHERE DiscussionID={$DiscussionID}");
+         if (($Views % C('Vanilla.Views.DenormalizeWriteback', 100)) == 0) {
+            $this->SetField($DiscussionID, 'CountViews', $Views);
          }
       } else {
          $this->SQL
@@ -1716,13 +1721,22 @@ class DiscussionModel extends VanillaModel {
          $Log = 'Delete';
       
       LogModel::BeginTransaction();
-      LogModel::Insert($Log, 'Discussion', $Data, $LogOptions);
       
       // Log all of the comment deletes.
       $Comments = $this->SQL->GetWhere('Comment', array('DiscussionID' => $DiscussionID))->ResultArray();
-      foreach ($Comments as $Comment) {
-         LogModel::Insert($Log, 'Comment', $Comment, $LogOptions);
+      
+      if (count($Comments) > 0 && count($Comments) < 50) {
+         // A smaller number of comments should just be stored with the record.
+         $Data['_Data']['Comment'] = $Comments;
+         LogModel::Insert($Log, 'Discussion', $Data, $LogOptions);
+      } else {
+         LogModel::Insert($Log, 'Discussion', $Data, $LogOptions);
+         foreach ($Comments as $Comment) {
+            LogModel::Insert($Log, 'Comment', $Comment, $LogOptions);
+         }
       }
+
+      LogModel::EndTransaction();
       
       $this->SQL->Delete('Comment', array('DiscussionID' => $DiscussionID));
       $this->SQL->Delete('Discussion', array('DiscussionID' => $DiscussionID));
@@ -1750,5 +1764,33 @@ class DiscussionModel extends VanillaModel {
 		}
 			
       return TRUE;
+   }
+   
+   /**
+	 * Convert tags from stored format to user-presentable format.
+	 *
+    * @since 2.1
+    * @access protected
+    *
+    * @param string Serialized array.
+    * @return string Comma-separated tags.
+    */
+   protected function FormatTags($Tags) {
+      // Don't bother if there aren't any tags
+      if (!$Tags)
+         return '';
+      
+      // Get the array
+      $TagsArray = Gdn_Format::Unserialize($Tags);     
+      
+      // Compensate for deprecated space-separated format 
+      if (is_string($TagsArray) && $TagsArray == $Tags)
+         $TagsArray = explode(' ', $Tags);
+      
+      // Safe format
+      $TagsArray = Gdn_Format::Text($TagsArray);
+      
+      // Send back an comma-separated string
+      return implode(',', $TagsArray);
    }
 }

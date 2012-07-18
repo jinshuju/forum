@@ -19,7 +19,12 @@ echo $this->Form->Errors();
    <li>
       <?php
          echo $this->Form->Label('Email', 'Email');
-         echo $this->Form->TextBox('Email');
+         
+         $Attributes2 = array();
+         if (!$this->CanEditEmail) {
+            $Attributes2['disabled'] = 'disabled';
+         }
+         echo $this->Form->TextBox('Email', $Attributes2);
       ?>
    </li>
    <li>
@@ -37,4 +42,4 @@ echo $this->Form->Errors();
       $this->FireEvent('EditMyAccountAfter');
    ?>
 </ul>
-<?php echo $this->Form->Close('Save');
+<?php echo $this->Form->Close('Save', '', array('class' => 'Button Primary'));

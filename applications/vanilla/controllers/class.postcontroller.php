@@ -95,8 +95,7 @@ class PostController extends VanillaController {
       else
          $this->Category = NULL;
 
-      if ($UseCategories)
-			$CategoryData = CategoryModel::Categories();
+      $CategoryData = $UseCategories ? CategoryModel::Categories() : FALSE;
       
       // Check permission 
       if (isset($this->Discussion)) {
@@ -124,7 +123,7 @@ class PostController extends VanillaController {
       
       // Set the model on the form
       $this->Form->SetModel($this->DiscussionModel);
-      if ($this->Form->AuthenticatedPostBack() === FALSE) {
+      if ($this->Form->IsPostBack() == FALSE) {
          // Prep form with current data for editing
          if (isset($this->Discussion)) {
             $this->Form->SetData($this->Discussion);
@@ -144,8 +143,8 @@ class PostController extends VanillaController {
          $Draft = $this->Form->ButtonExists('Save Draft') ? TRUE : FALSE;
          $Preview = $this->Form->ButtonExists('Preview') ? TRUE : FALSE;
          if (!$Preview) {
-            if (!is_object($this->Category) && isset($FormValues['CategoryID']))
-               $this->Category = $CategoryData[$FormValues['CategoryID']];
+            if (!is_object($this->Category) && is_array($CategoryData) && isset($FormValues['CategoryID']))
+               $this->Category = GetValue($FormValues['CategoryID'], $CategoryData);
 
             if (is_object($this->Category)) {
                // Check category permissions.
@@ -179,8 +178,11 @@ class PostController extends VanillaController {
                } else {
                   $DiscussionID = $this->DiscussionModel->Save($FormValues, $this->CommentModel);
                   $this->Form->SetValidationResults($this->DiscussionModel->ValidationResults());
-                  if ($DiscussionID > 0 && $DraftID > 0)
+                  
+                  if ($DiscussionID > 0) {
+                     if ($DraftID > 0)
                      $this->DraftModel->Delete($DraftID);
+                  }
                   if ($DiscussionID == SPAM) {
                      $this->StatusMessage = T('Your post has been flagged for moderation.');
                      $this->Render('Spam');
@@ -222,6 +224,7 @@ class PostController extends VanillaController {
                if (!$Draft) {
                   // Redirect to the new discussion
                   $Discussion = $this->DiscussionModel->GetID($DiscussionID);
+                  $this->SetData('Discussion', $Discussion);
                   $this->EventArguments['Discussion'] = $Discussion;
                   $this->FireEvent('AfterDiscussionSave');
                   
@@ -303,6 +306,7 @@ class PostController extends VanillaController {
       $vanilla_category_id = $this->Form->GetFormValue('vanilla_category_id', '');
       $Attributes = array('ForeignUrl' => $vanilla_url);
       $vanilla_identifier = $this->Form->GetFormValue('vanilla_identifier', '');
+      
       // Only allow vanilla identifiers of 32 chars or less - md5 if larger
       if (strlen($vanilla_identifier) > 32) {
          $Attributes['vanilla_identifier'] = $vanilla_identifier;
@@ -310,9 +314,7 @@ class PostController extends VanillaController {
       }
       
       if (!$Discussion && $vanilla_url != '' && $vanilla_identifier != '') {
-         $Discussion = $this->DiscussionModel->GetWhere(array(
-            'ForeignID' => $vanilla_identifier
-         ))->FirstRow();
+         $Discussion = $Discussion = $this->DiscussionModel->GetForeignID($vanilla_identifier, $vanilla_type);
          
          if ($Discussion) {
             $this->DiscussionID = $DiscussionID = $Discussion->DiscussionID;
@@ -320,7 +322,6 @@ class PostController extends VanillaController {
          }
       }
       
-      // Add these back to the form
       // If so, create it!
       if (!$Discussion && $vanilla_url != '' && $vanilla_identifier != '') {
          // Add these values back to the form if they exist!
@@ -453,15 +454,17 @@ class PostController extends VanillaController {
          $this->Permission('Vanilla.Comments.Add', TRUE, 'Category', $Discussion->PermissionCategoryID);
       }
 
-      if ($this->Form->AuthenticatedPostBack() === FALSE) {
+      if (!$this->Form->IsPostBack()) {
          // Form was validly submitted
-         if (isset($this->Comment))
-            $this->Form->SetData($this->Comment);
+         if (isset($this->Comment)) {
+            $this->Form->SetData((array)$this->Comment);
+         }
             
       } else {
          // Save as a draft?
          $FormValues = $this->Form->FormValues();
          $FormValues = $this->CommentModel->FilterForm($FormValues);
+         
          if ($DraftID == 0)
             $DraftID = $this->Form->GetFormValue('DraftID', 0);
          
@@ -557,7 +560,6 @@ class PostController extends VanillaController {
                      $this->Offset = 1;
                      $Comments = $this->CommentModel->GetIDData($CommentID);
                      $this->SetData('Comments', $Comments);
-                     $this->SetData('CommentData', $Comments, TRUE);
                      // Load the discussion
                      $this->ControllerName = 'discussion';
                      $this->View = 'comments';
@@ -588,16 +590,12 @@ class PostController extends VanillaController {
 //                     if ($Redirect) {
 //                        // The user posted a comment on a page other than the last one, so just redirect to the last page.
 //                        $this->RedirectUrl = Gdn::Request()->Url("discussion/comment/$CommentID/#Comment_$CommentID", TRUE);
-//                        $this->CommentData = NULL;
 //                     } else {
 //                        // Make sure to load all new comments since the page was last loaded by this user
 //								if ($DisplayNewCommentOnly)
                         $this->Offset = $this->CommentModel->GetOffset($CommentID);
                         $Comments = $this->CommentModel->GetIDData($CommentID);
                         $this->SetData('Comments', $Comments);
-                        $this->SetData('CommentData', $Comments, TRUE);
-//								else 
-//									$this->SetData('CommentData', $this->CommentModel->GetNew($DiscussionID, $LastCommentID), TRUE);
 
                         $this->SetData('NewComments', TRUE);
                         
@@ -608,7 +606,7 @@ class PostController extends VanillaController {
                      
                      // Make sure to set the user's discussion watch records
                      $CountComments = $this->CommentModel->GetCount($DiscussionID);
-                     $Limit = is_object($this->CommentData) ? $this->CommentData->NumRows() : $Discussion->CountComments;
+                     $Limit = is_object($this->Data('Comments')) ? $this->Data('Comments')->NumRows() : $Discussion->CountComments;
                      $Offset = $CountComments - $Limit;
                      $this->CommentModel->SetWatch($this->Discussion, $Limit, $Offset, $CountComments);
                   }
@@ -633,8 +631,23 @@ class PostController extends VanillaController {
          
       $this->FireEvent('BeforeCommentRender');
       
-      // Render default view
-      $this->Render();
+      if ($this->DeliveryType() == DELIVERY_TYPE_DATA) {
+         $Comment = $this->Data('Comments')->FirstRow(DATASET_TYPE_ARRAY);
+         if ($Comment) {
+            $Photo = $Comment['InsertPhoto'];
+            
+            if (strpos($Photo, '//') === FALSE) {
+               $Photo = Gdn_Upload::Url(ChangeBasename($Photo, 'n%s'));
+            }
+            
+            $Comment['InsertPhoto'] = $Photo;
+         }
+         $this->Data = array('Comment' => $Comment);
+         $this->RenderData($this->Data);
+      } else {
+         // Render default view.
+         $this->Render();
+      }
    }
    
    /**
@@ -671,7 +684,7 @@ class PostController extends VanillaController {
          $this->Form->SetModel($this->DraftModel);
          $this->Comment = $this->DraftModel->GetID($DraftID);
       }
-      $this->View = 'Comment';
+      $this->View = 'editcomment';
       $this->Comment($this->Comment->DiscussionID);
    }
    

@@ -321,6 +321,7 @@ $Definition['HeadlineFormat.PictureChange.ForUser'] = '{RegardingUserID,You} 更
 $Definition['HeadlineFormat.PictureChange'] = '{RegardingUserID,You} changed {ActivityUserID,your} 头像.';
 $Definition['I remember now!'] = '我现在想起了!';
 $Definition['Import'] = '导入';
+$Definition['in'] = '分类:';
 $Definition['In seconds'] = '秒';
 $Definition['In this Conversation'] = '在该会话';
 $Definition['In this Discussion'] = '本讨论参与人';

@@ -79,7 +79,7 @@ function WriteDiscussionRow($Discussion, &$Sender, &$Session, $Alt2) {
 	<td class="BlockColumn BlockColumn-User FirstUser">
 		<div class="Block Wrap">
 			<?php
-				echo UserPhoto($First, 'PhotoLink');
+				echo UserPhoto($First, array('Size' => 'Small'));
 				echo UserAnchor($First, 'UserLink BlockTitle');
             echo '<div class="Meta">';
 				echo Anchor(Gdn_Format::Date($Discussion->FirstDate, 'html'), $FirstPageUrl, 'CommentDate MItem');
@@ -109,7 +109,7 @@ function WriteDiscussionRow($Discussion, &$Sender, &$Session, $Alt2) {
 		<div class="Block Wrap">
 			<?php
 			if ($Last) {
-				echo UserPhoto($Last, 'PhotoLink');
+				echo UserPhoto($Last, array('Size' => 'Small'));
 				echo UserAnchor($Last, 'UserLink BlockTitle');
             echo '<div class="Meta">';
 				echo Anchor(Gdn_Format::Date($Discussion->LastDate, 'html'), $LastPageUrl, 'CommentDate MItem');
@@ -128,19 +128,25 @@ function WriteDiscussionRow($Discussion, &$Sender, &$Session, $Alt2) {
  * Render the page.
  */
 
-$PagerOptions = array('RecordCount' => $this->Data('CountDiscussions'), 'CurrentRecords' => $this->Data('Discussions')->NumRows());
+$PagerOptions = array('Wrapper' => '<div %1$s>%2$s</div>', 'RecordCount' => $this->Data('CountDiscussions'), 'CurrentRecords' => $this->Data('Discussions')->NumRows());
 if ($this->Data('_PagerUrl')) {
    $PagerOptions['Url'] = $this->Data('_PagerUrl');
 }
 
 echo '<h1 class="H HomepageTitle">'.$this->Data('Title').'</h1>';
 
-echo '<div class="P PageDescription">';
-echo PagerModule::Write($PagerOptions);
-echo $this->Data('_Description', '&#160;');
+if ($Description = $this->Data('_Description')) {
+   echo '<div class="P PageDescription">';
+   echo $this->Data('_Description', '&#160;');
+   echo '</div>';
+}
+
+include $this->FetchViewLocation('Subtree', 'Categories', 'Vanilla');
+
+echo '<div class="PageControls Top">';
+   PagerModule::Write($PagerOptions);
+   echo Gdn_Theme::Module('NewDiscussionModule', array('CssClass' => 'Button Action'));
 echo '</div>';
-
-
 
 if ($this->DiscussionData->NumRows() > 0 || (isset($this->AnnounceData) && is_object($this->AnnounceData) && $this->AnnounceData->NumRows() > 0)) {
 ?>
@@ -176,7 +182,12 @@ if ($this->DiscussionData->NumRows() > 0 || (isset($this->AnnounceData) && is_ob
 </table>
 </div>
 <?php
-   PagerModule::Write($PagerOptions);
+
+   echo '<div class="PageControls Bottom">';
+      PagerModule::Write($PagerOptions);
+      echo Gdn_Theme::Module('NewDiscussionModule', array('CssClass' => 'Button Action'));
+   echo '</div>';
+   
 } else {
    ?>
    <div class="Empty"><?php echo T('No discussions were found.'); ?></div>

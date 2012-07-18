@@ -14,6 +14,7 @@
          border-top: solid 1px #efefef;
          border-bottom: solid 1px #efefef;
          padding: 4px;
+         vertical-align: top;
       }
       
       .Trace pre {
@@ -63,9 +64,12 @@
       </td>
       <td>
          <?php
-         if (is_string($Message))
-            echo htmlspecialchars($Message);
-         elseif (is_a($Message, 'Exception')) {
+         if (is_string($Message)) {
+            if ($Var != 'Debug')
+               echo '<b>'.htmlspecialchars($Var).'</b>: ';
+            
+            echo nl2br(htmlspecialchars($Message));
+         } elseif (is_a($Message, 'Exception')) {
             echo '<pre>';
             echo htmlspecialchars($Message->getMessage());
             echo "\n\n";
