@@ -8,15 +8,16 @@ a {
   color: #8B920A;
   font-weight: normal;
 }
-.PagerWrap {
+.PageControls {
   background: #F6F6F6;
-  padding: 2px 0;
+  padding: 5px 10px 8px;
+  margin: 0;
 }
-.PagerWrap .Pager {
+.PageControls .Pager {
   float: left;
 }
-.PagerWrap .Pager a,
-.PagerWrap .Pager span {
+.PageControls .Pager a,
+.PageControls .Pager span {
   font-size: 14px;
   padding: 1px 5px;
   border: 1px #eee solid;
@@ -27,8 +28,8 @@ a {
   -moz-border-radius: 3px;
   border-radius: 3px;
 }
-.PagerWrap .Pager a.Highlight,
-.PagerWrap .Pager span.Highlight {
+.PageControls .Pager a.Highlight,
+.PageControls .Pager span.Highlight {
   color: #777;
 }
 .HasNew {
