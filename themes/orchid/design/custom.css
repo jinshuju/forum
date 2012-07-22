@@ -138,10 +138,8 @@ ul.Discussions .Item {
   background: #FFF;
   padding: 8px 8px 3px;
 }
-h1.HomepageTitle {
-  padding: 5px 10px;
-  margin: 0;
-  background: #F2F2F2;
+.Discussion .PageTitle h1 {
+  font-weight: normal;
 }
 #Panel .FilterMenu li,
 .PanelInfo li {
