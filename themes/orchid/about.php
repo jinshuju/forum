@@ -14,7 +14,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $ThemeInfo['orchid'] = array(
    'Name' => 'Orchid',
    'Description' => "a better theme for Vanilla.",
-   'Version' => '0.13',
+   'Version' => '0.13.1',
    'Author' => "chuck911",
    'AuthorEmail' => 'contact@with.cat',
    'AuthorUrl' => 'http://disappear.with.cat'
