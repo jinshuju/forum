@@ -122,76 +122,30 @@ class ProfileController extends Gdn_Controller {
       
       $this->SetTabView('Activity');
       $Comment = $this->Form->GetFormValue('Comment');
-      /*
-      if ($Session->UserID > 0 && $this->Form->AuthenticatedPostBack() 
-         && !StringIsNullOrEmpty($Comment) && CheckPermission('Garden.Profiles.Edit')) {
-         // Active user has submitted a comment
-         $Comment = substr($Comment, 0, 1000); // Limit to 1000 characters...
-         
-         // Update About if necessary.
-         $SendNotification = TRUE;
-         if ($Session->UserID == $this->User->UserID) {
-            $SendNotification = FALSE;
-            $this->UserModel->SaveAbout($Session->UserID, $Comment);
-            $this->User->About = $Comment;
-            $this->SetJson('UserData', $this->FetchView('user'));
-            
-            $ActivityUserID = $Session->UserID;
-            $RegardingUserID = $ActivityUserID;
-            $ActivityType = 'AboutUpdate';
-         } else {
-            $ActivityUserID = $this->User->UserID;
-            $RegardingUserID = $Session->UserID;
-            $ActivityType = 'WallPost';
-         }
-         
-         // Create activity entry
-         $NewActivityID = $this->ActivityModel->Add(
-            $ActivityUserID,
-            $ActivityType,
-            $Comment,
-            $RegardingUserID,
-            '',
-            '/profile/'.$this->ProfileUrl(),
-            FALSE);
-         
-         // @todo Add a notification too.
+      
+      // Load data to display
+      $this->ProfileUserID = $this->User->UserID;
+      $Limit = 30;
 
-         if ($this->_DeliveryType === DELIVERY_TYPE_ALL) {
-            Redirect('dashboard/profile/'.$this->ProfileUrl());
-         } else {
-            // Load just the single new comment
-            $this->HideActivity = TRUE;
-            $this->ActivityData = $this->ActivityModel->GetWhere(array('ActivityID' => $NewActivityID));
-            $this->View = 'activities';
-            $this->ControllerName = 'activity';
-         }
-      } else {
-		*/
-         // Load data to display
-         $this->ProfileUserID = $this->User->UserID;
-			$Limit = 30;
-         
-         $NotifyUserIDs = array(ActivityModel::NOTIFY_PUBLIC);
-         if (Gdn::Session()->CheckPermission('Garden.Moderation.Manage'))
-            $NotifyUserIDs[] = ActivityModel::NOTIFY_MODS;
-         
-         $Activities = $this->ActivityModel->GetWhere(
-            array('ActivityUserID' => $UserID, 'NotifyUserID' => $NotifyUserIDs), 
-            $Offset, $Limit)->ResultArray();
-         $this->ActivityModel->JoinComments($Activities);
-         $this->SetData('Activities', $Activities);
-         if (count($Activities) > 0) {
-            $LastActivity = $Activities[0];
-            $LastModifiedDate = Gdn_Format::ToTimestamp($this->User->DateUpdated);
-            $LastActivityDate = Gdn_Format::ToTimestamp($LastActivity['DateInserted']);
-            if ($LastModifiedDate < $LastActivityDate)
-               $LastModifiedDate = $LastActivityDate;
-               
-            // Make sure to only query this page if the user has no new activity since the requesting browser last saw it.
-            $this->SetLastModified($LastModifiedDate);
-         }
-      // }
+      $NotifyUserIDs = array(ActivityModel::NOTIFY_PUBLIC);
+      if (Gdn::Session()->CheckPermission('Garden.Moderation.Manage'))
+         $NotifyUserIDs[] = ActivityModel::NOTIFY_MODS;
+
+      $Activities = $this->ActivityModel->GetWhere(
+         array('ActivityUserID' => $UserID, 'NotifyUserID' => $NotifyUserIDs), 
+         $Offset, $Limit)->ResultArray();
+      $this->ActivityModel->JoinComments($Activities);
+      $this->SetData('Activities', $Activities);
+      if (count($Activities) > 0) {
+         $LastActivity = $Activities[0];
+         $LastModifiedDate = Gdn_Format::ToTimestamp($this->User->DateUpdated);
+         $LastActivityDate = Gdn_Format::ToTimestamp($LastActivity['DateInserted']);
+         if ($LastModifiedDate < $LastActivityDate)
+            $LastModifiedDate = $LastActivityDate;
+
+         // Make sure to only query this page if the user has no new activity since the requesting browser last saw it.
+         $this->SetLastModified($LastModifiedDate);
+      }
 
       // Set the canonical Url.
       if (is_numeric($this->User->Name) || Gdn_Format::Url($this->User->Name) != strtolower($this->User->Name)) {
@@ -264,7 +218,18 @@ class ProfileController extends Gdn_Controller {
       
       // Decide if they have ability to edit the username
       $this->CanEditUsername = C("Garden.Profile.EditUsernames");
-      $this->CanEditUsername = $this->CanEditUsername || $Session->CheckPermission('Garden.Users.Edit');
+      
+      if ($this->CanEditUsername < 0)
+         $this->CanEditUsername = FALSE;
+      else
+         $this->CanEditUsername = $this->CanEditUsername || $Session->CheckPermission('Garden.Users.Edit');
+      
+      $this->CanEditEmail = C('Garden.Profile.EditEmails', TRUE);
+      
+      if ($this->CanEditEmail < 0)
+         $this->CanEditEmail = FALSE;
+      else
+         $this->CanEditEmail = $this->CanEditEmail || $Session->CheckPermission('Garden.Users.Edit');
          
       $UserModel = Gdn::UserModel();
       $User = $UserModel->GetID($this->User->UserID);
@@ -289,11 +254,14 @@ class ProfileController extends Gdn_Controller {
             $UsernameError = T('UsernameError', 'Username can only contain letters, numbers, underscores, and must be between 3 and 20 characters long.');
             $UserModel->Validation->ApplyRule('Name', 'Username', $UsernameError);
          }
+         
          if ($this->Form->Save() !== FALSE) {
             $User = $UserModel->GetID($this->User->UserID);
             $this->InformMessage(Sprite('Check', 'InformSprite').T('Your changes have been saved.'), 'Dismissable AutoDismiss HasSprite');
-            // $this->RedirectUrl = Url('/profile/'.$this->ProfileUrl($User->Name));
          }
+         
+         if (!$this->CanEditEmail)
+            $this->Form->SetFormValue("Email", $User->Email);
       }
       
 		$this->Title(T('Edit Account'));
@@ -308,13 +276,13 @@ class ProfileController extends Gdn_Controller {
     *
     * @since 2.0.0
     * @access public
-    * @param mixed $UserReference Unique identifier, possible ID or username.
+    * @param mixed $User Unique identifier, possible ID or username.
     * @param string $Username.
     * @param int $UserID Unique ID.
     */
-   public function Index($UserReference = '', $Username = '', $UserID = '', $Page = FALSE) {
+   public function Index($User = '', $Username = '', $UserID = '', $Page = FALSE) {
 		$this->EditMode(FALSE);
-      $this->GetUserInfo($UserReference, $Username, $UserID);
+      $this->GetUserInfo($User, $Username, $UserID);
 		
       if ($this->User->Admin == 2 && $this->Head) {
          // Don't index internal accounts. This is in part to prevent vendors from getting endless Google alerts.
@@ -325,10 +293,9 @@ class ProfileController extends Gdn_Controller {
 		if ($this->User->UserID == Gdn::Session()->UserID)
 			return $this->Notifications($Page);
 		elseif (C('Garden.Profile.ShowActivities', TRUE))
-			return $this->Activity($UserReference, $Username, $UserID);
+			return $this->Activity($User, $Username, $UserID);
       else
-         return Gdn::Dispatcher()->Dispatch('/profile/discussions/'.
-            ConcatSep('/', rawurlencode($UserReference), rawurlencode($Username), rawurlencode($UserID)));
+         return Gdn::Dispatcher()->Dispatch(UserUrl($this->User, '', 'discussions'));
    }
    
    /** 
@@ -401,11 +368,12 @@ class ProfileController extends Gdn_Controller {
       $this->SetTabView('Notifications');
       $Session = Gdn::Session();
       
-      // Drop notification count back to zero.
-      Gdn::UserModel()->SetField($Session->UserID, 'CountNotifications', '0');
-      
-      // Get notifications data
       $this->ActivityModel = new ActivityModel();
+      
+      // Drop notification count back to zero.
+      $this->ActivityModel->MarkRead($Session->UserID);
+      
+      // Get notifications data.
       $Activities = $this->ActivityModel->GetNotifications($Session->UserID, $Offset, $Limit)->ResultArray();
       $this->ActivityModel->JoinComments($Activities);
       $this->SetData('Activities', $Activities);
@@ -434,7 +402,19 @@ class ProfileController extends Gdn_Controller {
 			}
 		}
 		$this->Render();
-   }   
+   }
+   
+   public function NotificationsPopin() {
+      $this->Permission('Garden.SignIn.Allow');
+      
+      $this->ActivityModel = new ActivityModel();
+      $Activities = $this->ActivityModel->GetNotifications(Gdn::Session()->UserID, 0, 5)->ResultArray();
+      $this->SetData('Activities', $Activities);
+      $this->ActivityModel->MarkRead(Gdn::Session()->UserID);
+      
+      $this->SetData('Title', T('Notifications'));
+      $this->Render('Popin', 'Activity', 'Dashboard');
+   }
    
    /**
     * Set new password for current user.
@@ -568,12 +548,13 @@ class ProfileController extends Gdn_Controller {
          if ($this->Form->ErrorCount() == 0) {
             if (!$this->UserModel->Save(array('UserID' => $this->User->UserID, 'Photo' => $UserPhoto), array('CheckExisting' => TRUE)))
                $this->Form->SetValidationResults($this->UserModel->ValidationResults());
+            else
+               $this->User->Photo = $UserPhoto;
          }
          // If there were no problems, redirect back to the user account
          if ($this->Form->ErrorCount() == 0) {
 				$this->InformMessage(Sprite('Check', 'InformSprite').T('Your changes have been saved.'), 'Dismissable AutoDismiss HasSprite');
-            Redirect($this->DeliveryType() == DELIVERY_TYPE_VIEW ? 'dashboard/profile/'.$this->ProfileUrl() : 'dashboard/profile/picture/'.$this->ProfileUrl());
-				
+            Redirect($this->DeliveryType() == DELIVERY_TYPE_VIEW ? UserUrl($this->User) : UserUrl($this->User, '', 'picture'));
          }
       }
 		if ($this->Form->ErrorCount() > 0)
@@ -733,6 +714,7 @@ class ProfileController extends Gdn_Controller {
       $this->_SetBreadcrumbs($this->Data('Title'), $this->CanonicalUrl());
       $this->Render();
    }
+   
    /**
     * Remove the user's photo.
     *
@@ -750,7 +732,7 @@ class ProfileController extends Gdn_Controller {
       
       // Get user data & another permission check
       $this->GetUserInfo($UserReference, $Username, '', TRUE);
-      $RedirectUrl = 'dashboard/profile/picture/'.$this->ProfileUrl();
+      $RedirectUrl = UserUrl($this->User, '', 'picture');
       if ($Session->ValidateTransientKey($TransientKey)
          && is_object($this->User)
          && (
@@ -903,7 +885,7 @@ class ProfileController extends Gdn_Controller {
          }
          // If there were no problems, redirect back to the user account
          if ($this->Form->ErrorCount() == 0) {
-            Redirect('dashboard/profile/picture/'.$this->ProfileUrl());
+            Redirect(UserUrl($this->User, '', 'picture'));
 				$this->InformMessage(Sprite('Check', 'InformSprite').T('Your changes have been saved.'), 'Dismissable AutoDismiss HasSprite');
          }
       }
@@ -973,7 +955,7 @@ class ProfileController extends Gdn_Controller {
       foreach ($TabName as $Name => $TabInfo) {
 			$Url = GetValue('TabUrl', $TabInfo, '');
          if ($Url == '')
-            $TabInfo['TabUrl'] = '/profile/'.strtolower($Name).'/'.$this->User->UserID.'/'.Gdn_Format::Url($this->User->Name);
+            $TabInfo['TabUrl'] = UserUrl($this->User, '', strtolower($Name));
             
          $this->ProfileTabs[$Name] = $TabInfo;
 			$this->_ProfileTabs[$Name] = $TabInfo; // Backwards Compatibility
@@ -1039,14 +1021,14 @@ class ProfileController extends Gdn_Controller {
 			$Module->AddLink('Options', Sprite('SpEdit').T('Edit Account'), '/user/edit/'.$this->User->UserID, 'Garden.Users.Edit', array('class' => 'Popup EditAccountLink'));
 			$Module->AddLink('Options', Sprite('SpDelete').T('Delete Account'), '/user/delete/'.$this->User->UserID, 'Garden.Users.Delete', array('class' => 'Popup DeleteAccountLink'));
 			if ($this->User->Photo != '' && $AllowImages)
-				$Module->AddLink('Options', Sprite('SpDelete').T('Remove Picture'), '/profile/removepicture/'.$this->User->UserID.'/'.Gdn_Format::Url($this->User->Name).'/'.$Session->TransientKey(), 'Garden.Users.Edit', array('class' => 'RemovePictureLink'));
+				$Module->AddLink('Options', Sprite('SpDelete').T('Remove Picture'), CombinePaths(array(UserUrl($this->User, '', 'removepicture'),$Session->TransientKey())), 'Garden.Users.Edit', array('class' => 'RemovePictureLink'));
 			
-			$Module->AddLink('Options', Sprite('SpPreferences').T('Edit Preferences'), '/profile/preferences/'.$this->User->UserID.'/'.Gdn_Format::Url($this->User->Name), 'Garden.Users.Edit', array('class' => 'Popup PreferencesLink'));
+			$Module->AddLink('Options', Sprite('SpPreferences').T('Edit Preferences'), UserUrl($this->User, '', 'preferences'), 'Garden.Users.Edit', array('class' => 'Popup PreferencesLink'));
 
 			// Add profile options for everyone
-			$Module->AddLink('Options', Sprite('SpPicture').T('Change Picture'), '/profile/picture/'.$this->User->UserID.'/'.Gdn_Format::Url($this->User->Name), 'Garden.Users.Edit', array('class' => 'PictureLink'));
+			$Module->AddLink('Options', Sprite('SpPicture').T('Change Picture'), UserUrl($this->User, '', 'picture'), 'Garden.Users.Edit', array('class' => 'PictureLink'));
 			if ($this->User->Photo != '' && $AllowImages && !$RemotePhoto) {
-				$Module->AddLink('Options', Sprite('SpThumbnail').T('Edit Thumbnail'), '/profile/thumbnail/'.$this->User->UserID.'/'.Gdn_Format::Url($this->User->Name), 'Garden.Users.Edit', array('class' => 'ThumbnailLink'));
+				$Module->AddLink('Options', Sprite('SpThumbnail').T('Edit Thumbnail'), UserUrl($this->User, '', 'thumbnail'), 'Garden.Users.Edit', array('class' => 'ThumbnailLink'));
 			}
 		} else {
 			// Add profile options for the profile owner
@@ -1068,7 +1050,7 @@ class ProfileController extends Gdn_Controller {
 				$Module->AddLink('Options', Sprite('SpPassword').$passwordLabel, '/profile/password', FALSE, array('class' => 'Popup PasswordLink'));
 			}
 
-			$Module->AddLink('Options', Sprite('SpPreferences').T('Notification Preferences'), '/profile/preferences/'.$this->User->UserID.'/'.Gdn_Format::Url($this->User->Name), FALSE, array('class' => 'Popup PreferencesLink'));
+			$Module->AddLink('Options', Sprite('SpPreferences').T('Notification Preferences'), UserUrl($this->User, '', 'preferences'), FALSE, array('class' => 'Popup PreferencesLink'));
 			if ($AllowImages)
 				$Module->AddLink('Options', Sprite('SpPicture').T('Change My Picture'), '/profile/picture', 'Garden.Profiles.Edit', array('class' => 'PictureLink'));
 				
@@ -1106,7 +1088,7 @@ class ProfileController extends Gdn_Controller {
          // Build activity URL
          $ActivityUrl = 'profile/activity/';
          if ($this->User->UserID != $Session->UserID)
-            $ActivityUrl .= $this->User->UserID.'/'.Gdn_Format::Url($this->User->Name);
+            $ActivityUrl = UserUrl($this->User, '', 'activity');
          
          // Show notifications?
          if ($this->User->UserID == $Session->UserID) {
@@ -1173,7 +1155,7 @@ class ProfileController extends Gdn_Controller {
     *
     * @since 2.0.0
     * @access public
-    * @param mixed $UserReference Unique identifier, possibly username or ID.
+    * @param mixed $User Unique identifier, possibly username or ID.
     * @param string $Username.
     * @param int $UserID Unique ID.
     * @param bool $CheckPermissions Whether or not to check user permissions.
@@ -1194,15 +1176,18 @@ class ProfileController extends Gdn_Controller {
 		   
       $this->Roles = array();
       if ($UserReference == '') {
-         $this->User = $this->UserModel->GetID(Gdn::Session()->UserID);
-      } else if (is_numeric($UserReference) && $Username != '') {
+         if ($Username) {
+            $this->User = $this->UserModel->GetByUsername($Username);
+         } else
+            $this->User = $this->UserModel->GetID(Gdn::Session()->UserID);
+      } elseif (is_numeric($UserReference) && $Username != '') {
          $this->User = $this->UserModel->GetID($UserReference);
       } else {
          $this->User = $this->UserModel->GetByUsername($UserReference);
       }
          
       if ($this->User === FALSE) {
-         throw NotFoundException();
+         throw NotFoundException('User');
       } else if ($this->User->Deleted == 1) {
          Redirect('dashboard/home/deleted');
       } else {
@@ -1235,6 +1220,22 @@ class ProfileController extends Gdn_Controller {
 		if (!property_exists($this, 'User'))
 			$this->GetUserInfo();
 			
+      if ($UserReference === NULL)
+         $UserReference = $this->User->Name;
+      if ($UserID === NULL)
+         $UserID = $this->User->UserID;
+
+      $UserReferenceEnc = rawurlencode($UserReference);
+      if ($UserReferenceEnc == $UserReference)
+         return $UserReferenceEnc;
+      else
+         return "$UserID/$UserReferenceEnc";
+   }
+   
+   public function GetProfileUrl($UserReference = NULL, $UserID = NULL) {
+      if (!property_exists($this, 'User'))
+			$this->GetUserInfo();
+      
       if ($UserReference === NULL)
          $UserReference = $this->User->Name;
       if ($UserID === NULL)

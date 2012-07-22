@@ -27,6 +27,8 @@ echo "</div>\n\n";
 if ($this->Data('Page') == 1) {
    include $this->FetchViewLocation('discussion', 'discussion');
    echo '</div>'; // close discussion wrap
+   
+   $this->FireEvent('AfterDiscussion');
 } else {
    echo '</div>'; // close discussion wrap
 }
@@ -41,14 +43,14 @@ echo $this->Pager->ToString('less');
 echo '</span>';
 
 echo '<div class="DataBox DataBox-Comments">';
-if ($this->Data['CommentData']->NumRows() > 0)
+if ($this->Data('Comments')->NumRows() > 0)
 	echo '<h2 class="CommentHeading">'.T('Comments').'</h2>';
 ?>
 <ul class="MessageList DataList Comments">
 	<?php include $this->FetchViewLocation('comments'); ?>
 </ul>
 <?php
-$this->FireEvent('AfterDiscussion');
+$this->FireEvent('AfterComments');
 if($this->Pager->LastPage()) {
    $LastCommentID = $this->AddDefinition('LastCommentID');
    if(!$LastCommentID || $this->Data['Discussion']->LastCommentID > $LastCommentID)

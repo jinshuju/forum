@@ -815,7 +815,7 @@ if (!function_exists('DomGetImages')) {
                continue;
             
             // Don't take a banner-shaped image.
-            if ($Height * 5 < $Width)
+            if ($Height * 4 < $Width)
                continue;
             
             // Prefer images that are less than 800px wide (banners?)
@@ -941,7 +941,7 @@ function _FormatStringCallback($Match, $SetArgs = FALSE) {
    $Field = trim($Parts[0]);
    $Format = trim(GetValue(1, $Parts, ''));
    $SubFormat = strtolower(trim(GetValue(2, $Parts, '')));
-   $FomatArgs = GetValue(3, $Parts, '');
+   $FormatArgs = GetValue(3, $Parts, '');
 
    if (in_array($Format, array('currency', 'integer', 'percent'))) {
       $FormatArgs = $SubFormat;
@@ -999,6 +999,23 @@ function _FormatStringCallback($Match, $SetArgs = FALSE) {
                }
             }
             break;
+         case 'plural':
+            if (is_array($Value))
+               $Value = count($Value);
+            elseif (StringEndsWith($Field, 'UserID', TRUE))
+               $Value = 1;
+            
+            if(!is_numeric($Value)) {
+               $Result = $Value;
+            } else {
+               if (!$SubFormat)
+                  $SubFormat = rtrim("%s $Field", 's');
+               if (!$FormatArgs)
+                  $FormatArgs = $SubFormat.'s';
+               
+               $Result = Plural($Value, $SubFormat, $FormatArgs);
+            }
+            break;
          case 'rawurlencode':
             $Result = rawurlencode($Value);
             break;
@@ -1032,7 +1049,7 @@ function _FormatStringCallback($Match, $SetArgs = FALSE) {
                $Value = array_shift($Value);
             
             if (is_array($Value)) {
-               $Max = C('Garden.FormatUsername.Max', 10);
+               $Max = C('Garden.FormatUsername.Max', 5);
                
                $Count = count($Value);
                $Result = '';
@@ -1048,14 +1065,22 @@ function _FormatStringCallback($Match, $SetArgs = FALSE) {
                   if (is_array($ID)) {
                      continue;
                   }
-                  $User = Gdn::UserModel()->GetID($ID);
-                  $User->Name = FormatUsername($User, $Format, Gdn::Session()->UserID);
                   
                   if ($i == $Count - 1)
                      $Result .= ' '.T('sep and', 'and').' ';
                   elseif ($i > 0)
                      $Result .= ', ';
-                  $Result .= UserAnchor($User);
+                  
+                  $Special = array(-1 => T('everyone'), -2 => T('moderators'), -3 => T('administrators'));
+                  if (isset($Special[$ID])) {
+                     $Result .= $Special[$ID];
+                  } else {
+                     $User = Gdn::UserModel()->GetID($ID);
+                     $User->Name = FormatUsername($User, $Format, Gdn::Session()->UserID);
+
+
+                     $Result .= UserAnchor($User);
+                  }
                }
             } else {
                $User = Gdn::UserModel()->GetID($Value);
@@ -1543,6 +1568,20 @@ if (!function_exists('IsWritable')) {
    }
 }
 
+if (!function_exists('MarkString')):
+   /**
+    * Wrap occurences of $Needle in $Haystack with <mark> tags. Explodes $Needle 
+    * on spaces. Returns $Haystack with replacements.
+    */   
+   function MarkString($Needle, $Haystack) {
+      $Needle = explode(' ', $Needle);
+      foreach ($Needle as $n) {
+         $Haystack = preg_replace('#(?!<.*?)('.preg_quote($n).')(?![^<>]*?>)#i', '<mark>\1</mark>', $Haystack);
+      }
+      return $Haystack;
+   }
+endif;
+
 if (!function_exists('MergeArrays')) {
    /**
     * Merge two associative arrays into a single array.
@@ -1695,6 +1734,85 @@ if (!function_exists('SignInPopup')) {
     */
    function SignInPopup() {
       return C('Garden.SignIn.Popup') && !IsMobile();
+   }
+}
+
+if (!function_exists('ParseUrl')) {
+   // 
+   /** 
+    * A Vanilla wrapper for php's parse_url, which doesn't always return values for every url part.
+    * @param string $Url The url to parse. 
+    * @param constant Use PHP_URL_SCHEME, PHP_URL_HOST, PHP_URL_PORT, PHP_URL_USER, PHP_URL_PASS, PHP_URL_PATH, PHP_URL_QUERY or PHP_URL_FRAGMENT to retrieve just a specific url component.
+    */
+   function ParseUrl($Url, $Component = -1) {
+      // Retrieve all the parts
+      $PHP_URL_SCHEME = @parse_url($Url, PHP_URL_SCHEME);
+      $PHP_URL_HOST = @parse_url($Url, PHP_URL_HOST);
+      $PHP_URL_PORT = @parse_url($Url, PHP_URL_PORT);
+      $PHP_URL_USER = @parse_url($Url, PHP_URL_USER);
+      $PHP_URL_PASS = @parse_url($Url, PHP_URL_PASS);
+      $PHP_URL_PATH = @parse_url($Url, PHP_URL_PATH);
+      $PHP_URL_QUERY = @parse_url($Url, PHP_URL_QUERY);
+      $PHP_URL_FRAGMENT = @parse_url($Url, PHP_URL_FRAGMENT);
+
+      // Build a cleaned up array to return
+      $Parts = array(
+         'scheme' => $PHP_URL_SCHEME == NULL ? 'http' : $PHP_URL_SCHEME,
+         'host' => $PHP_URL_HOST == NULL ? '' : $PHP_URL_HOST,
+         'port' => $PHP_URL_PORT == NULL ? $PHP_URL_SCHEME == 'https' ? '443' : '80' : $PHP_URL_PORT,
+         'user' => $PHP_URL_USER == NULL ? '' : $PHP_URL_USER,
+         'pass' => $PHP_URL_PASS == NULL ? '' : $PHP_URL_PASS,
+         'path' => $PHP_URL_PATH == NULL ? '' : $PHP_URL_PATH,
+         'query' => $PHP_URL_QUERY == NULL ? '' : $PHP_URL_QUERY,
+         'fragment' => $PHP_URL_FRAGMENT == NULL ? '' : $PHP_URL_FRAGMENT
+      );
+      
+      // Return
+      switch ($Component) {
+         case PHP_URL_SCHEME: return $Parts['scheme'];
+         case PHP_URL_HOST: return $Parts['host'];
+         case PHP_URL_PORT: return $Parts['port'];
+         case PHP_URL_USER: return $Parts['user'];
+         case PHP_URL_PASS: return $Parts['pass'];
+         case PHP_URL_PATH: return $Parts['path'];
+         case PHP_URL_QUERY: return $Parts['query'];
+         case PHP_URL_FRAGMENT: return $Parts['fragment'];
+         default: return $Parts;
+      }
+   }
+}
+if (!function_exists('BuildUrl')) {
+   // 
+   /** 
+    * Complementary to ParseUrl, this function puts the pieces back together and returns a valid url.
+    * @param array ParseUrl array to build. 
+    */
+   function BuildUrl($Parts) {
+      // Full format: http://user:pass@hostname:port/path?querystring#fragment
+      $Return = $Parts['scheme'].'://';
+      if ($Parts['user'] != '' || $Parts['pass'] != '')
+         $Return .= $Parts['user'].':'.$Parts['pass'].'@';
+
+      $Return .= $Parts['host'];
+      // Custom port?
+      if ($Parts['port'] == '443' && $Parts['scheme'] == 'https') {
+      } elseif ($Parts['port'] == '80' && $Parts['scheme'] == 'http') {
+      } elseif ($Parts['port'] != '') {
+         $Return .= ':'.$Parts['port'];
+      }
+      
+      if ($Parts['path'] != '') {
+         if (substr($Parts['path'], 0, 1) != '/')
+            $Return .= '/';
+         $Return .= $Parts['path'];
+      }
+      if ($Parts['query'] != '') 
+         $Return .= '?'.$Parts['query'];
+      
+      if ($Parts['fragment'] != '') 
+         $Return .= '#'.$Parts['fragment'];
+      
+      return $Return;
    }
 }
 
@@ -2087,10 +2205,10 @@ if (!function_exists('Redirect')) {
       if (!$Destination)
          $Destination = Url('');
       
-      if (Debug() && $Trace = Trace()) {
-         Trace("Redirecting to $Destination");
-         return;
-      }
+//      if (Debug() && $Trace = Trace()) {
+//         Trace("Redirecting to $Destination");
+//         return;
+//      }
          
       // Close any db connections before exit
       $Database = Gdn::Database();

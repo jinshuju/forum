@@ -53,6 +53,9 @@ endif;
  */
 if (!function_exists('WriteComment')):
 function WriteComment($Comment, $Sender, $Session, $CurrentOffset) {
+   static $UserPhotoFirst = NULL;
+   if ($UserPhotoFirst === NULL)
+      $UserPhotoFirst = C('Vanilla.Comment.UserPhotoFirst', TRUE);
    $Author = Gdn::UserModel()->GetID($Comment->InsertUserID); //UserBuilder($Comment, 'Insert');
    $Permalink = GetValue('Url', $Comment, '/discussion/comment/'.$Comment->CommentID.'/#Comment_'.$Comment->CommentID);
 
@@ -88,14 +91,19 @@ function WriteComment($Comment, $Sender, $Session, $CurrentOffset) {
          <div class="AuthorWrap">
             <span class="Author">
                <?php
-               echo UserPhoto($Author);
-               echo UserAnchor($Author, 'Username');
+               if ($UserPhotoFirst) {
+                  echo UserPhoto($Author);
+                  echo UserAnchor($Author, 'Username');
+               } else {
+                  echo UserAnchor($Author, 'Username');
+                  echo UserPhoto($Author);
+               }
                echo FormatMeAction($Comment);
                ?>
             </span>
             <span class="AuthorInfo">
                <?php
-               echo WrapIf(GetValue('Title', $Author), 'span', array('class' => 'MItem AuthorTitle'));
+               echo ' '.WrapIf(htmlspecialchars(GetValue('Title', $Author)), 'span', array('class' => 'MItem AuthorTitle'));
                $Sender->FireEvent('AuthorInfo'); 
                ?>
             </span>   
@@ -140,19 +148,9 @@ endif;
 
 if (!function_exists('WriteReactions')):
 function WriteReactions($Row, $Type = 'Comment') {
-   // noop
-}
-endif;
-
-if (!function_exists('WriteReactions')):
-function WriteReactions($Row, $Type = 'Comment') {
-   // noop
-}
-endif;
-
-if (!function_exists('WriteReactions')):
-function WriteReactions($Row, $Type = 'Comment') {
-   // noop
+   echo '<div class="Reactions">';
+      Gdn::Controller()->FireEvent('AfterReactions');
+   echo '</div>';
 }
 endif;
 
@@ -251,7 +249,7 @@ function WriteDiscussionOptions($Discussion = NULL) {
    $Options = GetDiscussionOptions($Discussion);
    
    if (empty($Options))
-      return;
+      return; 
    ?>
    <span class="ToggleFlyout OptionsMenu">
       <span class="OptionsTitle" title="<?php echo T('Options'); ?>"><?php echo T('Options'); ?></span>
@@ -393,7 +391,8 @@ function WriteCommentForm() {
                   'RegisterUrl' => Url(RegisterUrl(Url(''))),
                   'Popup' => $Popup
                )
-            ); ?></div>
+            ); ?>
+         </div>
 			<?php //echo Anchor(T('All Discussions'), 'discussions', 'TabLink'); ?>
 		</div>
 		<?php
@@ -474,8 +473,8 @@ if (!function_exists('FormatMeAction')):
       if (!IsMeAction($Comment))
          return;
       
-      // Maxlength (don't let people blow up the forum
-      $Maxlength = 100;
+      // Maxlength (don't let people blow up the forum)
+      $Maxlength = C('Vanilla.MeAction.MaxLength', 100);
       $Body = Gdn_Format::PlainText(substr($Comment->Body, 4));
       if (strlen($Body) > $Maxlength)
          $Body = substr($Body, 0, $Maxlength).'...';

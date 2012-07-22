@@ -291,16 +291,25 @@ class UserModel extends Gdn_Model {
       
       // Don't synch the user photo if they've uploaded one already.
       $Photo = GetValue('Photo', $NewUser);
-      if (!GetValue('Photo', $CurrentUser) || !is_string($Photo) || ($Photo && !StringBeginsWith($Photo, 'http'))) {
+      $CurrentPhoto = GetValue('Photo', $CurrentUser);
+      if (FALSE
+         || ($CurrentPhoto && !StringBeginsWith($CurrentPhoto, 'http')) 
+         || !is_string($Photo) 
+         || ($Photo && !StringBeginsWith($Photo, 'http')) 
+         || strpos($Photo, '.gravatar.') !== FALSE
+         || StringBeginsWith($Photo, Url('/', TRUE))) {
          unset($NewUser['Photo']);
+         Trace('Not setting photo.');
       }
       
       if (C('Garden.SSO.SynchRoles')) {
          // Translate the role names to IDs.
          
-         $Roles = GetValue('Roles', $NewUser);
+         $Roles = GetValue('Roles', $NewUser, '');
          if (is_string($Roles))
             $Roles = explode(',', $Roles);
+         else
+            $Roles = array();
          $Roles = array_map('trim', $Roles);
          $Roles = array_map('strtolower', $Roles);
          
@@ -312,15 +321,22 @@ class UserModel extends Gdn_Model {
                $RoleIDs[] = $RoleID;
             }
          }
-         $NewUser['RoleIDs'] = $RoleIDs;
+         if (empty($RoleIDs)) {
+            $RoleIDs = $this->NewUserRoleIDs();
+         }
+         $NewUser['RoleID'] = $RoleIDs;
       } else {
          unset($NewUser['Roles']);
-         unset($NewUser['RoleIDs']);
+         unset($NewUser['RoleID']);
       }
       
       // Save the user information.
       $NewUser['UserID'] = $CurrentUser['UserID'];
-      $this->Save($NewUser, array('NoConfirmEmail' => TRUE, 'FixUnique' => TRUE, 'SaveRoles' => isset($NewUser['RoleIDs'])));
+      Trace($NewUser);
+      
+      $Result = $this->Save($NewUser, array('NoConfirmEmail' => TRUE, 'FixUnique' => TRUE, 'SaveRoles' => isset($NewUser['RoleID'])));
+      if (!$Result)
+         Trace($this->Validation->ResultsText());
    }
 
    /** Connect a user with a foreign authentication system.
@@ -405,6 +421,9 @@ class UserModel extends Gdn_Model {
                'Score' => 0));
       if (!Gdn::Session()->CheckPermission('Garden.Moderation.Manage')) {
          $Data = array_diff_key($Data, array('Banned' => 0, 'Verified' => 0));
+      }
+      if (!Gdn::Session()->CheckPermission('Garden.Moderation.Manage')) {
+         unset($Data['RankID']);
       }
       if (!Gdn::Session()->CheckPermission('Garden.Users.Edit') && !C("Garden.Profile.EditUsernames")) {
          unset($Data['Name']);
@@ -771,6 +790,9 @@ class UserModel extends Gdn_Model {
    }
 
    public function GetID($ID, $DatasetType = DATASET_TYPE_OBJECT) {
+      if (!$ID)
+         return FALSE;
+      
       // Check page cache, then memcached
       $User = $this->GetUserFromCache($ID, 'userid');
       
@@ -1529,11 +1551,24 @@ class UserModel extends Gdn_Model {
       if ($ApplicantRoleID != 0)
          $this->SQL->Where('ur.RoleID is null');
 
-      return $this->SQL
+      $Data = $this->SQL
          ->Where('u.Deleted', 0)
          ->OrderBy($OrderFields, $OrderDirection)
          ->Limit($Limit, $Offset)
          ->Get();
+      
+      $Result =& $Data->Result();
+      
+      foreach ($Result as &$Row) {
+         if ($Row->Photo && strpos($Row->Photo, '//') === FALSE) {
+            $Row->Photo = Gdn_Upload::Url($Row->Photo);
+         }
+         
+         $Row->Attributes = @unserialize($Row->Preferences);
+         $Row->Preferences = @unserialize($Row->Preferences);
+      }
+      
+      return $Data;
    }
 
    public function SearchCount($Keywords = FALSE) {
@@ -2528,7 +2563,8 @@ class UserModel extends Gdn_Model {
 
    public function SetCalculatedFields(&$User) {
       if ($v = GetValue('Attributes', $User))
-         SetValue('Attributes', $User, @unserialize($v));
+         if (is_string($v))
+            SetValue('Attributes', $User, @unserialize($v));
       if ($v = GetValue('Permissions', $User))
          SetValue('Permissions', $User, @unserialize($v));
       if ($v = GetValue('Preferences', $User))
@@ -2550,6 +2586,14 @@ class UserModel extends Gdn_Model {
          }
          SetValue('AllIPAddresses', $User, $IPAddresses);
       }
+      
+      TouchValue('_CssClass', $User, '');
+      if ($v = GetValue('Banned', $User)) {
+         SetValue('_CssClass', $User, 'Banned');
+      }
+      
+      $this->EventArguments['User'] =& $User;
+      $this->FireEvent('SetCalculatedFields');
    }
 
    public static function SetMeta($UserID, $Meta, $Prefix = '') {
@@ -2822,6 +2866,8 @@ class UserModel extends Gdn_Model {
          break;
       }
       
+      if (empty($RoleID))
+         Trace("You don't have any default roles defined.", TRACE_WARNING);
       return $RoleID;
    }
    

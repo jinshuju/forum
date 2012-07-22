@@ -88,9 +88,9 @@ a {
 	}
 }
 
-.ItemContent.Discussion {
+/*.ItemContent.Discussion {
 	overflow:hidden;
-}
+}*/
 
 .Box {
 	margin: 15px 0;
@@ -104,8 +104,16 @@ a {
 	border: 1px solid #DDD;
 }
 
+.UserBox, .MeBox {
+	margin-top:0;
+}
+
 .PageDescription {
 	padding:0 10px;
+}
+
+.PageControls.Top {
+	display:none;
 }
 
 #Content {
@@ -128,12 +136,20 @@ h1.HomepageTitle {
 	background: #F2F2F2;
 }
 
-.Discussion {
+ul.Discussions {
 	.Title a {
-		color:#333;
+		color:#000;
 	}
 	.Meta a {
 		color:#8B920A;
+	}
+	li img {
+		width:40px;
+		height:40px;
+	}
+	.Item {
+		background:#FFF;
+		padding:8px 8px 3px;
 	}
 }
 
@@ -183,10 +199,6 @@ h1.HomepageTitle {
 	color:#777;
 }
 
-.Discussions .Item {
-	background:#FFF;
-}
-
 #dashboard_entry_signin #Content {
 	overflow:hidden;
 }
@@ -205,6 +217,9 @@ h1.HomepageTitle {
 	a {
 		color:#B7B7B7;
 	}
+}
+.Discussion .PageTitle h1 {
+	font-weight: normal;
 }
 
 h2.CommentHeading {

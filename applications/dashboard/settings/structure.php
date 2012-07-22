@@ -535,7 +535,7 @@ if ($PhotoIDExists) {
    $Construct->Table('User')->DropColumn('PhotoID');
 }
 
-// This is a fix for erroneos unique constraint.
+// This is a fix for erroneous unique constraint.
 if ($Construct->TableExists('Tag')) {
    $Db = Gdn::Database();
    $Px = Gdn::Database()->DatabasePrefix;
@@ -591,7 +591,7 @@ $Construct->Table('Log')
    ->Column('OtherUserIDs', 'varchar(255)', NULL)
    ->Column('DateUpdated', 'datetime', NULL)
    ->Column('ParentRecordID', 'int', NULL, 'index')
-   ->Column('Data', 'text', NULL) // the data from the record.
+   ->Column('Data', 'mediumtext', NULL) // the data from the record.
    ->Column('CountGroup', 'int', NULL)
    ->Engine('InnoDB')
    ->Set($Explicit, $Drop);
@@ -629,3 +629,30 @@ $Construct->Table('Spammer')
    ->Column('CountSpam', 'usmallint', 0)
    ->Column('CountDeletedSpam', 'usmallint', 0)
    ->Set($Explicit, $Drop);
+
+$Construct
+   ->Table('Media')
+   ->PrimaryKey('MediaID')
+   ->Column('Name', 'varchar(255)')
+   ->Column('Path', 'varchar(255)')
+   ->Column('Type', 'varchar(128)')
+   ->Column('Size', 'int(11)')
+   
+   ->Column('InsertUserID', 'int(11)')
+   ->Column('DateInserted', 'datetime')
+   ->Column('ForeignID', 'int(11)', TRUE)
+   ->Column('ForeignTable', 'varchar(24)', TRUE)
+
+   ->Column('ImageWidth', 'usmallint', NULL)
+   ->Column('ImageHeight', 'usmallint', NULL)
+//   ->Column('StorageMethod', 'varchar(24)')
+   ->Column('ThumbWidth', 'usmallint', NULL)
+   ->Column('ThumbHeight', 'usmallint', NULL)
+   ->Column('ThumbPath', 'varchar(255)', NULL)
+   
+   ->Set(FALSE, FALSE);
+
+// Make sure the smarty folders exist.
+if (!file_exists(PATH_CACHE.'/Smarty')) @mkdir(PATH_CACHE.'/Smarty');
+if (!file_exists(PATH_CACHE.'/Smarty/cache')) @mkdir(PATH_CACHE.'/Smarty/cache');
+if (!file_exists(PATH_CACHE.'/Smarty/compile')) @mkdir(PATH_CACHE.'/Smarty/compile');

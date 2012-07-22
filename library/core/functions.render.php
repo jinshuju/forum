@@ -32,9 +32,63 @@ if (!function_exists('BigPlural')) {
       }
       $Title = sprintf(T($Number == 1 ? $Singular : $Plural), number_format($Number));
       
-      return '<span title="'.$Title.'">'.Gdn_Format::BigNumber($Number).'</span>';
+      return '<span title="'.$Title.'" class="Number">'.Gdn_Format::BigNumber($Number).'</span>';
    }
 }
+
+if (!function_exists('Bullet')):
+   function Bullet() {
+      return '<span class="Bullet">&bull;</span>';
+   }
+endif;
+
+if (!function_exists('ButtonGroup')):
+   /**
+    *
+    * @param array $Links An array of arrays with the following keys:
+    *  - Text: The text of the link.
+    *  - Url: The url of the link.
+    * @param string $CssClass The css class of the link.
+    * @param string|false $Default The url of the default link.
+    * @since 2.1
+    */
+   function ButtonGroup($Links, $CssClass = 'Button', $Default = FALSE) {
+      if (!is_array($Links) || count($Links) < 1)
+         return;
+      
+      $Text = $Links[0]['Text'];
+      $Url = $Links[0]['Url'];
+      
+      if ($Default) {
+         // Find the default button. 
+         $Default = ltrim($Default, '/');
+         foreach ($Links as $Link) {
+            if (StringBeginsWith(ltrim($Link['Url'], '/') , $Default)) {
+               $Text = $Link['Text'];
+               $Url = $Link['Url'];
+               break;
+            }
+         }
+      }
+      
+      if (count($Links) < 2) {
+         echo Anchor($Text, $Url, $CssClass);
+      } else {
+         // NavButton or Button?
+         $ButtonCss = strpos($CssClass, 'NavButton') !== FALSE ? 'NavButton' : 'Button';
+         // Strip "Button" or "NavButton" off the group class.
+         echo '<div class="ButtonGroup '.str_replace(array('NavButton', 'Button'), array('',''), $CssClass).'">';
+            echo Anchor($Text, $Url, $ButtonCss);
+            echo Anchor(Sprite('SpDropdownHandle'), '#', $ButtonCss.' Handle');
+            echo '<ul class="Dropdown MenuItems">';
+               foreach ($Links as $Link) {
+                  echo Wrap(Anchor($Link['Text'], $Link['Url'], GetValue('CssClass', $Link, '')), 'li');
+               }
+            echo '</ul>';
+         echo '</div>';
+      }
+   }
+endif; 
 
 if (!function_exists('CategoryUrl')):
 
@@ -146,6 +200,14 @@ function CssClass($Row) {
       
       if ($_CssClss = GetValue('_CssClass', $Row))
          $CssClass .= ' '.$_CssClss;
+      
+      // Insert User classes.
+      if ($UserID = GetValue('InsertUserID', $Row)) {
+         $User = Gdn::UserModel()->GetID($UserID);
+         if ($_CssClss = GetValue('_CssClass', $User)) {
+            $CssClass .= ' '.$_CssClss;
+         }
+      }
 
    return trim($CssClass);
 }
@@ -357,7 +419,7 @@ if (!function_exists('UserAnchor')) {
       } elseif (is_string($Options))
          $Options = array('Px' => $Options);
       
-      $Px = GetValue('Px', $Options);
+      $Px = GetValue('Px', $Options, '');
       
       $Name = GetValue($Px.'Name', $User, T('Unknown'));
       $UserID = GetValue($Px.'UserID', $User, 0);
@@ -367,8 +429,8 @@ if (!function_exists('UserAnchor')) {
           'class' => $CssClass,
           'rel' => GetValue('Rel', $Options)
           );
-
-      return '<a href="'.htmlspecialchars(Url('/profile/'.($NameUnique ? '' : "$UserID/").rawurlencode($Name))).'"'.Attribute($Attributes).'>'.$Text.'</a>';
+      $UserUrl = UserUrl($User,$Px);
+      return '<a href="'.htmlspecialchars(Url($UserUrl)).'"'.Attribute($Attributes).'>'.$Text.'</a>';
    }
 }
 
@@ -407,12 +469,33 @@ if (!function_exists('UserPhoto')) {
       else
          $User = (object)$User;
       
-      $LinkClass = GetValue('LinkClass', $Options, 'ProfileLink');
-      $ImgClass = GetValue('ImageClass', $Options, 'ProfilePhoto ProfilePhotoMedium');
+      $LinkClass = ConcatSep(' ', GetValue('LinkClass', $Options, ''), 'PhotoWrap');
+      $ImgClass = GetValue('ImageClass', $Options, 'ProfilePhoto');
+      
+      $Size = GetValue('Size', $Options);
+      if ($Size) {
+         $LinkClass .= " PhotoWrap{$Size}";
+         $ImgClass .= " {$ImgClass}{$Size}";
+      } else {
+         $ImgClass .= " {$ImgClass}Medium"; // backwards compat
+      }
+      
+      $FullUser = Gdn::UserModel()->GetID(GetValue('UserID', $User), DATASET_TYPE_ARRAY);
+      $UserCssClass = GetValue('_CssClass', $FullUser);
+      if ($UserCssClass)
+         $LinkClass .= ' '.$UserCssClass;
       
       $LinkClass = $LinkClass == '' ? '' : ' class="'.$LinkClass.'"';
 
-      $Photo = $User->Photo;
+      $Photo = GetValue('Photo', $User);
+      $Name = GetValue('Name', $User);
+      $Title = htmlspecialchars(GetValue('Title', $Options, $Name));
+      
+      if ($FullUser['Banned']) {
+         $Photo = 'http://cdn.vanillaforums.com/images/banned_100.png';
+         $Title .= ' ('.T('Banned').')';
+      }
+      
       if (!$Photo && function_exists('UserPhotoDefaultUrl'))
          $Photo = UserPhotoDefaultUrl($User, $ImgClass);
 
@@ -423,8 +506,8 @@ if (!function_exists('UserPhoto')) {
             $PhotoUrl = $Photo;
          }
          $Href = Url(UserUrl($User));
-         return '<a title="'.htmlspecialchars($User->Name).'" href="'.$Href.'"'.$LinkClass.'>'
-            .Img($PhotoUrl, array('alt' => htmlspecialchars($User->Name), 'class' => $ImgClass))
+         return '<a title="'.$Title.'" href="'.$Href.'"'.$LinkClass.'>'
+            .Img($PhotoUrl, array('alt' => htmlspecialchars($Name), 'class' => $ImgClass))
             .'</a>';
       } else {
          return '';
@@ -437,14 +520,21 @@ if (!function_exists('UserUrl')) {
     * Return the url for a user.
     * @param array|object $User The user to get the url for.
     * @param string $Px The prefix to apply before fieldnames. @since 2.1
+    * @param string $Method Optional. ProfileController method to target.
     * @return string The url suitable to be passed into the Url() function.
     */
-   function UserUrl($User, $Px = '') {
+   function UserUrl($User, $Px = '', $Method = '') {
       static $NameUnique = NULL;
       if ($NameUnique === NULL)
          $NameUnique = C('Garden.Registration.NameUnique');
       
-      return '/profile/'.($NameUnique ? '' : GetValue($Px.'UserID', $User, 0).'/').rawurlencode(GetValue($Px.'Name', $User));
+      $UserName = GetValue($Px.'Name', $User);
+      $UserName = preg_replace('/([\?&]+)/', '', $UserName);
+      
+      return '/profile/'.
+         ($Method ? trim($Method, '/').'/' : '').
+         ($NameUnique ? '' : GetValue($Px.'UserID', $User, 0).'/').
+         rawurlencode($UserName);
    }
 }
 

@@ -83,9 +83,9 @@ a {
 		padding:5px 10px;*/
 
 }
-.ItemContent.Discussion {
-  overflow: hidden;
-}
+/*.ItemContent.Discussion {
+	overflow:hidden;
+}*/
 .Box {
   margin: 15px 0;
 }
@@ -96,8 +96,15 @@ a {
   box-shadow: 0 0 10px 0 #e2e2e2;
   border: 1px solid #DDD;
 }
+.UserBox,
+.MeBox {
+  margin-top: 0;
+}
 .PageDescription {
   padding: 0 10px;
+}
+.PageControls.Top {
+  display: none;
 }
 #Content {
   padding: 10px 10px;
@@ -117,14 +124,24 @@ h1.HomepageTitle {
   margin: 0;
   background: #F2F2F2;
 }
-.Discussion .Title a {
-  color: #333;
+ul.Discussions .Title a {
+  color: #000;
 }
-.Discussion .Meta a {
+ul.Discussions .Meta a {
   color: #8B920A;
 }
-.Discussion .PageTitle h1 {
-  font-weight: normal;
+ul.Discussions li img {
+  width: 40px;
+  height: 40px;
+}
+ul.Discussions .Item {
+  background: #FFF;
+  padding: 8px 8px 3px;
+}
+h1.HomepageTitle {
+  padding: 5px 10px;
+  margin: 0;
+  background: #F2F2F2;
 }
 #Panel .FilterMenu li,
 .PanelInfo li {
@@ -184,9 +201,6 @@ h1.HomepageTitle {
 .Item .Author a {
   color: #777;
 }
-.Discussions .Item {
-  background: #FFF;
-}
 #dashboard_entry_signin #Content {
   overflow: hidden;
 }
@@ -202,6 +216,9 @@ h1.HomepageTitle {
 }
 #friend-links a {
   color: #B7B7B7;
+}
+.Discussion .PageTitle h1 {
+  font-weight: normal;
 }
 h2.CommentHeading {
   border-radius: 3px;
