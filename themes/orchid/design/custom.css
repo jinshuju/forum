@@ -73,9 +73,9 @@ a {
 		padding:5px 10px;*/
 
 }
-.ItemContent.Discussion {
-  overflow: hidden;
-}
+/*.ItemContent.Discussion {
+	overflow:hidden;
+}*/
 .Box {
   margin: 15px 0;
 }
@@ -86,8 +86,15 @@ a {
   box-shadow: 0 0 10px 0 #e2e2e2;
   border: 1px solid #DDD;
 }
+.UserBox,
+.MeBox {
+  margin-top: 0;
+}
 .PageDescription {
   padding: 0 10px;
+}
+.PageControls.Top {
+  display: none;
 }
 #Content {
   padding: 10px 10px;
@@ -104,11 +111,19 @@ h1.HomepageTitle {
   font-weight: normal;
   font-size: 130%;
 }
-.Discussion .Title a {
-  color: #333;
+ul.Discussions .Title a {
+  color: #000;
 }
-.Discussion .Meta a {
+ul.Discussions .Meta a {
   color: #8B920A;
+}
+ul.Discussions li img {
+  width: 40px;
+  height: 40px;
+}
+ul.Discussions .Item {
+  background: #FFF;
+  padding: 8px 8px 3px;
 }
 h1.HomepageTitle {
   padding: 5px 10px;
@@ -172,9 +187,6 @@ h1.HomepageTitle {
 }
 .Item .Author a {
   color: #777;
-}
-.Discussions .Item {
-  background: #FFF;
 }
 #dashboard_entry_signin #Content {
   overflow: hidden;
