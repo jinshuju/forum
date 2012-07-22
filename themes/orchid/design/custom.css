@@ -191,6 +191,9 @@ h1.HomepageTitle {
 #dashboard_entry_signin #Content {
   overflow: hidden;
 }
+.Discussion .PageTitle h1 {
+  font-weight: normal;
+}
 h2.CommentHeading {
   border-radius: 3px;
   background: #EEE;
