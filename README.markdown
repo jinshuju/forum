@@ -1,10 +1,8 @@
 #Vanilla论坛中文版
 
-<<<<<<< HEAD
 Vanilla是一个结构良好、方便扩展的开源轻型论坛程序。vanilla4china项目将对它进行一定的定制和扩展，使其符合中文用户的习惯
-=======
+
 **Welcome!** Vanilla was born out of the desire to create flexible, customizable, and downright entertaining community solutions. Vanilla has been used to power over 500,000 community forums around the world and we couldn't be happier that you've decided to use Vanilla to grow yours.
->>>>>>> upstream/master
 
 ###主要特性：
 *   更完善的中文翻译
