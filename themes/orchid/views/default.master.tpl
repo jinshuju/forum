@@ -14,9 +14,9 @@
       {dashboard_link}
       {discussions_link}
       {activity_link}
-      {inbox_link}
+      <!-- {inbox_link} -->
       {custom_menu}
-      {profile_link}
+      <!-- {profile_link} -->
       {signinout_link}
      </ul>
      <div class="SiteSearch">{searchbox}</div>
@@ -24,7 +24,6 @@
   </div>
   <div id="Body">
     <div class="Row">
-      <!-- <div class="BreadcrumbsWrapper P">{breadcrumbs}</div> -->
       <div class="Column PanelColumn" id="Panel">
          {module name="MeModule"}
          {asset name="Panel"}
