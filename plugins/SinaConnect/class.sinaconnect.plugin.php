@@ -299,7 +299,7 @@ class SinaConnectPlugin extends Gdn_Plugin {
       if ($HttpCode == '200')
          return $Result;
       else
-         throw new OAuthException(GetValue('error', $Result, $Result), $HttpCode, $previous);
+         throw new OAuthException(GetValue('error', $Result, $Result), $HttpCode);
    }
 
    public function GetProfile() {
