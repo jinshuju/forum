@@ -6,7 +6,7 @@
  * Ex. Hello World - Page 2 - Vanilla Forums***/
 $Definition[' - Page %s'] = ' - 页 %s';
 
-$Definition[' You should '] = ' 您应该 ';
+$Definition[' You should '] = ' 你应该 ';
 $Definition[' now.'] = ' 现在。';
 
 $Definition['%1$s accepted %4$s invitation for membership.'] = '%1$s接受了%4$s的邀请。';
@@ -42,7 +42,7 @@ $Definition['%s Point'] = '';
 $Definition['%s Points'] = '';
 $Definition['%s Up Votes'] = '%s 投票最多';
 $Definition['%s WTFs'] = '%s 踩';
-$Definition['%s and you'] = '%s和您';
+$Definition['%s and you'] = '%s和你';
 $Definition['%s changed %s\'s permissions.'] = '%s 修改了 %s 的权限。';
 $Definition['%s comment'] = '%s条回复';
 $Definition['%s comments'] = '%s条回复';
@@ -96,13 +96,13 @@ $Definition['Activity.AddedToConversation.FullHeadline'] = 'Activity.AddedToConv
 $Definition['Activity.AddedToConversation.ProfileHeadline'] = 'Activity.AddedToConversation.ProfileHeadline';
 $Definition['Activity.AnswerAccepted.FullHeadline'] = '%1$s 接受了 %4$s %8$s。';
 $Definition['Activity.AnswerAccepted.ProfileHeadline'] = 'Activity.AnswerAccepted.ProfileHeadline';
-$Definition['Activity.BookmarkComment.FullHeadline'] = '%1$s 回复了您的 %8$s。';
-$Definition['Activity.BookmarkComment.ProfileHeadline'] = '%1$s 回复了您的 %8$s。';
+$Definition['Activity.BookmarkComment.FullHeadline'] = '%1$s 回复了你的 %8$s。';
+$Definition['Activity.BookmarkComment.ProfileHeadline'] = '%1$s 回复了你的 %8$s。';
 $Definition['Activity.Comment'] = '回复';
 $Definition['Activity.CommentMention.FullHeadline'] = '%1$s 在 %8$s 中提到了 %3$s。';
 $Definition['Activity.CommentMention.ProfileHeadline'] = '%1$s 在 %8$s 中提到了 %3$s。';
-$Definition['Activity.ConversationMessage.FullHeadline'] = '%1$s 给您发送了一个 %8$s。';
-$Definition['Activity.ConversationMessage.ProfileHeadline'] = '%1$s 给您发送了一个 %8$s。';
+$Definition['Activity.ConversationMessage.FullHeadline'] = '%1$s 给你发送了一个 %8$s。';
+$Definition['Activity.ConversationMessage.ProfileHeadline'] = '%1$s 给你发送了一个 %8$s。';
 $Definition['Activity.Default.FullHeadline'] = 'Activity.Default.FullHeadline';
 $Definition['Activity.Default.ProfileHeadline'] = 'Activity.Default.ProfileHeadline';
 $Definition['Activity.Delete'] = '×';
@@ -156,8 +156,8 @@ $Definition['All Conversations'] = '所有邮件';
 $Definition['All Discussions'] = '所有话题';
 $Definition['All Time Leaders'] = '所有管理员';
 $Definition['Allow'] = '允许';
-$Definition['Allow other members to see your email?'] = '允许其它用户查看您的电子邮件地址?';
-$Definition['An invitation has already been sent to the email you entered.'] = '邀请已发送到您输入的邮件地址 ';
+$Definition['Allow other members to see your email?'] = '允许其它用户查看你的电子邮件地址?';
+$Definition['An invitation has already been sent to the email you entered.'] = '邀请已发送到你输入的邮件地址 ';
 $Definition['Ancient Membership'] = '老会员';
 $Definition['Announce this discussion'] = '置顶话题';
 $Definition['Announce...'] = '置顶';
@@ -167,15 +167,15 @@ $Definition['Answers'] = '回答';
 $Definition['Apply Changes'] = '应用更改';
 $Definition['Apply for Membership'] = '注册';
 $Definition['Apply for membership'] = '申请入会';
-$Definition['Are you ABSOLUTELY sure you want to take this action?'] = '完全确认您现在的操作？';
-$Definition['Are you sure you want to delete this %s?'] = '确认您想要删除%s？';
+$Definition['Are you ABSOLUTELY sure you want to take this action?'] = '完全确认你现在的操作？';
+$Definition['Are you sure you want to delete this %s?'] = '确认你想要删除%s？';
 $Definition['Are you sure you want to do this?'] = '确认要这么做？';
 $Definition['Are you sure you wish to continue?'] = '确认要继续？';
 $Definition['Ask Question'] = '提问';
 $Definition['Ask a Question'] = '我要提问';
 $Definition['Attach a file'] = '添加附件';
 $Definition['Attachments'] = '附件';
-$Definition['AttemptingSignOut'] = '您正试图退出。您确定要%s？';
+$Definition['AttemptingSignOut'] = '你正试图退出。你确定要%s？';
 $Definition['Authenticate URL'] = '验证地址';
 $Definition['Awaiting Moderation'] = '等待审核';
 $Definition['Awesome'] = '顶';
@@ -201,12 +201,12 @@ $Definition['Bookmark'] = '关注';
 $Definition['Bookmarked Discussions'] = '关注的话题';
 $Definition['Bookmarks'] = '关注';
 $Definition['By'] = '被';
-$Definition['By uploading a file you certify that you have the right to distribute this picture and that it does not violate the Terms of Service.'] = '上传文件时请确定您有权发布该图片, 并且不违反服务条款。';
+$Definition['By uploading a file you certify that you have the right to distribute this picture and that it does not violate the Terms of Service.'] = '上传文件时请确定你有权发布该图片, 并且不违反服务条款。';
 
 $Definition['Casual'] = '临时';
 $Definition['CategoriesShowFollowed'] = '展示我关注的版块';
 $Definition['CategoriesShowUnfollowed'] = '展示我未关注的版块';
-$Definition['CategoriesViewingAll'] = '您正在浏览所有的版块。';
+$Definition['CategoriesViewingAll'] = '你正在浏览所有的版块。';
 $Definition['CategoriesViewingFollowed'] = '现在展示的是我关注的版块，还有许多待发掘的版块内容哦！';
 $Definition['CategoriesViewingUnfollowed'] = '';
 $Definition['Category Management'] = '版块管理';
@@ -221,14 +221,14 @@ $Definition['Change Picture'] = '更换图片';
 $Definition['Check all roles that apply to this user:'] = '查看此用户的所有权限:';
 $Definition['Child Categories'] = '子版块';
 $Definition['Child Categories:'] = '子版块：';
-$Definition['Choose a name to identify yourself on the site.'] = '输入您在论坛里显示的用户名';
-$Definition['Choose the main discussion into which all comments will be merged:'] = '选择所有主题将合并进的主体主题。';
-$Definition['Choose whether you want to ask a question or start a discussion.'] = '选择咨询问题或开始一个新主题';
+$Definition['Choose a name to identify yourself on the site.'] = '输入你在论坛里显示的用户名';
+$Definition['Choose the main discussion into which all comments will be merged:'] = '选择所有回复将合并进的主话题。';
+$Definition['Choose whether you want to ask a question or start a discussion.'] = '选择咨询问题或开始一个新话题';
 $Definition['Clear'] = '删除';
 $Definition['Clear Conversation History'] = '清除聊天历史';
-$Definition['Click <a href="%s">here</a> to go back to the discussion.'] = '点击 <a href="%s">这里</a> 返回主题。';
+$Definition['Click <a href="%s">here</a> to go back to the discussion.'] = '点击 <a href="%s">这里</a> 返回话题。';
 $Definition['Click accept or reject beside an answer.'] = '尊重他人回答，请选择 “采纳” 或 “不采纳” 进行评价。';
-$Definition['Click the %s beside discussions to bookmark them.'] = '点击主题后面的 %s 收藏它们。';
+$Definition['Click the %s beside discussions to bookmark them.'] = '点击话题后面的 %s 收藏它们。';
 $Definition['Close this discussion'] = '锁定话题';
 $Definition['Closed'] = '已关闭';
 $Definition['Combo Breaker'] = '';
@@ -254,7 +254,7 @@ $Definition['Custom Information'] = '自定义信息';
 $Definition['Custom Profile Field Settings'] = '自定义个人资料设置栏目';
 $Definition['Custom Profile Fields'] = '自定义个人资料栏目';
 $Definition['Customize'] = '个性化';
-$Definition['Customize your Public Profile'] = '个性化您的个人资料';
+$Definition['Customize your Public Profile'] = '个性化你的个人资料';
 
 $Definition['Dashboard Home'] = '控制面板主页';
 $Definition['Dashboard Summaries'] = '控制面板简介';
@@ -265,7 +265,7 @@ $Definition['Date.DefaultDayFormat'] = '%B %e';
 $Definition['Date.DefaultFormat'] = '%Y年%m月%d日';
 $Definition['Date.DefaultTimeFormat'] = '%l:%M%p';
 $Definition['Date.DefaultYearFormat'] = '%B %Y';
-$Definition['Define Thumbnail'] = '点击并拖动图片以选定区域作为您的小头像。';
+$Definition['Define Thumbnail'] = '点击并拖动图片以选定区域作为你的小头像。';
 $Definition['Delete %s'] = '删除 %s';
 $Definition['Delete Conversation'] = '删除邮件';
 $Definition['Delete Discussion'] = '删除话题';
@@ -279,7 +279,7 @@ $Definition['Discussions Page'] = '话题列表页面';
 $Definition['Dislike'] = '不喜欢';
 $Definition['Dismiss'] = '忽略';
 $Definition['Disqus'] = 'Disqus';
-$Definition['Do you want to expire or delete this warning?'] = '您想删除此警告吗？';
+$Definition['Do you want to expire or delete this warning?'] = '你想删除此警告吗？';
 $Definition['Don\'t have an account? %s'] = '还没有账号？%s';
 $Definition['Draft saved at %s'] = '草稿保存在 %s。';
 $Definition['Draft.Delete'] = '×';
@@ -303,24 +303,24 @@ $Definition['Email Unavailable'] = '该地址已被占用';
 $Definition['Email sent from the application will be addressed from the following name and address'] = '应用程序将会按照以下的名字和地址发送电子邮件。';
 $Definition['Email visible to other users'] = '电子邮件地址公开';
 $Definition['Email/Username'] = 'Email/用户名';
-$Definition['EmailConfirmEmail'] = '您好！
+$Definition['EmailConfirmEmail'] = '你好！
 
-请您确认您的帐户邮箱。账户邮箱将作为您重置密码，收取提醒消息等一系列的功能的前提，请确认邮箱的正确性。
+请你确认你的帐户邮箱。账户邮箱将作为你重置密码，收取提醒消息等一系列的功能的前提，请确认邮箱的正确性。
 
 请点击下面的链接进行确认: {/entry/emailconfirm,url,domain}/{User.UserID,rawurlencode}/{EmailKey,rawurlencode}';
 $Definition['EmailFooter'] = '
-祝您开心每一天!';
-$Definition['EmailHeader'] = '您好，{User.Name}！
+祝你开心每一天!';
+$Definition['EmailHeader'] = '你好，{User.Name}！
 ';
-$Definition['EmailInvitation'] = '您好!
+$Definition['EmailInvitation'] = '你好!
 
-    您的好友 %1$s 邀请您加入 %2$s. 欢迎点击下面链接的成为社区的一员:
+    你的好友 %1$s 邀请你加入 %2$s. 欢迎点击下面链接的成为社区的一员:
 	
     %3$s
 ';
-$Definition['EmailMembershipApproved'] = '您好： %1$s,
+$Definition['EmailMembershipApproved'] = '你好： %1$s,
 
-    恭喜您，您的申请已被管理员通过。 点击下面的链接进行登录:
+    恭喜你，你的申请已被管理员通过。 点击下面的链接进行登录:
 
      %2$s';
 $Definition['EmailNotification'] = '%1$s
@@ -328,9 +328,9 @@ $Definition['EmailNotification'] = '%1$s
      点击以下下链接继续：
 	
      %2$s';
-$Definition['EmailPassword'] = '您好 %1$s,
+$Definition['EmailPassword'] = '你好 %1$s,
 
-     %2$s 的密码已经被您重置 %3$s. 请使用系统随机的密码登录并修改您的密码:       
+     %2$s 的密码已经被你重置 %3$s. 请使用系统随机的密码登录并修改你的密码:       
 
 	  Email: %6$s
 	  Password: %5$s
@@ -344,12 +344,12 @@ $Definition['EmailStoryNotification'] = '%1$s
 	
         %2$s
 
-    如果此邮件对您造成了影响，请您登陆社区，进入个人主页，通知设置中取消邮件通知的勾选。
+    如果此邮件对你造成了影响，请你登陆社区，进入个人主页，通知设置中取消邮件通知的勾选。
 	
-     祝您开心每一天!';
-$Definition['EmailWelcome'] = '您好 %1$s,
+     祝你开心每一天!';
+$Definition['EmailWelcome'] = '你好 %1$s,
     
-    %2$s 已经为您创建了爱青大的账户 %3$s. 请使用以下信息登录:
+    %2$s 已经为你创建了爱青大的账户 %3$s. 请使用以下信息登录:
 
 	  Email: %6$s
 	  Password: %5$s
@@ -360,13 +360,13 @@ $Definition['EmailWelcomeConnect'] = 'You have successfully connected to {Title}
   Connected With: {ProviderName}
 
 You can access the site at {/,exurl,domain}.';
-$Definition['EmailWelcomeRegister'] = '您好，{User.Name}
-    恭喜您成功注册了账号 {Title}。以下是您的注册信息：
+$Definition['EmailWelcomeRegister'] = '你好，{User.Name}
+    恭喜你成功注册了账号 {Title}。以下是你的注册信息：
     
     用户名：{User.Name}
     邮件：{User.Email}
 
-您可以用过 {/,url,domain} 访问站点。';
+你可以用过 {/,url,domain} 访问站点。';
 $Definition['EmbeddedDiscussionFormat'] = '';
 $Definition['EmbeddedNoBodyFormat'] = '{Url}';
 $Definition['EmbeddedNoBodyFormat.'] = '';
@@ -374,20 +374,20 @@ $Definition['EmbededDiscussionFormat'] = '<div class="EmbeddedContent">{Image}<s
 <p>{Excerpt}</p>
 <p><a href="{Url}">阅读全文</a></p><div class="ClearFix"></div></div>';
 $Definition['English'] = '英语';
-$Definition['Enter Your OpenID Url'] = '输入您的OpenID地址';
+$Definition['Enter Your OpenID Url'] = '输入你的OpenID地址';
 $Definition['Enter your Email address'] = '电子邮件';
 $Definition['Enter your Email address or username'] = 'Email/用户名';
-$Definition['Enter your email address'] = '输入您的电子邮件地址';
+$Definition['Enter your email address'] = '输入你的电子邮件地址';
 $Definition['Erase User Content'] = '清空用户内容';
 $Definition['Error'] = '错误';
 $Definition['ErrorBadInvitationCode'] = '邀请码错误';
 $Definition['ErrorCredentials'] = '用户名或密码错误，请重新输入';
-$Definition['ErrorPermission'] = '您没有该权限';
+$Definition['ErrorPermission'] = '你没有该权限';
 $Definition['ErrorPluginDisableRequired'] = '错误终止插件命令。插件{1}需要基于插件{0}运行，插件{0}不能终止';
 $Definition['ErrorPluginEnableRequired'] = '错误调用插件命令。这个插件需要{ 0 }插件被打开后才可以使用';
 $Definition['ErrorPluginVersionMatch'] = '插件版本错误。可用插件{0} V1不符合版本要求({2})';
 $Definition['ErrorRecordNotFound'] = '找不到记录错误。要求的记录找不到';
-$Definition['ErrorTermsOfService'] = '服务条款错误。您必须同意服务条款';
+$Definition['ErrorTermsOfService'] = '服务条款错误。你必须同意服务条款';
 $Definition['Expired'] = '过期';
 
 $Definition['Facebook'] = 'Facebook';
@@ -412,8 +412,8 @@ $Definition['Following %d person'] = '关注 %s 人';
 $Definition['Follows'] = '关注';
 $Definition['Forgot your password?'] = '忘记密码?';
 $Definition['Forgot?'] = '忘记密码？';
-$Definition['Format You'] = '您';
-$Definition['Format Your'] = '您的';
+$Definition['Format You'] = '你';
+$Definition['Format Your'] = '你的';
 $Definition['Format their'] = '他们的';
 $Definition['Fourth Anniversary'] = '四周年';
 $Definition['Friends'] = '好友';
@@ -435,14 +435,14 @@ $Definition['Give'] = '给';
 $Definition['Given'] = '给';
 $Definition['Go'] = '搜索';
 $Definition['Google+'] = 'Google+';
-$Definition['GuestModule.Message'] = '您好，新朋友。点击以下按钮加入我们！';
+$Definition['GuestModule.Message'] = '你好，新朋友。点击以下按钮加入我们！';
 
 $Definition['Hang on a sec while we sign you out.'] = '正在退出，请稍等';
 $Definition['HeadlineFormat.Badge'] = '{ActivityUserID,You} 获得了 <a href="{Url,html}">{Data.Name,text}</a> 徽章.';
 $Definition['HeadlineFormat.Ban'] = '{RegardingUserID,You} 屏蔽 {ActivityUserID,you}.';
 $Definition['HeadlineFormat.Comment'] = '{ActivityUserID,user} 回复了 <a href="{Url,html}">{Data.Name,text}</a>';
 $Definition['HeadlineFormat.Discussion'] = '{ActivityUserID,user} <a href="{Url,html}">{Data.Name,text}</a>';
-$Definition['HeadlineFormat.Mention'] = '{ActivityUserID,user} 在 <a href="{Url,html}">{Data.Name,text}</a> 中提到您。';
+$Definition['HeadlineFormat.Mention'] = '{ActivityUserID,user} 在 <a href="{Url,html}">{Data.Name,text}</a> 中提到你。';
 $Definition['HeadlineFormat.PictureChange.ForUser'] = '{RegardingUserID,You} 更换了 {ActivityUserID,user} 的个人资料图片。';
 $Definition['HeadlineFormat.Registration'] = '{ActivityUserID,You} 已加入。';
 $Definition['HeadlineFormat.Unban'] = '{RegardingUserID,You} 取消屏蔽 {ActivityUserID,you}。';
@@ -452,8 +452,8 @@ $Definition['Hide signatures always'] = '始终隐藏签名';
 $Definition['Hide signatures on my mobile device'] = '在手机上隐藏签名';
 $Definition['Hide signatures?'] = '隐藏签名？';
 $Definition['Home'] = '主页';
-$Definition['How long do you want this warning to last?'] = '您想让这个警告持续多久？';
-$Definition['Howdy, Stranger!'] = '您好，游客！';
+$Definition['How long do you want this warning to last?'] = '你想让这个警告持续多久？';
+$Definition['Howdy, Stranger!'] = '你好，游客！';
 
 $Definition['I agree to the <a id="TermsOfService" class="Popup" target="terms" href="%s">terms of service</a>'] = '我同意 <a id="TermsOfService" class="Popup" target="terms" href="%s">服务条款</a>。';
 $Definition['I remember now!'] = '我现在想起来了！';
@@ -464,7 +464,7 @@ $Definition['In this Conversation'] = '在本次对话中';
 $Definition['Insert Image'] = '插入图片';
 $Definition['Insightful'] = '有见地';
 $Definition['Internal'] = '内部';
-$Definition['Invalid password.'] = '您输入的密码错误，请注意区分大小写。';
+$Definition['Invalid password.'] = '你输入的密码错误，请注意区分大小写。';
 $Definition['Invitations'] = '邀请';
 $Definition['Invite'] = '邀请';
 $Definition['InviteErrorPermission'] = '对不起, 没有权限.';
@@ -476,7 +476,7 @@ $Definition['Jailed users have reduced abilities.'] = '禁言用户无法使用�
 $Definition['Joined'] = '已加入';
 $Definition['Just delete the user record, and keep all of the user\'s content.'] = '删除用户记录，并保留用户内容。';
 $Definition['Just expire the warning.'] = '关闭警告';
-$Definition['Just you!'] = '只有您!';
+$Definition['Just you!'] = '只有你!';
 
 $Definition['Keep User Content'] = '保留用户内容';
 $Definition['Keep me signed in'] = '记住登录状态';
@@ -499,14 +499,14 @@ $Definition['Link to content:'] = '文章链接';
 $Definition['Locale'] = 'en-CA';
 $Definition['Login with Facebook'] = '使用 Facebook 登陆';
 
-$Definition['Make me invisible? (Will not show you on the list)'] = '在线对其他用户不可见（您将不会出现在在线列表中）';
+$Definition['Make me invisible? (Will not show you on the list)'] = '在线对其他用户不可见（你将不会出现在在线列表中）';
 $Definition['Make this poll anonymous (user votes are not made public).'] = '设置匿名投票(用户投票不被公开)';
 $Definition['Male'] = '男';
 $Definition['Mark All Viewed'] = '忽略新消息';
 $Definition['Mark Read'] = '标为已读';
 $Definition['Marking as spam cannot be undone.'] = '';
 $Definition['Merge'] = '合并';
-$Definition['Merge Discussions'] = '合并主题';
+$Definition['Merge Discussions'] = '合并话题';
 $Definition['Mixed Layout'] = '混合布局';
 $Definition['Moderator Activity'] = '发起人动态';
 $Definition['Moderators'] = '版主';
@@ -569,8 +569,8 @@ $Definition['Only show followed categories'] = '只显示一下板块';
 $Definition['OpenID Settings'] = 'OpenID 设置';
 $Definition['Optional Description'] = '可选的描述';
 $Definition['Options'] = '选项';
-$Definition['Or you can...'] = '或者您可以...';
-$Definition['Organize discussion categories'] = '管理主题板块';
+$Definition['Or you can...'] = '或者你可以...';
+$Definition['Organize discussion categories'] = '管理话题板块';
 $Definition['Organize your Categories'] = '组织分类';
 $Definition['Original'] = '原始图';
 $Definition['Other Records'] = '其他记录';
@@ -579,35 +579,35 @@ $Definition['Page Not Found'] = '页面不存在';
 $Definition['PageDetailsMessage'] = '页面详情消息';
 $Definition['PageDetailsMessageFull'] = '页面详情消息已满';
 $Definition['PageViews'] = '页面浏览';
-$Definition['ParticipatedHomepageTitle'] = '参与主题';
+$Definition['ParticipatedHomepageTitle'] = '参与话题';
 $Definition['Password'] = '密码';
-$Definition['PasswordRequest'] = '您好，我们收到对您 %2$s 帐户的密码重置申请 . 如果您需要重置密码，请点击下面的链接进行:
+$Definition['PasswordRequest'] = '你好，我们收到对你 %2$s 帐户的密码重置申请 . 如果你需要重置密码，请点击下面的链接进行:
 
 %3$s
 
-如果这不是您本人的重置申请，请忽略这封Email.';
+如果这不是你本人的重置申请，请忽略这封Email.';
 $Definition['Passwords don\'t match'] = '密码输入不一致';
 $Definition['Permalink'] = '永久链接';
 $Definition['Permanent (301)'] = '永久移动 (301)';
 $Definition['Permission.Category'] = '板块权限';
-$Definition['PermissionErrorMessage'] = '您没有权限执行该操作。';
+$Definition['PermissionErrorMessage'] = '你没有权限执行该操作。';
 $Definition['PermissionErrorTitle'] = '权限问题';
 $Definition['PermissionRequired.Garden.Moderation.Manage'] = '发起者才可以进行此操作。';
 $Definition['PermissionRequired.Garden.Settings.Manage'] = '管理员才可以进行此操作。';
-$Definition['PermissionRequired.Javascript'] = '您需要开启Javascript。';
+$Definition['PermissionRequired.Javascript'] = '你需要开启Javascript。';
 $Definition['Photogenic'] = '上相';
 $Definition['Picture'] = '图片';
 $Definition['Poll'] = '投票';
 $Definition['Poll Options'] = '投票选项';
 $Definition['Poll Question'] = '投票问题';
 $Definition['Popular'] = '最热门的';
-$Definition['Popular Discussions'] = '热门主题';
+$Definition['Popular Discussions'] = '热门话题';
 $Definition['Popular Tags'] = '热门标签';
 $Definition['Popup'] = '站内提醒';
 $Definition['Position'] = '位置';
 $Definition['Post'] = '发表';
 $Definition['Post Comment'] = '回复';
-$Definition['Post Discussion'] = '提问';
+$Definition['Post Discussion'] = '发起话题';
 $Definition['Post edited by %1$s at %2$s'] = '在 %2$s 被 %1$s 最后编辑';
 $Definition['Post this anonymously'] = '匿名发表';
 $Definition['Posts'] = '话题数';
@@ -636,7 +636,7 @@ $Definition['Q&A Answered'] = '已回答';
 $Definition['Q&A Question'] = '提问';
 $Definition['QnA Accepted Answer'] = ' 已被采纳为最佳答案√';
 $Definition['QnA Rejected Answer'] = '  未被采纳的答案';
-$Definition['Question Title'] = '问题主题';
+$Definition['Question Title'] = '问题标题';
 $Definition['Quote'] = '引用';
 $Definition['Quote Folding'] = '引用内容折叠';
 $Definition['Quote Settings'] = '引用设置';
@@ -686,14 +686,14 @@ $Definition['Save Comment'] = '保存回复';
 $Definition['Save Draft'] = '保存草稿';
 $Definition['Save Poll'] = '保存投票';
 $Definition['Save Preferences'] = '保存偏好';
-$Definition['Save your password'] = '保存您的密码';
+$Definition['Save your password'] = '保存你的密码';
 $Definition['Search for a tag.'] = '搜索全部或部分标签。';
 $Definition['Search results for \'%s\''] = '在结果中搜索 \'%s\'';
 $Definition['SearchBoxPlaceHolder'] = '搜索';
 $Definition['Second Anniversary'] = '两周年';
 $Definition['Sections'] = '选项';
 $Definition['Security Check'] = '验证码';
-$Definition['Select an image on your computer (2mb max)'] = '在您的计算机中选择一张图片 (最大2MB)';
+$Definition['Select an image on your computer (2mb max)'] = '在你的计算机中选择一张图片 (最大2MB)';
 $Definition['Send Message'] = '发送消息';
 $Definition['Set a New Warning Level'] = '设置新的警告水平';
 $Definition['Setting'] = '设置';
@@ -719,13 +719,13 @@ $Definition['Signature Code'] = '签名';
 $Definition['Signature Settings'] = '签名设置';
 $Definition['Signature invalid.'] = '签名无效。';
 $Definition['Signatures'] = '签名';
-$Definition['SigningOut'] = '请稍等，正在为您注销。';
+$Definition['SigningOut'] = '请稍等，正在为你注销。';
 $Definition['Sink this discussion'] = '沉贴';
 $Definition['Site Description'] = '站点描述';
 $Definition['Sitemap Settings'] = '站点地图设置';
 $Definition['Sixth Anniversary'] = '六周年';
 $Definition['Some Code'] = '一些代码';
-$Definition['Someone\'s answered your question. You need to accept/reject the answer.'] = '有人回答了您的提问。您需要去检查他的回答 采纳/不采纳';
+$Definition['Someone\'s answered your question. You need to accept/reject the answer.'] = '有人回答了你的提问。你需要去检查他的回答 采纳/不采纳';
 $Definition['Source:'] = '源：';
 $Definition['Split'] = '分割';
 $Definition['Split Comments'] = '分割回复';
@@ -748,19 +748,19 @@ $Definition['Tagged'] = '此话题使用的标签';
 $Definition['Tagged with '] = '标签为 ';
 $Definition['Tagging'] = '标签';
 $Definition['Tags'] = '标签';
-$Definition['Tags are keywords that users can assign to discussions to help categorize their question with similar questions.'] = '标签 用于对相似主题进行分类。';
+$Definition['Tags are keywords that users can assign to discussions to help categorize their question with similar questions.'] = '标签 用于对相似话题进行分类。';
 $Definition['Take Action'] = '立刻去处理';
 $Definition['Take Action:'] = '采取行动：';
 $Definition['Target'] = '目标';
 $Definition['Tell the user why you\'re warning them'] = '告诉用户警告他们的原因';
-$Definition['Tell us why you want to join!'] = '说说您为什么加入！';
+$Definition['Tell us why you want to join!'] = '说说你为什么加入！';
 $Definition['Tenth Anniversary'] = '十周年';
 $Definition['Terms of Service'] = '服务条款';
 $Definition['TermsOfService'] = '服务条款';
 $Definition['TermsOfServiceText'] = ' 
 服务条款<br>
-当您申请用户时，表示您已经同意遵守本规章。 <br>
-欢迎您加入本站点参加交流和讨论，本站点为公共论坛，为维护网上公共秩序和社会稳定，请您自觉遵守以下条款： <br>
+当你申请用户时，表示你已经同意遵守本规章。 <br>
+欢迎你加入本站点参加交流和讨论，本站点为公共论坛，为维护网上公共秩序和社会稳定，请你自觉遵守以下条款： <br>
 <br>
 一、不得利用本站危害国家安全、泄露国家秘密，不得侵犯国家社会集体的和公民的合法权益，不得利用本站制作、复制和传播下列信息：<br>
 　（一）煽动抗拒、破坏宪法和法律、行政法规实施的；<br>
@@ -777,21 +777,21 @@ $Definition['TermsOfServiceText'] = '
 二、互相尊重，对自己的言论和行为负责。<br>
 三、禁止在申请用户时使用相关本站的词汇，或是带有侮辱、毁谤、造谣类的或是有其含义的各种语言进行注册用户，否则我们会将其删除。<br>
 四、禁止以任何方式对本站进行各种破坏行为。<br>
-五、如果您有违反国家相关法律法规的行为，本站概不负责，您的登录论坛信息均被记录无疑，必要时，我们会向相关的国家管理部门提供此类信息。<br>';
+五、如果你有违反国家相关法律法规的行为，本站概不负责，你的登录论坛信息均被记录无疑，必要时，我们会向相关的国家管理部门提供此类信息。<br>';
 $Definition['Text  Max  Length'] = '文本最大长度';
-$Definition['The conversation has been cleared.'] = '这个主题已经被清除。';
+$Definition['The conversation has been cleared.'] = '这个话题已经被清除。';
 $Definition['The email you entered in use by another member.'] = '电子邮件地址已存在。';
-$Definition['The email you have entered is already related to an existing account.'] = '您输入的邮件地址已经绑定了一个帐号';
+$Definition['The email you have entered is already related to an existing account.'] = '你输入的邮件地址已经绑定了一个帐号';
 $Definition['The file failed to upload.'] = '文件上传失败。';
 $Definition['The name you entered is already in use by another member.'] = '名字已存在。';
-$Definition['The page you were looking for could not be found.'] = '您所访问的页面不存在。';
+$Definition['The page you were looking for could not be found.'] = '你所访问的页面不存在。';
 $Definition['The quote had to be converted from %s to %s.'] = 'The quote had to be converted from %s to %s. 格式可能会丢失。';
 $Definition['The reCAPTCHA value was not entered correctly. Please try again.'] = 'reCAPTCHA 值输入错误，请重新输入。';
 $Definition['The response was not in the correct format.'] = '回复的内容格式不正确。';
 $Definition['The site is currently undergoing maintenance.'] = '网站正在维护。';
 $Definition['The uploaded file was too big (max %s).'] = '上传的文件太大 (最大 %s).';
 $Definition['There are no tags in the system yet.'] = '还没有标签。';
-$Definition['There is already an account with the same username (%1$s) or email (%2$s) as you. You can either create a new account, or you can enter the credentials for your existing forum account.'] = '用户名 (%1$s) 或电子邮箱 (%2$s) 已经被注册。您可以创建一个新账户或者使用已有账户登录。';
+$Definition['There is already an account with the same username (%1$s) or email (%2$s) as you. You can either create a new account, or you can enter the credentials for your existing forum account.'] = '用户名 (%1$s) 或电子邮箱 (%2$s) 已经被注册。你可以创建一个新账户或者使用已有账户登录。';
 $Definition['There was an error connecting to Disqus'] = '连接Disqus出错';
 $Definition['There was an error connecting to Facebook'] = '连接Facebook出错';
 $Definition['There was an error uploading the file. It is most likely because the file is too large.'] = '上传文件失败，很可能是由于文件过大。';
@@ -801,12 +801,12 @@ $Definition['This Week\'s Leaders'] = '本周活跃榜';
 $Definition['This answer was %s.'] = '答案是 %s。';
 $Definition['This answer was Accepted.'] = '回答正确。';
 $Definition['This discussion has been closed.'] = '话题已锁定';
-$Definition['This discussion is related to an undefined foriegn content source.'] = '这个主题与外部来源相关。';
+$Definition['This discussion is related to an undefined foriegn content source.'] = '这个话题与外部来源相关。';
 $Definition['This discussion was created from comments split from: %s.'] = '这个话题由 %s 分割而来。';
-$Definition['This discussion was merged into %s'] = '此主题合并进 %s';
+$Definition['This discussion was merged into %s'] = '此话题合并进 %s';
 $Definition['This image has been resized to fit in the page. Click to enlarge.'] = '点击查看原始图片。';
-$Definition['This is a private poll: no-one will see what you voted for.'] = '这是一个私密投票：没人知道您投什么。';
-$Definition['This is a public poll: others will see what you voted for.'] = '这是一个公开投票：其他人知道您投什么。';
+$Definition['This is a private poll: no-one will see what you voted for.'] = '这是一个私密投票：没人知道你投什么。';
+$Definition['This is a public poll: others will see what you voted for.'] = '这是一个公开投票：其他人知道你投什么。';
 $Definition['This is a system account and does not represent a real person.'] = '这是一个系统账户，不代表真有其人。';
 $Definition['This question\'s answer has been accepted.'] = '该提问的回答被采纳';
 $Definition['This user has been verified as a non-spammer.'] = '该用户已确认不是垃圾邮件发送者。';
@@ -817,7 +817,7 @@ $Definition['This user is verified as a non-spammer'] = '这些用户已经验�
 $Definition['This warning has expired. Do you want to completely delete it?'] = '这个警告已经过期，是否彻底删除？';
 $Definition['Thumbnail'] = '缩略图';
 $Definition['Title'] = '标题';
-$Definition['To use reCAPTCHA you must get an API key from %s'] = ' 您必须从 %s 获得一个 API key，以便使用 reCAPTCHA';
+$Definition['To use reCAPTCHA you must get an API key from %s'] = ' 你必须从 %s 获得一个 API key，以便使用 reCAPTCHA';
 $Definition['Troll'] = '钓鱼';
 $Definition['Turn ON'] = '启用插件';
 $Definition['Twitter'] = 'Twitter';
@@ -829,8 +829,8 @@ $Definition['Unanswered'] = '未回答';
 $Definition['Unanswered Questions'] = '等待回答的问题';
 $Definition['Unban User'] = '取消屏蔽用户';
 $Definition['Unbookmark'] = '取消关注';
-$Definition['Undefined discussion body.'] = '没有填写主题的内容。';
-$Definition['Undefined discussion subject.'] = '没有填写主题的标题。';
+$Definition['Undefined discussion body.'] = '没有填写内容。';
+$Definition['Undefined discussion subject.'] = '没有填写标题。';
 $Definition['Undefined foreign content'] = '没有填写外部链接。';
 $Definition['Undo Follow'] = '取消关注';
 $Definition['Unfollow'] = '取消关注';
@@ -838,7 +838,7 @@ $Definition['Unhide'] = '不隐藏';
 $Definition['Unknown'] = '未知';
 $Definition['Unknown client: %s.'] = '未知设备: %s';
 $Definition['Unread'] = '文件上传失败。';
-$Definition['Unread Discussions'] = '未读主题';
+$Definition['Unread Discussions'] = '未读话题';
 $Definition['Unsink'] = '解除下沉';
 $Definition['Unspecified'] = '未指定';
 $Definition['Update'] = '更新';
@@ -863,7 +863,7 @@ $Definition['ValidateDate'] = '日期验证';
 $Definition['ValidateDecimal'] = '小数验证';
 $Definition['ValidateEmail'] = '电子邮箱不可用';
 $Definition['ValidateEnum'] = '列举型验证';
-$Definition['ValidateFormat'] = '您不能发表HTML代码。';
+$Definition['ValidateFormat'] = '你不能发表HTML代码。';
 $Definition['ValidateInteger'] = '整数验证';
 $Definition['ValidateIntegerArray'] = '%s 必须是逗号分割的数字。';
 $Definition['ValidateLength'] = '长度不正确';
@@ -884,7 +884,7 @@ $Definition['Vanilla'] = 'Vanilla';
 $Definition['Vanilla Statistics'] = 'Vanilla 统计';
 $Definition['Vanilla Statistics Plugin'] = 'Vanilla 统计插件';
 $Definition['Verified'] = '已验证';
-$Definition['Verifying your credentials...'] = '验证您的凭证...';
+$Definition['Verifying your credentials...'] = '验证你的凭证...';
 $Definition['View Badge'] = '查看徽章';
 $Definition['Views'] = '浏览数';
 $Definition['Visible'] = '可见';
@@ -911,51 +911,51 @@ $Definition['Write a comment'] = '回复';
 $Definition['Write something about yourself...'] = '个人简介...';
 
 $Definition['Yes'] = '是';
-$Definition['You'] = '您';
-$Definition['You already have an account here.'] = '您在这里已经有账号了.';
-$Definition['You are about to ban {User.UserID,user}.'] = '您要禁言 {User.UserID,user}。';
-$Definition['You are about to unban {User.UserID,user}.'] = '您要解除禁言 {User.UserID,user}.';
-$Definition['You are connected through %2$s.'] = '您通过 %2$s 连接。';
-$Definition['You are currently only viewing categories that you follow.'] = '您当前正查看您加星的板块。';
-$Definition['You are currently viewing all categories.'] = '您正在查看所有板块。';
-$Definition['You are editing %s\'s signature'] = '您正在编辑 %s 的个性签名。';
-$Definition['You can either ask a question or start a discussion.'] = '发起一个提问，说出您心中的不解，让大家解答您心中的烦恼;<br>发表一个话题，写下自己的见闻，分享您的感受~~  ';
-$Definition['You can follow individual categories and be notified of all posts within them.'] = '您可以订阅各个目录，在目录中的讨论都会通知您。';
+$Definition['You'] = '你';
+$Definition['You already have an account here.'] = '你在这里已经有账号了.';
+$Definition['You are about to ban {User.UserID,user}.'] = '你要禁言 {User.UserID,user}。';
+$Definition['You are about to unban {User.UserID,user}.'] = '你要解除禁言 {User.UserID,user}.';
+$Definition['You are connected through %2$s.'] = '你通过 %2$s 连接。';
+$Definition['You are currently only viewing categories that you follow.'] = '你当前正查看你加星的板块。';
+$Definition['You are currently viewing all categories.'] = '你正在查看所有板块。';
+$Definition['You are editing %s\'s signature'] = '你正在编辑 %s 的个性签名。';
+$Definition['You can either ask a question or start a discussion.'] = '发起一个提问，说出你心中的不解，让大家解答你心中的烦恼;<br>发表一个话题，写下自己的见闻，分享你的感受~~  ';
+$Definition['You can follow individual categories and be notified of all posts within them.'] = '你可以订阅各个目录，在目录中的讨论都会通知你。';
 $Definition['You can only specify up to %s tags.'] = '最多可以使用 %s 个标签。';
-$Definition['You cannot edit the thumbnail of an externally linked profile picture.'] = '您不能使用外部链接的图片作为头像。';
+$Definition['You cannot edit the thumbnail of an externally linked profile picture.'] = '你不能使用外部链接的图片作为头像。';
 $Definition['You do not have any bookmarks.'] = '未添加关注';
 $Definition['You do not have any conversations.'] = '目前没有邮件';
-$Definition['You do not have any drafts.'] = '您没有任何草稿。';
-$Definition['You do not have any notifications yet.'] = '您没有收到任何通知。';
-$Definition['You do not have enough invitations left.'] = '您没有足够的邀请。';
-$Definition['You do not have permission to write new comments.'] = '您没有权限发表新的回复。';
-$Definition['You don\'t have permission to do that.'] = '您没有权限完成此操作。';
-$Definition['You have answered questions'] = '您已回答的问题';
-$Definition['You have entered an invalid discussion title'] = '您输入了一个无效的标题';
-$Definition['You have not started any discussions.'] = '您还没有发表过任何话题。';
-$Definition['You have posted %1$s times within %2$s seconds. A spam block is now in effect on your account. You must wait at least %3$s seconds before attempting to post again.'] = '您在%2$s秒内已经发布了%1$s次内容。已启用对您的账户的垃圾信息屏蔽功能。请在%3$s秒后重新发布。';
-$Definition['You have selected %1$s in this discussion.'] = '您已在这个主题中选择了%1$s。';
-$Definition['You have selected %1$s.'] = '您已选择了%1$s。';
-$Definition['You have to select at least 2 discussions to merge.'] = '请至少选择2个主题以便合并。';
+$Definition['You do not have any drafts.'] = '你没有任何草稿。';
+$Definition['You do not have any notifications yet.'] = '你没有收到任何通知。';
+$Definition['You do not have enough invitations left.'] = '你没有足够的邀请。';
+$Definition['You do not have permission to write new comments.'] = '你没有权限发表新的回复。';
+$Definition['You don\'t have permission to do that.'] = '你没有权限完成此操作。';
+$Definition['You have answered questions'] = '你已回答的问题';
+$Definition['You have entered an invalid discussion title'] = '你输入了一个无效的标题';
+$Definition['You have not started any discussions.'] = '你还没有发表过任何话题。';
+$Definition['You have posted %1$s times within %2$s seconds. A spam block is now in effect on your account. You must wait at least %3$s seconds before attempting to post again.'] = '你在%2$s秒内已经发布了%1$s次内容。已启用对你的账户的垃圾信息屏蔽功能。请在%3$s秒后重新发布。';
+$Definition['You have selected %1$s in this discussion.'] = '你已在这个话题中选择了%1$s。';
+$Definition['You have selected %1$s.'] = '你已选择了%1$s。';
+$Definition['You have to select at least 2 discussions to merge.'] = '请至少选择2个话题以便合并。';
 $Definition['You haven\'t read this yet.'] = '未读。';
-$Definition['You must agree to the terms of service.'] = '您必须同意服务条款。';
-$Definition['You need to confirm your email address.'] = '您需要验证您的电子邮件地址。点击 <a href="{/entry/emailconfirmrequest,url}">这里</a> 重新发送确认邮件。';
-$Definition['You need to sign in before you can do this.'] = '您需要先登录。';
+$Definition['You must agree to the terms of service.'] = '你必须同意服务条款。';
+$Definition['You need to confirm your email address.'] = '你需要验证你的电子邮件地址。点击 <a href="{/entry/emailconfirmrequest,url}">这里</a> 重新发送确认邮件。';
+$Definition['You need to sign in before you can do this.'] = '你需要先登录。';
 $Definition['You were added to a conversation.'] = '{InsertUserID,user} 添加 {NotifyUserID,you} 到一个 <a href="{Url,htmlencode}">会话</a>中。';
-$Definition['YouEarnedBadge'] = '您获得了此徽章';
+$Definition['YouEarnedBadge'] = '你获得了此徽章';
 $Definition['Your changes have been saved successfully.'] = '更改保存成功。';
 $Definition['Your changes have been saved.'] = 'Vanilla 统计插件';
-$Definition['Your changes were saved.'] = '您的更改已经保存。';
-$Definition['Your email has been successfully confirmed.'] = '您的电子邮件地址验证成功。';
+$Definition['Your changes were saved.'] = '你的更改已经保存。';
+$Definition['Your email has been successfully confirmed.'] = '你的电子邮件地址验证成功。';
 $Definition['Your invitation has been sent.'] = '邀请已发送。';
 $Definition['Your old password was incorrect.'] = '旧密码输入有误。';
 $Definition['Your password has been changed.'] = '密码已修改。';
 $Definition['Your picture has been removed.'] = '头像已删除。';
-$Definition['Your post will appear once it\'s been approved.'] = '您的发表内容将在通过审核之后显示。';
+$Definition['Your post will appear once it\'s been approved.'] = '你的发表内容将在通过审核之后显示。';
 $Definition['Your preferences have been saved.'] = '个性化设置已保存。';
-$Definition['Your private conversations with other members.'] = '和其他用户之间的私密主题。';
-$Definition['Your registered username: <strong>%s</strong>'] = '您注册的用户名： <strong>%s</strong>';
-$Definition['Your request has been sent.'] = '您的请求已发送。请检查您的邮箱以获取进一步的说明。';
+$Definition['Your private conversations with other members.'] = '和其他用户之间的私密话题。';
+$Definition['Your registered username: <strong>%s</strong>'] = '你注册的用户名： <strong>%s</strong>';
+$Definition['Your request has been sent.'] = '你的请求已发送。请检查你的邮箱以获取进一步的说明。';
 $Definition['Your settings have been saved successfully.'] = '设置保存成功。';
 $Definition['Your settings have been saved.'] = '设置已保存。';
 $Definition['Your warning was added.'] = '警告添加成功。';
@@ -978,7 +978,7 @@ $Definition['clear'] = '清空';
 $Definition['clicking here'] = '点击这里';
 $Definition['comment'] = '回复';
 $Definition['conversation'] = '会话';
-$Definition['customize your profile now'] = '现在个性化您的个人资料';
+$Definition['customize your profile now'] = '现在个性化你的个人资料';
 
 $Definition['days'] = '天';
 $Definition['dot'] = '.';
@@ -1028,8 +1028,8 @@ $Definition['via %s'] = '通过 %s';
 $Definition['wall'] = '墙';
 $Definition['weeks'] = '周';
 
-$Definition['you'] = '您';
-$Definition['your'] = '您的';
+$Definition['you'] = '你';
+$Definition['your'] = '你的';
 
 $Definition['↳ No results for \'%s\''] = ' \'%s\' 没有任何结果';
 $Definition['↳ Search results for \'%s\''] = '↳ \'%s\' 的搜索结果';
@@ -1059,7 +1059,7 @@ $Definition['(YYYY-mm-dd)'] = '(YYYY-mm-dd)';
 $Definition['(less)'] = '(收缩)';
 $Definition['(more)'] = '(展开)';
 
-$Definition['. The community forum is what all of your users &amp; customers will see when they visit '] = '。这个社区就是您的用户和游客将会访问到的 ';
+$Definition['. The community forum is what all of your users &amp; customers will see when they visit '] = '。这个社区就是你的用户和游客将会访问到的 ';
 
 $Definition['1 day'] = '1天';
 $Definition['1 hour'] = '1小时';
@@ -1076,24 +1076,24 @@ $Definition['4 hours'] = '4小时';
 $Definition['5 minutes'] = '5分钟';
 
 $Definition['<strong>Categories</strong>'] = '<strong>板块</strong>';
-$Definition['<strong>Categories</strong> allow you to organize your discussions. Categories can only contain discussions.'] = '您可以使用 <strong>板块</strong> 来组织您的讨论，板块只能包含讨论。';
+$Definition['<strong>Categories</strong> allow you to organize your discussions. Categories can only contain discussions.'] = '你可以使用 <strong>板块</strong> 来组织你的讨论，板块只能包含讨论。';
 $Definition['<strong>Heads Up!</strong> Deleting a role can result in users not having access to the application.'] = '<strong>注意！</strong> 删除用户角色会影响所有用户。';
 $Definition['<strong>Heads Up!</strong> Moving discussions into a replacement category can result in discussions vanishing (or appearing) if the replacement category has different permissions than the category being deleted.'] = '<strong>注意！</strong> 将讨论移动到其他板块可能导致其消失（或保留），如果移动到的板块有不同的权限或者被删除。';
 
 $Definition['@Require users to confirm their email addresses (recommended)'] = '需要用户确认他们的电子邮件地址（推荐）';
 
-$Definition['A message has been sent to your email address with password reset instructions.'] = '密码重置邮件已经发送至您的邮箱，请注意查收！';
+$Definition['A message has been sent to your email address with password reset instructions.'] = '密码重置邮件已经发送至你的邮箱，请注意查收！';
 $Definition['A url-friendly version of the category name for better SEO.'] = '一个针对 SEO 优化更友好的分类名称。';
 $Definition['API Status'] = 'API 状态';
 $Definition['About Vanilla Statistics'] = '关于 Vanilla 统计';
-$Definition['About.DisableStatistics'] = '如果您因为某些商业原因需要关闭数据报告，您可以在安装配置文件中添加下列文字：
+$Definition['About.DisableStatistics'] = '如果你因为某些商业原因需要关闭数据报告，你可以在安装配置文件中添加下列文字：
  <code>$Configuration[\'Garden\'][\'Analytics\'][\'Enabled\'] = FALSE;</code>';
 $Definition['About.VanillaStatistics'] = '以便我们准确的分析覆盖度和有效性，请不要关闭数据报告。这对开源免费的Vanilla相当的重要。';
-$Definition['AboutCommentEmbedding'] = 'Vanilla 可以用来更换您的博客自身的评论系统。事实上，它可以用来为任何网页添加评论。';
-$Definition['AboutEmbedding'] = '嵌入技术可以将您的社区嵌入到其他应用程序和网页中。';
+$Definition['AboutCommentEmbedding'] = 'Vanilla 可以用来更换你的博客自身的评论系统。事实上，它可以用来为任何网页添加评论。';
+$Definition['AboutEmbedding'] = '嵌入技术可以将你的社区嵌入到其他应用程序和网页中。';
 $Definition['Above Main Content'] = '在主内容区以上';
 $Definition['Accepted'] = '已接受';
-$Definition['Access your community forum by clicking the "Visit Site" link on the top-left of this page, or by '] = '您可以点击左上角的“访问站点”访问您的社区 ';
+$Definition['Access your community forum by clicking the "Visit Site" link on the top-left of this page, or by '] = '你可以点击左上角的“访问站点”访问你的社区 ';
 $Definition['Account Sync Failed'] = '账户同步失败';
 $Definition['Action'] = '操作';
 $Definition['Actions Based on Votes'] = '投票动态';
@@ -1107,10 +1107,10 @@ $Definition['Add Info &amp; Create Account'] = '起个昵称吧';
 $Definition['Add Item'] = '添加屏蔽项';
 $Definition['Add Role'] = '添加用户角色';
 $Definition['Add User'] = '添加用户';
-$Definition['Add a new Pocket to your site.'] = '为您的站点添加一个新口袋。';
+$Definition['Add a new Pocket to your site.'] = '为你的站点添加一个新口袋。';
 $Definition['Added By'] = '添加人';
 $Definition['Adding & Editing Categories'] = '添加&编辑板块';
-$Definition['AddonProblems'] = '扩展问题<h2>Probleme?</h2><p>如果启用扩展后您无法访问站点，可以手动停止它：</p>%s';
+$Definition['AddonProblems'] = '扩展问题<h2>Probleme?</h2><p>如果启用扩展后你无法访问站点，可以手动停止它：</p>%s';
 $Definition['Addons'] = '扩展';
 $Definition['Administrator'] = '管理员';
 $Definition['Advanced'] = '高级';
@@ -1127,7 +1127,7 @@ $Definition['All Dashboard Pages'] = '所有控制面板页面';
 $Definition['All Forum Pages'] = '所有社区讨论区页面';
 $Definition['All Pages'] = '所有页面';
 $Definition['All categories listed with a selection of 5 recent discussions under each'] = '所有板块以及最新的5条讨论';
-$Definition['All discussions in this category will be permanently deleted.'] = '此板块下的所有主题将会彻底删除。';
+$Definition['All discussions in this category will be permanently deleted.'] = '此板块下的所有话题将会彻底删除。';
 $Definition['All of the user content will be replaced with a message stating the user has been deleted.'] = '所有的用户内容将被替换，说明此账户已经删除。';
 $Definition['Allow users to dismiss this message'] = '允许用户撤消该消息';
 $Definition['Although the invitation was created successfully, the email failed to send. The server reported the following error: %s'] = '邀请创建成功，但邮件无法送达。服务器抛如下错误信息: %s';
@@ -1139,10 +1139,10 @@ $Definition['Applicants'] = '申请者';
 $Definition['Application'] = '应用';
 $Definition['Application ID'] = '应用 ID';
 $Definition['Application Secret'] = 'Application Secret';
-$Definition['ApplicationHelp'] = '应用帮助。 您可以添加更多应用功能。<br />应用功能被加入到文件夹 %s,您可以在这里激活或关闭它';
+$Definition['ApplicationHelp'] = '应用帮助。 你可以添加更多应用功能。<br />应用功能被加入到文件夹 %s,你可以在这里激活或关闭它';
 $Definition['Applications'] = '应用';
 $Definition['Applied On'] = '日期';
-$Definition['Apply'] = '已接受';
+$Definition['Apply'] = '应用';
 $Definition['Approval'] = '审核方式';
 $Definition['Approve'] = '同意';
 $Definition['Archive Discussions'] = '帖子存档';
@@ -1153,7 +1153,7 @@ $Definition['Are you sure you want to delete this category?'] = '确定删除这
 $Definition['Are you sure you want to do that?'] = '确定要做此项操作?';
 $Definition['Are you sure you want to restore %s items?'] = '确定恢复%s个条目？';
 $Definition['Are you sure you want to restore 1 item?'] = '确定恢复这一条目？';
-$Definition['Are you sure you\'ve entered the correct database host name? Maybe you mistyped it? The database reported: <code>%s</code>'] = '您确定输入了正确的数据库主机地址？或许您写错了？数据库返回信息：<code>%s</code>';
+$Definition['Are you sure you\'ve entered the correct database host name? Maybe you mistyped it? The database reported: <code>%s</code>'] = '你确定输入了正确的数据库主机地址？或许你写错了？数据库返回信息：<code>%s</code>';
 $Definition['Authentication'] = '认证';
 $Definition['Authentication URL'] = '授权';
 $Definition['Authors can always edit their posts'] = '作者永远可以编辑';
@@ -1196,7 +1196,7 @@ $Definition['Body'] = '内容';
 $Definition['Browse Addons'] = '浏览全部扩展';
 $Definition['Browse for a new banner logo if you would like to change it:'] = '更改站点LOGO: ';
 $Definition['By %s'] = '由 %s';
-$Definition['By clicking the button below, you will be deleting the user account for %s forever.'] = '点击下面的按钮，您将永久删除账户%s。';
+$Definition['By clicking the button below, you will be deleting the user account for %s forever.'] = '点击下面的按钮，你将永久删除账户%s。';
 
 $Definition['Cancel'] = '取消';
 $Definition['Cannot build profile information if user is not defined.'] = '用户没有定义的情况下不能建立个人资料信息。';
@@ -1205,16 +1205,16 @@ $Definition['Categories'] = '版块设置';
 $Definition['Categories &amp; Discussions'] = '版块 & 话题';
 $Definition['Categories Layout'] = '板块布局';
 $Definition['Categories are used to help organize discussions.'] = '板块用来组织话题。拖动 或 放下它们以便排序和分级。';
-$Definition['Categories are used to organize discussions.'] = '<strong>板块</strong> 允许您组织您的话题。';
+$Definition['Categories are used to organize discussions.'] = '<strong>板块</strong> 允许你组织你的话题。';
 $Definition['Category'] = '版块';
 $Definition['Category Page Layout'] = '版块页布局';
 $Definition['Category Url:'] = '分类 Url:';
 $Definition['Censored Words'] = '敏感词';
 $Definition['Change Log'] = '更改日志';
 $Definition['Change tables to InnoDB'] = '更改表为 InnoDB 结构 (查看帮助)';
-$Definition['Change the look of All Categories'] = '您可以在<a href="%s">这里</a>更改<b>所有板块</b>的外观。';
+$Definition['Change the look of All Categories'] = '你可以在<a href="%s">这里</a>更改<b>所有板块</b>的外观。';
 $Definition['Change the way that new users register with the site.'] = '选择新用户注册方式';
-$Definition['Change the way your community works with plugins. We\'ve bundled popular plugins with the software, and there are more available online.'] = '改变您的社区在插件方面的工作。我们已经在论坛程序中捆绑了部分流行插件，并且它们在线上很活跃。';
+$Definition['Change the way your community works with plugins. We\'ve bundled popular plugins with the software, and there are more available online.'] = '改变你的社区在插件方面的工作。我们已经在论坛程序中捆绑了部分流行插件，并且它们在线上很活跃。';
 $Definition['Change your banner'] = '更改站点设置';
 $Definition['Changing the Discussions Menu Link'] = '更改话题菜单链接';
 $Definition['Check all permissions that apply for each role'] = '检查每个用户角色的所有权限';
@@ -1254,12 +1254,12 @@ $Definition['Confirm'] = '确认';
 $Definition['Confirm Email'] = '邮箱确认';
 $Definition['Confirm email addresses'] = '需要用户验证他们的邮箱地址（推荐的）';
 $Definition['Connect'] = '连接';
-$Definition['ConnectAccountExists'] = '您已经拥有一个账户。';
-$Definition['ConnectChooseName'] = '输入您在本社区的用户名。';
+$Definition['ConnectAccountExists'] = '你已经拥有一个账户。';
+$Definition['ConnectChooseName'] = '输入你在本社区的用户名。';
 $Definition['ConnectCreateAccount'] = '添加信息并创建账户';
-$Definition['ConnectExistingPassword'] = '输入您已拥有账户的密码。';
+$Definition['ConnectExistingPassword'] = '输入你已拥有账户的密码。';
 $Definition['ConnectLeaveBlank'] = '请留空除非连接一个已有账户';
-$Definition['ConnectRegisteredName'] = '您注册的用户名: <strong>%s</strong>';
+$Definition['ConnectRegisteredName'] = '你注册的用户名: <strong>%s</strong>';
 $Definition['Consumer Key'] = 'Consumer Key';
 $Definition['Consumer Secret'] = 'Consumer Secret';
 $Definition['Content Flagging'] = '内容标记';
@@ -1271,14 +1271,14 @@ $Definition['Conversations'] = '对话';
 $Definition['Conversations Setup'] = '会话设置';
 $Definition['Converting from the <Embed> Vanilla Plugin'] = '从<Embed> Vanilla 插件转换中';
 $Definition['Copy'] = '复制';
-$Definition['Could not find a theme identified by \'%s\''] = '无法找到主题 \'%s\'';
+$Definition['Could not find a theme identified by \'%s\''] = '无法找到话题 \'%s\'';
 $Definition['Could not instantiate mail function.'] = '邮件服务异常，请联系管理员';
 $Definition['Could not link the addon.'] = '无法连接扩展。';
 $Definition['Could not open %s.'] = '无法打开 %s.';
 $Definition['Could not open addon file. Addons must be zip files.'] = '无法打开扩展。扩展文件必须是 ZIP 格式。';
 $Definition['Could not parse import file. The problem is near line %s.'] = '无法解析导入的文件，出错在 %s 。';
-$Definition['Create & organize discussion categories and manage your users.'] = '创建&组织话题板块和管理您的用户。';
-$Definition['Create & organize discussion categories, manage your users, and more...'] = '创建&组织话题板块，管理您的用户等等...';
+$Definition['Create & organize discussion categories and manage your users.'] = '创建&组织话题板块和管理你的用户。';
+$Definition['Create & organize discussion categories, manage your users, and more...'] = '创建&组织话题板块，管理你的用户等等...';
 $Definition['Create a localization CSV'] = '创建一个本地化的 CSV 文件';
 $Definition['CreateFile'] = '创建';
 $Definition['Created new badge'] = '创建新徽章';
@@ -1297,8 +1297,8 @@ $Definition['Default Locale'] = '默认语言';
 $Definition['Default Roles'] = '默认用户角色';
 $Definition['Define who can upload and manage files on the '] = '用户角色&权限';
 $Definition['Define who can upload and manage files on the <a href="/dashboard/role">Roles & Permissions</a> page.'] = '在<a href="/dashboard/role">用户角色&权限</a>页面授权谁可以上传和管理文件。';
-$Definition['Define your forum homepage'] = '定义您的社区首页';
-$Definition['Define your forum homepage, upload your logo, and more...'] = '定义您的社区首页，上传LOGO，以及其他...';
+$Definition['Define your forum homepage'] = '定义你的社区首页';
+$Definition['Define your forum homepage, upload your logo, and more...'] = '定义你的社区首页，上传LOGO，以及其他...';
 $Definition['Delete'] = '删除';
 $Definition['Delete Account'] = '删除帐号';
 $Definition['Delete Badge'] = '删除徽章';
@@ -1314,7 +1314,7 @@ $Definition['Deleting category...'] = '正在删除板块...';
 $Definition['Deleting forever cannot be undone.'] = '经常删除无用信息是保持论坛干净的好方式。';
 $Definition['Deleting role...'] = '正在删除用户角色...';
 $Definition['Description'] = '描述';
-$Definition['Did You Know?'] = '您知道吗?';
+$Definition['Did You Know?'] = '你知道吗?';
 $Definition['Disable'] = '关闭';
 $Definition['Disable Content Flagging'] = '禁用内容标记';
 $Definition['Disable Google Sign In'] = '禁用 Google 登陆';
@@ -1326,7 +1326,7 @@ $Definition['Disabled %1$s'] = '禁用 %1$s';
 $Definition['Disabled: The pocket will <b>not</b> be displayed.'] = '';
 $Definition['Discussion'] = '话题';
 $Definition['Discussion & Comment Editing'] = '话题 & 评论编辑';
-$Definition['Discussion categories are used to help your users organize their discussions in a way that is meaningful for your community.'] = '话题板块用于帮助您的用户组织他们的话题，这对社区很重要。';
+$Definition['Discussion categories are used to help your users organize their discussions in a way that is meaningful for your community.'] = '话题板块用于帮助你的用户组织他们的话题，这对社区很重要。';
 $Definition['Discussions'] = '所有话题';
 $Definition['Discussions Layout'] = '话题布局';
 $Definition['Discussions per Page'] = '每页话题';
@@ -1361,32 +1361,32 @@ $Definition['Embed Comments'] = '嵌入评论';
 $Definition['Embed Forum'] = '嵌入社区';
 $Definition['Embed Modules'] = '嵌入模块';
 $Definition['Embed Vanilla'] = '嵌入vanilla';
-$Definition['Embed modules from your Vanilla forum into your site'] = '在您的站点中嵌入您的社区的模块';
+$Definition['Embed modules from your Vanilla forum into your site'] = '在你的站点中嵌入你的社区的模块';
 $Definition['Embed your community forum into your website to increase engagement...'] = '';
-$Definition['Embed your entire Vanilla forum'] = '嵌入您的整个 Vanilla 论坛';
-$Definition['Embed your forum in your web site'] = '把论坛嵌入您的网站';
+$Definition['Embed your entire Vanilla forum'] = '嵌入你的整个 Vanilla 论坛';
+$Definition['Embed your forum in your web site'] = '把论坛嵌入你的网站';
 $Definition['Embedding is currently DISABLED.'] = '嵌入 当前停用。';
 $Definition['Embedding is currently ENABLED.'] = '嵌入 当前启用。';
 $Definition['Enable'] = '启用';
 $Definition['Enable OpenID'] = '启用 OpenID';
 $Definition['Enable admin checkboxes on discussions and comments.'] = '在话题和回复中启用管理员复选框';
-$Definition['Enable embedding to use blog comments.'] = '您需要开启嵌入功能才能开始工作。';
+$Definition['Enable embedding to use blog comments.'] = '你需要开启嵌入功能才能开始工作。';
 $Definition['Enable this message'] = '激活消息';
 $Definition['Enable/Disable'] = '启用/停用';
 $Definition['Enabled'] = '已启用：将会显示口袋。';
 $Definition['Enabled %1$s'] = '%1$s 已启用';
 $Definition['Enabled: The pocket will be displayed.'] = '已启用：将会显示扣抵啊。';
 $Definition['Enabling a Locale Pack'] = '启用语言包';
-$Definition['Encourage your friends to join your new community!'] = '鼓励您的朋友加入您的新社区';
+$Definition['Encourage your friends to join your new community!'] = '鼓励你的朋友加入你的新社区';
 $Definition['Enter a comma-delimited list of indexes, starting at 1.'] = '从1开始，以逗号分隔输入索引。';
 $Definition['Enter a descriptive name.'] = '';
 $Definition['Enter a short name for the site.'] = '填写网站的简短名称，这将显示在登录按钮中。';
 $Definition['Enter numbers starting at 1.'] = '从1开始输入的数字。';
-$Definition['Enter the address of your Wordpress Blog and we\'ll take it from there.'] = '填写您的 Wordpress博客地址';
-$Definition['Enter the connection settings for your sphinx server below.'] = '在下方填写您的 sphinx 服务器连接设置';
+$Definition['Enter the address of your Wordpress Blog and we\'ll take it from there.'] = '填写你的 Wordpress博客地址';
+$Definition['Enter the connection settings for your sphinx server below.'] = '在下方填写你的 sphinx 服务器连接设置';
 $Definition['Enter the email address of the person you would like to invite:'] = '输入受邀人的电子邮件地址';
-$Definition['Enter the url to the page you would like to use as your homepage'] = '输入您想要做为默认页（首页）的地址：';
-$Definition['Enter the url to the page you would like to use as your homepage:'] = '输入您想要做为默认页（首页）的地址：';
+$Definition['Enter the url to the page you would like to use as your homepage'] = '输入你想要做为默认页（首页）的地址：';
+$Definition['Enter the url to the page you would like to use as your homepage:'] = '输入你想要做为默认页（首页）的地址：';
 $Definition['Every 1 minute'] = '每分钟';
 $Definition['Every 10 seconds'] = '每10秒';
 $Definition['Every 30 seconds'] = '每30秒';
@@ -1401,9 +1401,9 @@ $Definition['Exclude archived discussions from the discussions list'] = '不将�
 $Definition['Existing members send invitations to new members.'] = '老用户邀请新用户方式';
 $Definition['Exit Preview'] = '退出预览';
 
-$Definition['Facebook Connect allows users to sign in using their Facebook account.'] = 'Facebook Connect 允许用户使用他们的 Facebook 账户登录。<b>前提是您必须在 Facebook 上已注册您的应用。</b>';
+$Definition['Facebook Connect allows users to sign in using their Facebook account.'] = 'Facebook Connect 允许用户使用他们的 Facebook 账户登录。<b>前提是你必须在 Facebook 上已注册你的应用。</b>';
 $Definition['Facebook Settings'] = 'Facebook 设置';
-$Definition['Failed to connect to the database with the username and password you entered. Did you mistype them? The database reported: <code>%s</code>'] = '使用您输入的用户名和密码连接数据库失败。忘记输入？数据库返回信息：<code>%s</code>';
+$Definition['Failed to connect to the database with the username and password you entered. Did you mistype them? The database reported: <code>%s</code>'] = '使用你输入的用户名和密码连接数据库失败。忘记输入？数据库返回信息：<code>%s</code>';
 $Definition['Failure'] = '失败';
 $Definition['Favicon'] = '网站小图标';
 $Definition['FaviconBrowse'] = '上传一个新的Favicon: ';
@@ -1430,10 +1430,10 @@ $Definition['Garden.Import.Merge'] = '与当前社区合并';
 $Definition['Garden.Import.Merge.Description'] = '';
 $Definition['Garden.Import.Overwrite'] = '覆盖当前社区';
 $Definition['Garden.Import.Overwrite.Description'] = '警告：当前社区所有内容将被覆盖。';
-$Definition['Garden.StatisticsDisabled'] = '您在您的配置文件中关闭了 Vanilla 统计功能。';
+$Definition['Garden.StatisticsDisabled'] = '你在你的配置文件中关闭了 Vanilla 统计功能。';
 $Definition['Garden.StatisticsLocal.Explain'] = '';
 $Definition['Garden.StatisticsLocal.Resolve'] = '';
-$Definition['Garden.StatisticsReadonly.Explain'] = '您的 config.php 文件属性为只读。这意味着 Vanilla 无法自动为您的社区创建安装ID 和密匙。';
+$Definition['Garden.StatisticsReadonly.Explain'] = '你的 config.php 文件属性为只读。这意味着 Vanilla 无法自动为你的社区创建安装ID 和密匙。';
 $Definition['Garden.StatisticsReadonly.Resolve'] = '设置 conf/config.php 权限777可以解决这个问题。';
 $Definition['Gave badge to users.'] = '授予用户徽章。';
 $Definition['Generate'] = '生成';
@@ -1493,7 +1493,7 @@ $Definition['How to use themes'] = '怎样使用主题';
 $Definition['IP Address'] = 'IP地址';
 $Definition['If a banner logo is uploaded, it will replace the banner title on user-facing forum pages.'] = '上传的站点LOGO将替换页面的站点名称。';
 $Definition['If you are using ProxyConnect with an officially supported remote application plugin such as our wordpress-proxyconnect plugin, these values will be available in that plugin\'s configuration screen.'] = '';
-$Definition['If you want to decrease the warning level then remove a warning.'] = '如果您想降低报警级别，请尝试解决报警的问题。';
+$Definition['If you want to decrease the warning level then remove a warning.'] = '如果你想降低报警级别，请尝试解决报警的问题。';
 $Definition['If your file is bigger than 20M then you must upload it to a public url.'] = '如果你的文件大于 20M， 你必须上传到其他的公共地址。';
 $Definition['If your file is small then just upload it here.'] = '小文件请上传到这里。';
 $Definition['Import'] = '导入';
@@ -1520,12 +1520,12 @@ $Definition['JS Connect Settings'] = 'JS Connect 设置';
 
 $Definition['Key Type'] = 'Captcha 密钥类型';
 $Definition['Key Value'] = 'Captcha 密钥值';
-$Definition['Kick-start your community and increase user engagement.'] = '启动您的社区，增加用户参与。';
+$Definition['Kick-start your community and increase user engagement.'] = '启动你的社区，增加用户参与。';
 
 $Definition['Label this Revision'] = '标记这份修订版';
 $Definition['Last Visit'] = '上次访问';
 $Definition['Last time your forum communicated with the statistics server it received the following message:'] = '最后一次社区与统计服务器连接返回的消息：';
-$Definition['Learn how to completely change your forum\'s look and feel: upload your logo, set your homepage, choose a theme and customize it.'] = '学习如何完全改变您的社区的外观和感觉：上传LOGO；设置首页及布局；选择一个主题并个性化主题。';
+$Definition['Learn how to completely change your forum\'s look and feel: upload your logo, set your homepage, choose a theme and customize it.'] = '学习如何完全改变你的社区的外观和感觉：上传LOGO；设置首页及布局；选择一个主题并个性化主题。';
 $Definition['Learn how to use the basic functionality of your forum.'] = '学习如何使用论坛的基本功能。';
 $Definition['Likes'] = '喜欢';
 $Definition['Limit the display of this plugin for mobile devices.'] = '限制该插件在手机浏览器上的显示。';
@@ -1538,7 +1538,7 @@ $Definition['Link my existing account'] = '连接我的一个已经存在的账�
 $Definition['Locale Key (Folder)'] = 'Locale Key (Folder)';
 $Definition['Locale Name'] = '语言名称';
 $Definition['Locales'] = '国际化';
-$Definition['Locales are in your %s folder.'] = '语言包可以让您的站点支持其他语言，把文件上传到 %s ，然后在下面启用或禁用它。';
+$Definition['Locales are in your %s folder.'] = '语言包可以让你的站点支持其他语言，把文件上传到 %s ，然后在下面启用或禁用它。';
 $Definition['Location'] = '位置';
 $Definition['LogoBrowse'] = '上传一个新的图片替换原有的LOGO。';
 $Definition['LogoDescription'] = '站点LOGO显示在站点的顶部，有些主题可能不会显示。';
@@ -1705,7 +1705,7 @@ $Definition['Reset password and send email notification to user'] = '重设密�
 $Definition['Resetting the password for %s.'] = '';
 $Definition['Restart'] = '重试';
 $Definition['Restore'] = '恢复';
-$Definition['Restoring your selection removes the items from this list.'] = '当您选择恢复，这些条目将从此删除并恢复到社区中。';
+$Definition['Restoring your selection removes the items from this list.'] = '当你选择恢复，这些条目将从此删除并恢复到社区中。';
 $Definition['Role'] = '用户角色';
 $Definition['Role Name'] = '用户角色名称';
 $Definition['Role to Grant'] = '角色授权';
@@ -1747,7 +1747,7 @@ $Definition['Show Pocket Locations'] = '显示可自定义HTML块及其位置';
 $Definition['Show all possible pocket locations.'] = '';
 $Definition['Sign Out'] = '退出';
 $Definition['Sign in'] = '登录';
-$Definition['SignedOut'] = '您已经注销。';
+$Definition['SignedOut'] = '你已经注销。';
 $Definition['Silver'] = '';
 $Definition['Sink'] = '下沉';
 $Definition['Site Name'] = '站点名称';
@@ -1765,7 +1765,7 @@ $Definition['Subscriber'] = '订阅者';
 $Definition['Success'] = '成功';
 $Definition['System'] = '系统';
 
-$Definition['Table Layout'] = '如果您想降低报警级别，请尝试解决报警的问题。';
+$Definition['Table Layout'] = '如果你想降低报警级别，请尝试解决报警的问题。';
 $Definition['Temporary (302)'] = '临时移动 (302)';
 $Definition['Test'] = '测试';
 $Definition['Test Mode'] = '';
@@ -1801,12 +1801,12 @@ $Definition['The banner title appears on your site\'s banner and in your browswe
 $Definition['The basic registration form requires that new users copy text from a "Captcha" image to help prevent spam.'] = '';
 $Definition['The behind-the-scenes URL that shares identity information with Vanilla'] = '';
 $Definition['The client ID uniqely identifies the site.'] = '';
-$Definition['The content you were looking for has been deleted.'] = '您要寻找的内容已删除。';
+$Definition['The content you were looking for has been deleted.'] = '你要寻找的内容已删除。';
 $Definition['The database user you specified does not have permission to access the database. Have you created the database yet? The database reported: <code>%s</code>'] = '';
 $Definition['The default role has not been configured.'] = '默认用户角色还没有配置。';
 $Definition['The following content has been flagged by users for moderator review.'] = '用户标记了以下内容给版主.';
 $Definition['The following structure changes are required for your database.'] = '以下结构变更需要数据库子支持。';
-$Definition['The homepage title is displayed on your home page.'] = '首页标题显示在您的首页，并将出现在搜索引擎中。';
+$Definition['The homepage title is displayed on your home page.'] = '首页标题显示在你的首页，并将出现在搜索引擎中。';
 $Definition['The homepage was saved successfully.'] = '首页保存成功。';
 $Definition['The import file does not contain any data.'] = '导入的文件不包含任何数据。';
 $Definition['The import file is not in the correct format.'] = '导入的文件格式不正确。';
@@ -1846,7 +1846,7 @@ $Definition['This category is archived.'] = '这个板块已经存档';
 $Definition['This forum is currently set to invitation only mode.'] = '该论坛已经被设置为‘只能邀请加入’模式';
 $Definition['This is a parent category that does not allow discussions.'] = '';
 $Definition['This is the administrative dashboard for your new community. Check out the configuration options to the left: from here you can configure how your community works. <b>Only users in the "Administrator" role can see this part of your community.</b>'] = '';
-$Definition['This is the first time you\'ve visited the discussion forums.'] = '这是您第一次访问该论坛。';
+$Definition['This is the first time you\'ve visited the discussion forums.'] = '这是你第一次访问该论坛。';
 $Definition['This option shows/hides the locations where pockets can go.'] = '';
 $Definition['This page requires Javascript.'] = '本页面需要 Javascript 的支持。';
 $Definition['This plugin allows users to sign in with OpenID. <b>Make sure you click Settings after enabling this plugin to enable OpenID signin</b>.'] = 'This plugin allows users to sign in with OpenID. <b>Make sure you click Settings after enabling this plugin to enable OpenID signin</b>.';
@@ -1868,7 +1868,7 @@ $Definition['Try Again'] = '重试';
 $Definition['Turn OFF'] = '关闭插件';
 $Definition['Twitter Connect allows users to sign in using their Twitter account.'] = 'Twitter Connect allows users to sign in using their Twitter account. <b>You must register your application with Twitter for this plugin to work.</b>';
 
-$Definition['Unable to detect PHP GD installed on this system. Vanilla requires GD version 2 or better.'] = '无法检测您的系统是否安装了 PHP GD扩展。Vanilla 论坛程序需要 GD 2.0或更高版本。';
+$Definition['Unable to detect PHP GD installed on this system. Vanilla requires GD version 2 or better.'] = '无法检测你的系统是否安装了 PHP GD扩展。Vanilla 论坛程序需要 GD 2.0或更高版本。';
 $Definition['Unable to initialize plugin: required connectivity libraries not found, need either \'fsockopen\' or \'curl\'.'] = '';
 $Definition['Unban'] = '撤销屏蔽';
 $Definition['Uninvite'] = '未邀请';
@@ -1909,7 +1909,7 @@ $Definition['Vanilla Sphinx Help'] = 'Vanilla Sphinx 帮助';
 $Definition['Vanilla Statistics are currently disabled'] = 'Vanilla 统计当前停用';
 $Definition['Vanilla can be embedded into your site in a variety of ways. Click the tabs below to find out more.'] = '';
 $Definition['Vanilla is installed!'] = 'Vnilla 已安装!';
-$Definition['Vanilla.Archive.Description'] = '您可以将发布于某日期之前的话题存档。存档的话题将关闭，无法回复。';
+$Definition['Vanilla.Archive.Description'] = '你可以将发布于某日期之前的话题存档。存档的话题将关闭，无法回复。';
 $Definition['Vanilla.Categories.MaxDisplayDepth'] = '分级板块用逗号分隔，当他们%1$s';
 $Definition['Verified!'] = '已验证!';
 $Definition['Version'] = '版本';
@@ -1931,14 +1931,14 @@ $Definition['Warning: Loading tables can be slow.'] = '';
 $Definition['Warning: This is for advanced users.'] = '';
 $Definition['Warning: deleting is permanent'] = '';
 $Definition['We only accept urls that begin with http:// or https://'] = '';
-$Definition['We will attempt to use the local mail server to send email by default. If you want to use a separate SMTP mail server, you can configure it below.'] = '我们将按默认设置使用本地邮件服务器。如果您想使用其它STMP 邮件服务器，请在下面设置。';
+$Definition['We will attempt to use the local mail server to send email by default. If you want to use a separate SMTP mail server, you can configure it below.'] = '我们将按默认设置使用本地邮件服务器。如果你想使用其它STMP 邮件服务器，请在下面设置。';
 $Definition['Welcome to Vanilla!'] = '欢迎来到Vanilla!';
 $Definition['Welcome to your Dashboard'] = '';
 $Definition['What\'s the Buzz?'] = '网站动态';
 $Definition['Where is your Community Forum?'] = '';
 $Definition['Where should the plugin be shown?'] = '在哪里可以显示插件？';
 $Definition['Who\'s Online Settings'] = '在线状态设置';
-$Definition['Why do you want to join?'] = '为什么您想要加入呢?';
+$Definition['Why do you want to join?'] = '为什么你想要加入呢?';
 $Definition['Within'] = '在有限时间内';
 $Definition['WordPress Plugin'] = '';
 $Definition['Wordpress'] = '';
@@ -1951,36 +1951,36 @@ $Definition['You are now signed in.'] = '';
 $Definition['You are previewing the %s theme.'] = '';
 $Definition['You can also ban the users that posted the spam and delete all of their posts.'] = '勾选发布垃圾信息的用户旁边的框，屏蔽他们并且删除所有他们的发布内容。 <b>请确认他是垃圾信息来源是使用。</b>';
 $Definition['You can always use your password at<a href="%1$s">%1$s</a>.'] = 'If you are ever locked out of your forum you can always log in using your original Vanilla email and password at <a href="%1$s">%1$s</a>';
-$Definition['You can ban IP addresses, email domains, and words from usernames using this tool.'] = '您可以通过这个工具通过用户名封禁 IP 地址，电子邮件地址和单词。';
+$Definition['You can ban IP addresses, email domains, and words from usernames using this tool.'] = '你可以通过这个工具通过用户名封禁 IP 地址，电子邮件地址和单词。';
 $Definition['You can connect to multiple sites that support jsConnect.'] = '';
 $Definition['You can customize the HTML and CSS for this theme on the %s page.'] = '';
 $Definition['You can either create a new account, or enter your credentials if you have an existing account.'] = '';
-$Definition['You can make the categories page your homepage.'] = '您可以在<a href="%s">这里</a>将分类设置为首页。';
+$Definition['You can make the categories page your homepage.'] = '你可以在<a href="%s">这里</a>将分类设置为首页。';
 $Definition['You can place files in your /uploads folder.'] = 'If your file is too
 			large to upload directly to this page you can place it in your /uploads
 					folder. Make sure the filename begins with the word <b>export</b> and ends
 							with one of <b>.txt, .gz</b>.';
 $Definition['You cannot disable the %1$s plugin because the %2$s plugin requires it in order to function.'] = 'You cannot disable the %1$s plugin because the %2$s plugin requires it in order to function.';
 $Definition['You cannot disable the OpenID plugin because the GoogleSignIn plugin requires it in order to function.'] = 'You cannot disable the OpenID plugin because the GoogleSignIn plugin requires it in order to function.';
-$Definition['You cannot edit the thumbnail of another member.'] = '您不可以编辑任何其他成员的缩略图。';
+$Definition['You cannot edit the thumbnail of another member.'] = '你不可以编辑任何其他成员的缩略图。';
 $Definition['You cannot remove an invitation that has been accepted.'] = '已被接受的邀请不能删除';
 $Definition['You cannot remove the only remaining category that allows discussions'] = '';
 $Definition['You do not have permission to view other profiles.'] = '';
-$Definition['You have %s invitations left for this month.'] = '本月您还有  %s 个邀请名额，快去邀请您的好友加入吧';
-$Definition['You must be authenticated in order to use this form.'] = '您必须经过验证才可以使用此表';
+$Definition['You have %s invitations left for this month.'] = '本月你还有  %s 个邀请名额，快去邀请你的好友加入吧';
+$Definition['You must be authenticated in order to use this form.'] = '你必须经过验证才可以使用此表';
 $Definition['You must have the MySQL driver for PDO enabled in order for Vanilla to connect to your database.'] = '';
-$Definition['You must have the PDO module enabled in PHP in order for Vanilla to connect to your database.'] = '您必须启用 PHP 的 PDO 模块以便让 Vanilla 连接您的数据库。';
+$Definition['You must have the PDO module enabled in PHP in order for Vanilla to connect to your database.'] = '你必须启用 PHP 的 PDO 模块以便让 Vanilla 连接你的数据库。';
 $Definition['You must provide at least one recipient'] = '';
-$Definition['You must select a file to import.'] = '您必须选择一个要导入的文件。';
-$Definition['You must specify an admin password.'] = '您必须指定一个管理员密码。';
-$Definition['You must specify an admin username.'] = '您必须指定一个管理员用户名。';
+$Definition['You must select a file to import.'] = '你必须选择一个要导入的文件。';
+$Definition['You must specify an admin password.'] = '你必须指定一个管理员密码。';
+$Definition['You must specify an admin username.'] = '你必须指定一个管理员用户名。';
 $Definition['You need to configure ProxyConnect'] = '';
 $Definition['Your application will be reviewed by an administrator. You will be notified by email if your application is approved.'] = 'Your application will be reviewed by an administrator. You will be notified by email if your application is approved.';
 $Definition['Your configuration file does not have the correct permissions. PHP needs to be able to read and write to this file: <code>%s</code>'] = '';
-$Definition['Your default locale won\'t display properly'] = '您的默认语言环境将不会正确显示。';
-$Definition['Your invitations were sent successfully.'] = '您的邀请已成功发送。';
+$Definition['Your default locale won\'t display properly'] = '你的默认语言环境将不会正确显示。';
+$Definition['Your invitations were sent successfully.'] = '你的邀请已成功发送。';
 
-$Definition['[%s] Confirm Your Email Address'] = '[%s] 请确认您的邮箱地址';
+$Definition['[%s] Confirm Your Email Address'] = '[%s] 请确认你的邮箱地址';
 $Definition['[%s] Invitation'] = '[%s]邀请';
 $Definition['[%s] Password Reset'] = '[%s]重设密码';
 $Definition['[%s] Password Reset Request'] = '[%s]重设密码请求';
@@ -2010,7 +2010,7 @@ $Definition['never'] = '绝不';
 $Definition['page'] = '页';
 
 $Definition['seconds'] = '秒';
-$Definition['starting your first discussion'] = '发布您的第一个话题';
+$Definition['starting your first discussion'] = '发布你的第一个话题';
 
 $Definition['unknown'] = '未知';
 
