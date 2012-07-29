@@ -1201,7 +1201,7 @@ $Definition['By clicking the button below, you will be deleting the user account
 $Definition['Cancel'] = '取消';
 $Definition['Cannot build profile information if user is not defined.'] = '用户没有定义的情况下不能建立个人资料信息。';
 $Definition['Capture definitions throughout the site. You must visit the pages in the site in order for the definitions to be captured. The captured definitions will be put in the <code>captured.php</code> and <code>captured_admin.php</code>.'] = '';
-$Definition['Categories'] = '版块设置';
+$Definition['Categories'] = '版块';
 $Definition['Categories &amp; Discussions'] = '版块 & 话题';
 $Definition['Categories Layout'] = '板块布局';
 $Definition['Categories are used to help organize discussions.'] = '板块用来组织话题。拖动 或 放下它们以便排序和分级。';
