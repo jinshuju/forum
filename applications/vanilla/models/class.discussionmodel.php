@@ -209,8 +209,8 @@ class DiscussionModel extends VanillaModel {
 		
 		$this->AddArchiveWhere($this->SQL);
       
-      
-      $this->SQL->Limit($Limit, $Offset);
+      if ($Offset !== FALSE && $Limit !== FALSE)
+         $this->SQL->Limit($Limit, $Offset);
       
       $this->EventArguments['SortField'] = C('Vanilla.Discussions.SortField', 'd.DateLastComment');
       $this->EventArguments['SortDirection'] = C('Vanilla.Discussions.SortDirection', 'desc');
@@ -431,6 +431,9 @@ class DiscussionModel extends VanillaModel {
 		$ArchiveTimestamp = Gdn_Format::ToTimestamp(Gdn::Config('Vanilla.Archive.Date', 0));
 		$Result = &$Data->Result();
 		foreach($Result as &$Discussion) {
+         $CategoryID = $Discussion->CategoryID;
+         $Category = CategoryModel::Categories($CategoryID);
+         
          $Discussion->Name = Gdn_Format::Text($Discussion->Name);
          $Discussion->Url = DiscussionUrl($Discussion);
 
@@ -447,6 +450,11 @@ class DiscussionModel extends VanillaModel {
          } else {
 				$Discussion->CountUnreadComments = $Discussion->CountComments - $Discussion->CountCommentWatch;
 			}
+         
+         $Discussion->Read = !(bool)$Discussion->CountUnreadComments;
+         if ($Category)
+            $Discussion->Read |= $Category['DateMarkedRead'] > $Discussion->DateLastComment;
+         
 			// Logic for incomplete comment count.
 			if ($Discussion->CountCommentWatch == 0 && $DateLastViewed = GetValue('DateLastViewed', $Discussion)) {
             $Discussion->CountUnreadComments = TRUE;
@@ -1144,29 +1152,26 @@ class DiscussionModel extends VanillaModel {
             // Remove the primary key from the fields for saving
             $Fields = RemoveKeyFromArray($Fields, 'DiscussionID');
             
-            $Discussion = FALSE;
             $StoredCategoryID = FALSE;
             
             if ($DiscussionID > 0) {
                // Updating
-               $Stored = $this->GetID($DiscussionID);
+               $Stored = $this->GetID($DiscussionID, DATASET_TYPE_ARRAY);
                
                // Clear the cache if necessary.
                if (GetValue('Announce', $Stored) != GetValue('Announce', $Fields)) {
                   $CacheKeys = array('Announcements');
-
-                  $Announce = GetValue('Announce', $Discussion);
                   $this->SQL->Cache($CacheKeys);
                }
 
                $this->SQL->Put($this->Name, $Fields, array($this->PrimaryKey => $DiscussionID));
 
-               $Fields['DiscussionID'] = $DiscussionID;
-               LogModel::LogChange('Edit', 'Discussion', (array)$Fields, (array)$Stored);
+               SetValue('DiscussionID', $Fields, $DiscussionID);
+               LogModel::LogChange('Edit', 'Discussion', (array)$Fields, $Stored);
                
-
-               if($Stored->CategoryID != $Fields['CategoryID']) 
-                  $StoredCategoryID = $Stored->CategoryID;
+               if (GetValue('CategoryID', $Stored) != GetValue('CategoryID', $Fields)) 
+                  $StoredCategoryID = GetValue('CategoryID', $Stored);
+               
             } else {
                // Inserting.
                if (!GetValue('Format', $Fields))
@@ -1178,8 +1183,6 @@ class DiscussionModel extends VanillaModel {
                // Clear the cache if necessary.
                if (GetValue('Announce', $Fields)) {
                   $CacheKeys = array('Announcements');
-
-                  $Announce = GetValue('Announce', $Discussion);
                   $this->SQL->Cache($CacheKeys);
                }
 
@@ -1210,8 +1213,6 @@ class DiscussionModel extends VanillaModel {
                // Notify users of mentions.
 					$DiscussionName = ArrayValue('Name', $Fields, '');
                $Story = ArrayValue('Body', $Fields, '');
-               
-               
                
                $NotifiedUsers = array();
                $UserModel = Gdn::UserModel();
@@ -1272,18 +1273,12 @@ class DiscussionModel extends VanillaModel {
             }
             
             // Get CategoryID of this discussion
-            $Data = $this->SQL
-               ->Select('CategoryID')
-               ->From('Discussion')
-               ->Where('DiscussionID', $DiscussionID)
-               ->Get();
             
-            $CategoryID = FALSE;
-            if ($Data->NumRows() > 0)
-               $CategoryID = $Data->FirstRow()->CategoryID;
+            $Discussion = $this->GetID($DiscussionID, DATASET_TYPE_ARRAY);
+            $CategoryID = GetValue('CategoryID', $Discussion, FALSE);
             
             // Update discussion counter for affected categories
-            $this->UpdateDiscussionCount($CategoryID, ($Insert ? $DiscussionID : FALSE));
+            $this->UpdateDiscussionCount($CategoryID, $Insert ? $Discussion : FALSE);
             if ($StoredCategoryID)
                $this->UpdateDiscussionCount($StoredCategoryID);
 				
@@ -1373,8 +1368,9 @@ class DiscussionModel extends VanillaModel {
     *
     * @param int $CategoryID Unique ID of category we are updating.
     */
-   public function UpdateDiscussionCount($CategoryID, $DiscussionID = FALSE) {
-		if(strcasecmp($CategoryID, 'All') == 0) {
+   public function UpdateDiscussionCount($CategoryID, $Discussion = FALSE) {
+      $DiscussionID = GetValue('DiscussionID', $Discussion, FALSE);
+		if (strcasecmp($CategoryID, 'All') == 0) {
 			$Exclude = (bool)Gdn::Config('Vanilla.Archive.Exclude');
 			$ArchiveDate = Gdn::Config('Vanilla.Archive.Date');
 			$Params = array();
@@ -1416,16 +1412,21 @@ class DiscussionModel extends VanillaModel {
          $CountDiscussions = (int)GetValue('CountDiscussions', $Data, 0);
          $CountComments = (int)GetValue('CountComments', $Data, 0);
          
+         $CacheAmendment = array(
+            'CountDiscussions'      => $CountDiscussions,
+            'CountComments'         => $CountComments
+         );
+         
          if ($DiscussionID) {
-            $this->SQL
-               ->Set('LastDiscussionID', $DiscussionID)
-               ->Set('LastCommentID', NULL);
+            $CacheAmendment = array_merge($CacheAmendment, array(
+               'LastDiscussionID'   => $DiscussionID,
+               'LastCommentID'      => NULL,
+               'LastDateInserted'   => GetValue('DateInserted', $Discussion)
+            ));
          }
          
          $CategoryModel = new CategoryModel();
-         $CategoryModel->SetField($CategoryID,
-            array('CountDiscussions' => $CountDiscussions,
-               'CountComments' => $CountComments));
+         $CategoryModel->SetField($CategoryID, $CacheAmendment);
       }
    }
 	
