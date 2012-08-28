@@ -6,8 +6,8 @@ class OrchidThemeHooks extends Gdn_Plugin {
 	}
 }
 
-if (!function_exists('UserPhotoDefaultUrl')) {
-   function UserPhotoDefaultUrl($User) {
-      return Url('/themes/orchid/design/default-avatar.jpg',TRUE);
-   }
-}
+// if (!function_exists('UserPhotoDefaultUrl')) {
+//    function UserPhotoDefaultUrl($User) {
+//       return Url('/themes/orchid/design/default-avatar.jpg',TRUE);
+//    }
+// }
