@@ -416,7 +416,7 @@ class LogModel extends Gdn_Pluggable {
             continue;
 
          SetValue('_New', $Row, $NewData);
-         self::Insert($Operation, $RecordType, $Row);
+         self::Insert($Operation, $RecordType, (array)$Row);
       }
    }
 

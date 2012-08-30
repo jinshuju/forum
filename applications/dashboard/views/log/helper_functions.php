@@ -7,10 +7,11 @@ function PluralCount($Count, $Type) {
 }
 
 function OtherRecordsMeta($Data) {
+	if(!is_array($Data)) $Data = (array)$Data;
+
    if (!isset($Data['_Data'])) {
       return '';
    }
-   
    
    $Result = '<div><b>'.T('Other Records').':</b></div><div>';
    $_Data = $Data['_Data'];
