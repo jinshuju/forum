@@ -239,8 +239,8 @@ class ActivityController extends Gdn_Controller {
             
             $ID = $this->ActivityModel->Comment($ActivityComment);
             
-            if ($ID == SPAM) {
-               $this->StatusMessage = T('Your post has been flagged for moderation.');
+            if ($ID == SPAM || $ID == UNAPPROVED) {
+               $this->StatusMessage = T('ActivityCommentRequiresApproval', 'Your comment will appear after it is approved.');
                $this->Render('Blank', 'Utility');
                return;
             }
@@ -326,8 +326,8 @@ class ActivityController extends Gdn_Controller {
          }
          
          $Activity = $this->ActivityModel->Save($Activity, FALSE, array('CheckSpam' => TRUE));
-         if ($Activity == SPAM) {
-            $this->StatusMessage = T('Your post has been flagged for moderation.');
+         if ($Activity == SPAM || $Activity == UNAPPROVED) {
+            $this->StatusMessage = T('ActivityRequiresApproval', 'Your post will appear after it is approved.');
             $this->Render('Blank', 'Utility');
             return;
          }
@@ -339,6 +339,11 @@ class ActivityController extends Gdn_Controller {
             $Activities = array($Activity);
             ActivityModel::JoinUsers($Activities);
             $this->ActivityModel->CalculateData($Activities);
+         } else {
+            $this->Form->SetValidationResults($this->ActivityModel->ValidationResults());
+            
+            $this->StatusMessage = $this->ActivityModel->Validation->ResultsText();
+//            $this->Render('Blank', 'Utility');
          }
       }
 
