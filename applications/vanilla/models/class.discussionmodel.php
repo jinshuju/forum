@@ -27,6 +27,8 @@ class DiscussionModel extends VanillaModel {
 
    public $Watching = FALSE;
    
+   const CACHE_DISCUSSIONVIEWS = 'discussion.%s.countviews';
+   
    /**
     * Class constructor. Defines the related database table name.
     * 
@@ -293,7 +295,7 @@ class DiscussionModel extends VanillaModel {
       
       if($Perms !== TRUE) {
          if (isset($Where['d.CategoryID'])) {
-            $Where['d.CategoryID'] = array_intersect((array)$Where['d.CategoryID'], $Perms);
+            $Where['d.CategoryID'] = array_values(array_intersect((array)$Where['d.CategoryID'], $Perms));
          } else {
             $Where['d.CategoryID'] = $Perms;
          }
@@ -486,24 +488,33 @@ class DiscussionModel extends VanillaModel {
       }
    }
    
+   /**
+    * Add denormalized views to discussions
+    * 
+    * WE NO LONGER NEED THIS SINCE THE LOGIC HAS BEEN CHANGED.
+    * 
+    * @deprecated since version 2.1.26a
+    * @param type $Discussions
+    */
    public function AddDenormalizedViews(&$Discussions) {
-      if ($Discussions instanceof Gdn_DataSet) {
-         $Result = $Discussions->Result();
-         foreach($Result as &$Discussion) {
-            $CacheKey = "QueryCache.Discussion.{$Discussion->DiscussionID}.CountViews";
-            $CacheViews = Gdn::Cache()->Get($CacheKey);
-            if ($CacheViews !== Gdn_Cache::CACHEOP_FAILURE)
-               $Discussion->CountViews = $CacheViews;
-         }
-      } else {
-         if (isset($Discussions->DiscussionID)) {
-            $Discussion = $Discussions;
-            $CacheKey = "QueryCache.Discussion.{$Discussion->DiscussionID}.CountViews";
-            $CacheViews = Gdn::Cache()->Get($CacheKey);
-            if ($CacheViews !== Gdn_Cache::CACHEOP_FAILURE)
-               $Discussion->CountViews = $CacheViews;
-         }
-      }
+      
+//      if ($Discussions instanceof Gdn_DataSet) {
+//         $Result = $Discussions->Result();
+//         foreach($Result as &$Discussion) {
+//            $CacheKey = sprintf(DiscussionModel::CACHE_DISCUSSIONVIEWS, $Discussion->DiscussionID);
+//            $CacheViews = Gdn::Cache()->Get($CacheKey);
+//            if ($CacheViews !== Gdn_Cache::CACHEOP_FAILURE)
+//               $Discussion->CountViews = $CacheViews;
+//         }
+//      } else {
+//         if (isset($Discussions->DiscussionID)) {
+//            $Discussion = $Discussions;
+//            $CacheKey = sprintf(DiscussionModel::CACHE_DISCUSSIONVIEWS, $Discussion->DiscussionID);
+//            $CacheViews = Gdn::Cache()->Get($CacheKey);
+//            if ($CacheViews !== Gdn_Cache::CACHEOP_FAILURE)
+//               $Discussion->CountViews += $CacheViews;
+//         }
+//      }
    }
 	
 	/**
@@ -1385,34 +1396,40 @@ class DiscussionModel extends VanillaModel {
                // Inserting.
                if (!GetValue('Format', $Fields))
                   $Fields['Format'] = C('Garden.InputFormatter', '');
-
-               // Check for spam.
-               $Spam = SpamModel::IsSpam('Discussion', $Fields);
                
                // Clear the cache if necessary.
                if (GetValue('Announce', $Fields)) {
                   $CacheKeys = array('Announcements');
                   $this->SQL->Cache($CacheKeys);
                }
-
-               if (!$Spam) {
-                  $DiscussionID = $this->SQL->Insert($this->Name, $Fields);
-                  $Fields['DiscussionID'] = $DiscussionID;
-                  
-                  // Update the cache.
-                  if ($DiscussionID && Gdn::Cache()->ActiveEnabled()) {
-                     $CategoryCache = array(
-                         'LastDiscussionID' => $DiscussionID,
-                         'LastCommentID' => NULL,
-                         'LastTitle' => Gdn_Format::Text($Fields['Name']), // kluge so JoinUsers doesn't wipe this out.
-                         'LastUserID' => $Fields['InsertUserID'],
-                         'LastDateInserted' => $Fields['DateInserted'],
-                         'LastUrl' => DiscussionUrl($Fields)
-                     );
-                     CategoryModel::SetCache($Fields['CategoryID'], $CategoryCache);
-                  }
-               } else {
+               
+               // Check for spam
+               $Spam = SpamModel::IsSpam('Discussion', $Fields);
+            	if ($Spam)
                   return SPAM;
+                  
+               // Check for approval
+					$ApprovalRequired = CheckRestriction('Vanilla.Approval.Require');
+					if ($ApprovalRequired && !GetValue('Verified', Gdn::Session()->User)) {
+               	LogModel::Insert('Pending', 'Discussion', $Fields);
+               	return UNAPPROVED;
+               }
+					
+               // Create discussion
+               $DiscussionID = $this->SQL->Insert($this->Name, $Fields);
+               $Fields['DiscussionID'] = $DiscussionID;
+                  
+               // Update the cache.
+               if ($DiscussionID && Gdn::Cache()->ActiveEnabled()) {
+                  $CategoryCache = array(
+                     'LastDiscussionID' => $DiscussionID,
+                     'LastCommentID' => NULL,
+                     'LastTitle' => Gdn_Format::Text($Fields['Name']), // kluge so JoinUsers doesn't wipe this out.
+                     'LastUserID' => $Fields['InsertUserID'],
+                     'LastDateInserted' => $Fields['DateInserted'],
+                     'LastUrl' => DiscussionUrl($Fields)
+                  );
+                  CategoryModel::SetCache($Fields['CategoryID'], $CategoryCache);
                }
                
                // Assign the new DiscussionID to the comment before saving.
@@ -1762,27 +1779,33 @@ class DiscussionModel extends VanillaModel {
     * @param int $DiscussionID Unique ID of discussion to get +1 view.
     */
 	public function AddView($DiscussionID) {
+      
       if (C('Vanilla.Views.Denormalize', FALSE) && Gdn::Cache()->ActiveEnabled()) {
-         $CacheKey = "QueryCache.Discussion.{$DiscussionID}.CountViews";
+         $WritebackLimit = C('Vanilla.Views.DenormalizeWriteback', 10);
+         $CacheKey = sprintf(DiscussionModel::CACHE_DISCUSSIONVIEWS, $DiscussionID);
          
          // Increment. If not success, create key.
          $Views = Gdn::Cache()->Increment($CacheKey);
-         if ($Views === Gdn_Cache::CACHEOP_FAILURE) {
-            $Views = $this->GetWhere(array('DiscussionID' => $DiscussionID))->Value('CountViews', 0);
-            Gdn::Cache()->Store($CacheKey, $Views);
-         }
+         if ($Views === Gdn_Cache::CACHEOP_FAILURE)
+            Gdn::Cache()->Store($CacheKey, 1);
          
          // Every X views, writeback to Discussions
-         if (($Views % C('Vanilla.Views.DenormalizeWriteback', 100)) == 0) {
-            $this->SetField($DiscussionID, 'CountViews', $Views);
+         if (($Views % $WritebackLimit) == 0) {
+            $IncrementBy = floor($Views / $WritebackLimit) * $WritebackLimit;
+            Gdn::Cache()->Decrement($CacheKey, $IncrementBy);
          }
       } else {
+         $IncrementBy = 1;
+      }
+      
+      if ($IncrementBy) {
          $this->SQL
             ->Update('Discussion')
-            ->Set('CountViews', 'CountViews + 1', FALSE)
+            ->Set('CountViews', "CountViews + {$IncrementBy}", FALSE)
             ->Where('DiscussionID', $DiscussionID)
             ->Put();
       }
+      
 	}
 
    /**

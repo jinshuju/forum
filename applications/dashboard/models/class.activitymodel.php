@@ -890,6 +890,9 @@ class ActivityModel extends Gdn_Model {
       $this->Validation->ApplyRule('DateInserted', 'Required');
       $this->Validation->ApplyRule('InsertUserID', 'Required');
       
+      $this->EventArguments['Comment'] = $Comment;
+      $this->FireEvent('BeforeSaveComment');
+      
       if ($this->Validate($Comment)) {
          $Activity = $this->GetID($Comment['ActivityID'], DATASET_TYPE_ARRAY);
          Gdn::Controller()->Json('Activity', $CommentActivityID);
@@ -905,6 +908,13 @@ class ActivityModel extends Gdn_Model {
          $Spam = SpamModel::IsSpam('ActivityComment', $Comment);
          if ($Spam)
             return SPAM;
+         
+         // Check for approval
+         $ApprovalRequired = CheckRestriction('Vanilla.Approval.Require');
+         if ($ApprovalRequired && !GetValue('Verified', Gdn::Session()->User)) {
+         	LogModel::Insert('Pending', 'ActivityComment', $Comment);
+         	return UNAPPROVED;
+         }
          
          $ID = $this->SQL->Insert('ActivityComment', $Comment);
          
@@ -1149,6 +1159,17 @@ class ActivityModel extends Gdn_Model {
             $Activity = $this->MergeActivities($GroupActivity, $Activity);
             $NotificationInc = 0;
          }
+      } elseif (GetValue('CheckRecord', $Options)) {
+         // Check to see if this record already notified so we don't notify multiple times.
+         $Where = ArrayTranslate($Activity, array('NotifyUserID', 'RecordType', 'RecordID'));
+         $Where['DateUpdated >'] = Gdn_Format::ToDateTime(strtotime('-2 days')); // index hint
+         
+         $CheckActivity = $this->SQL->GetWhere(
+            'Activity',
+            $Where)->FirstRow();
+         
+         if ($CheckActivity)
+            return FALSE;
       }
       
       $Delete = FALSE;
@@ -1171,10 +1192,25 @@ class ActivityModel extends Gdn_Model {
             $this->AddInsertFields($Activity);
             TouchValue('DateUpdated', $Activity, $Activity['DateInserted']);
             
+            $this->EventArguments['Activity'] =& $Activity;
+            $this->EventArguments['ActivityID'] = NULL;
+            $this->FireEvent('BeforeSave');
+            
+            if (count($this->ValidationResults()) > 0)
+               return FALSE;
+            
             if (GetValue('CheckSpam', $Options)) {
-               $Spam = SpamModel::IsSpam('Activity', $Activity);
+               // Check for spam
+            	$Spam = SpamModel::IsSpam('Activity', $Activity);
                if ($Spam)
                   return SPAM;
+                  
+            	// Check for approval
+		         $ApprovalRequired = CheckRestriction('Vanilla.Approval.Require');
+		         if ($ApprovalRequired && !GetValue('Verified', Gdn::Session()->User)) {
+		         	LogModel::Insert('Pending', 'Activity', $Activity);
+		         	return UNAPPROVED;
+		         }
             }
             
             $ActivityID = $this->SQL->Insert('Activity', $Activity);
@@ -1183,6 +1219,13 @@ class ActivityModel extends Gdn_Model {
       } else {
          $Activity['DateUpdated'] = Gdn_Format::ToDateTime();
          unset($Activity['ActivityID']);
+         
+         $this->EventArguments['Activity'] =& $Activity;
+         $this->EventArguments['ActivityID'] = $ActivityID;
+         $this->FireEvent('BeforeSave');
+         
+         if (count($this->ValidationResults()) > 0)
+               return FALSE;
          
          $this->SQL->Put('Activity', $Activity, array('ActivityID' => $ActivityID));
          $Activity['ActivityID'] = $ActivityID;

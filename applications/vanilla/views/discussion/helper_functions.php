@@ -135,8 +135,10 @@ function WriteComment($Comment, $Sender, $Session, $CurrentOffset) {
                   echo FormatBody($Comment);
                ?>
             </div>
-            <?php $Sender->FireEvent('AfterCommentBody'); ?>
-            <?php WriteReactions($Comment); ?>
+            <?php 
+            $Sender->FireEvent('AfterCommentBody');
+            WriteReactions($Comment); 
+            ?>
          </div>
       </div>
    </div>
@@ -419,7 +421,7 @@ function WriteEmbedCommentForm() {
    <h2><?php echo T('Leave a comment'); ?></h2>
    <div class="MessageForm CommentForm EmbedCommentForm">
       <?php
-      echo $Controller->Form->Open();
+      echo $Controller->Form->Open(array('id' => 'Form_Comment'));
       echo $Controller->Form->Errors();
       echo Wrap($Controller->Form->TextBox('Body', array('MultiLine' => TRUE)), 'div', array('class' => 'TextBoxWrapper'));
       echo "<div class=\"Buttons\">\n";

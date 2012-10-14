@@ -353,13 +353,18 @@ class Gdn_Controller extends Gdn_Pluggable {
       $this->_FormSaved = '';
       $this->_Json = array();
       $this->_Headers = array(
-         'Cache-Control' => '	private, no-cache, no-store, max-age=0, must-revalidate', // PREVENT PAGE CACHING: HTTP/1.1 
-         'Expires' =>  'Sat, 01 Jan 2000 00:00:00 GMT', // Make sure the client always checks at the server before using it's cached copy.
-         'Pragma' => 'no-cache', // PREVENT PAGE CACHING: HTTP/1.0
-         'X-Garden-Version' => APPLICATION.' '.APPLICATION_VERSION,
-         'Content-Type' => Gdn::Config('Garden.ContentType', '').'; charset='.Gdn::Config('Garden.Charset', '') // PROPERLY ENCODE THE CONTENT
+         'X-Garden-Version'   => APPLICATION.' '.APPLICATION_VERSION,
+         'Content-Type'       => Gdn::Config('Garden.ContentType', '').'; charset='.Gdn::Config('Garden.Charset', '') // PROPERLY ENCODE THE CONTENT
 //         'Last-Modified' => gmdate('D, d M Y H:i:s') . ' GMT', // PREVENT PAGE CACHING: always modified (this can be overridden by specific controllers)
       );
+      
+      if (Gdn::Session()->IsValid()) {
+         $this->_Headers = array_merge($this->_Headers, array(
+            'Cache-Control'   => 'private, no-cache, no-store, max-age=0, must-revalidate', // PREVENT PAGE CACHING: HTTP/1.1 
+            'Expires'         => 'Sat, 01 Jan 2000 00:00:00 GMT', // Make sure the client always checks at the server before using it's cached copy.
+            'Pragma'          => 'no-cache', // PREVENT PAGE CACHING: HTTP/1.0
+         ));
+      }
       
       $this->_ErrorMessages = '';
       $this->_InformMessages = array();
@@ -1557,7 +1562,7 @@ class Gdn_Controller extends Gdn_Pluggable {
 
             // And now search for/add all JS files.
             $Cdns = array();
-            if (Gdn::Request()->Scheme() != 'https') {
+            if (Gdn::Request()->Scheme() != 'https' && !C('Garden.Cdns.Disable', FALSE)) {
                $Cdns = array(
                   'jquery.js' => 'http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js'
                   );
