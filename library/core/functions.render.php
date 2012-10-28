@@ -42,6 +42,49 @@ if (!function_exists('Bullet')):
    }
 endif;
 
+if (!function_exists('ButtonDropDown')):
+   /**
+    *
+    * @param array $Links An array of arrays with the following keys:
+    *  - Text: The text of the link.
+    *  - Url: The url of the link.
+    * @param string|array $CssClass The css class of the link. This can be a two-item array where the second element will be added to the buttons.
+    * @param string $Label The text of the button.
+    * @since 2.1
+    */
+   function ButtonDropDown($Links, $CssClass = 'Button', $Label = FALSE) {
+      if (!is_array($Links) || count($Links) < 1)
+         return;
+      
+      $ButtonClass = '';
+      if (is_array($CssClass))
+         list($CssClass, $ButtonClass) = $CssClass;
+      
+      if (count($Links) < 2) {
+         $Link = array_pop($Links);
+         
+         echo Anchor($Link['Text'], $Link['Url'], $CssClass);
+      } else {
+         // NavButton or Button?
+         $ButtonClass = ConcatSep(' ', $ButtonClass, strpos($CssClass, 'NavButton') !== FALSE ? 'NavButton' : 'Button');
+         if (strpos($CssClass, 'Primary') !== FALSE)
+            $ButtonClass .= ' Primary';
+         // Strip "Button" or "NavButton" off the group class.
+         echo '<div class="ButtonGroup'.str_replace(array('NavButton', 'Button'), array('',''), $CssClass).'">';
+//            echo Anchor($Text, $Url, $ButtonClass);
+            
+            echo '<ul class="Dropdown MenuItems">';
+               foreach ($Links as $Link) {
+                  echo Wrap(Anchor($Link['Text'], $Link['Url'], GetValue('CssClass', $Link, '')), 'li');
+               }
+            echo '</ul>';
+            
+            echo Anchor($Label.' '.Sprite('SpDropdownHandle'), '#', $ButtonClass.' Handle');
+         echo '</div>';
+      }
+   }
+endif;
+
 if (!function_exists('ButtonGroup')):
    /**
     *
@@ -63,7 +106,12 @@ if (!function_exists('ButtonGroup')):
       if (is_array($CssClass))
          list($CssClass, $ButtonClass) = $CssClass;
       
-      if ($Default) {
+      if ($Default && count($Links) > 1) {
+         if (is_array($Default)) {
+            $DefaultText = $Default['Text'];
+            $Default = $Default['Url'];
+         }
+         
          // Find the default button. 
          $Default = ltrim($Default, '/');
          foreach ($Links as $Link) {
@@ -73,6 +121,9 @@ if (!function_exists('ButtonGroup')):
                break;
             }
          }
+         
+         if (isset($DefaultText))
+            $Text = $DefaultText;
       }
       
       if (count($Links) < 2) {
@@ -83,18 +134,20 @@ if (!function_exists('ButtonGroup')):
          if (strpos($CssClass, 'Primary') !== FALSE)
             $ButtonClass .= ' Primary';
          // Strip "Button" or "NavButton" off the group class.
-         echo '<div class="ButtonGroup '.str_replace(array('NavButton', 'Button'), array('',''), $CssClass).'">';
+         echo '<div class="ButtonGroup Multi '.str_replace(array('NavButton', 'Button'), array('',''), $CssClass).'">';
             echo Anchor($Text, $Url, $ButtonClass);
-            echo Anchor(Sprite('SpDropdownHandle'), '#', $ButtonClass.' Handle');
+            
             echo '<ul class="Dropdown MenuItems">';
                foreach ($Links as $Link) {
                   echo Wrap(Anchor($Link['Text'], $Link['Url'], GetValue('CssClass', $Link, '')), 'li');
                }
             echo '</ul>';
+            echo Anchor(Sprite('SpDropdownHandle'), '#', $ButtonClass.' Handle');
+            
          echo '</div>';
       }
    }
-endif; 
+endif;
 
 if (!function_exists('CategoryUrl')):
 
@@ -588,7 +641,7 @@ if (!function_exists('UserUrl')) {
     * @param string $Method Optional. ProfileController method to target.
     * @return string The url suitable to be passed into the Url() function.
     */
-   function UserUrl($User, $Px = '', $Method = '') {
+   function UserUrl($User, $Px = '', $Method = '', $Get = FALSE) {
       static $NameUnique = NULL;
       if ($NameUnique === NULL)
          $NameUnique = C('Garden.Registration.NameUnique');
@@ -596,10 +649,15 @@ if (!function_exists('UserUrl')) {
       $UserName = GetValue($Px.'Name', $User);
       $UserName = preg_replace('/([\?&]+)/', '', $UserName);
       
-      return '/profile/'.
+      $Result = '/profile/'.
          ($Method ? trim($Method, '/').'/' : '').
          ($NameUnique ? '' : GetValue($Px.'UserID', $User, 0).'/').
          rawurlencode($UserName);
+      
+      if ($Get)
+         $Result .= '?'.http_build_query($Get);
+      
+      return $Result;
    }
 }
 

@@ -58,7 +58,7 @@ $Definition['Invalid password.'] = 'The password you entered was incorrect. Reme
 $Definition['ErrorPluginVersionMatch'] = 'The enabled {0} plugin (version {1}) failed to meet the version requirements ({2}).';
 $Definition['ErrorPluginDisableRequired'] = 'You cannot disable the {0} plugin because the {1} plugin requires it in order to function.';
 $Definition['ErrorPluginEnableRequired'] = 'This plugin requires that the {0} plugin be enabled before it can be enabled itself.';
-$Definition['ErrorTermsOfService'] = 'You must agree to the terms of service.';
+//$Definition['ErrorTermsOfService'] = 'You must agree to the terms of service.';
 $Definition['ErrorRecordNotFound'] = 'The requested record could not be found.';
 
 $Definition['PageDetailsMessageFull'] = '%1$s to %2$s of %3$s';
@@ -143,28 +143,27 @@ $Definition['Date.DefaultDateTimeFormat'] = '%B %e, %Y %l:%M%p';
 $Definition['Saved'] = 'Your changes have been saved.';
 $Definition['%s new plural'] = '%s new';
 $Definition['TermsOfService'] = 'Terms of Service';
-$Definition['TermsOfServiceText'] = "
-   <p>You agree, through your use of this service, that you will not use this
-   community to post any material which is knowingly false and/or defamatory,
-   inaccurate, abusive, vulgar, hateful, harassing, obscene, profane, sexually
-   oriented, threatening, invasive of a person's privacy, or otherwise violative
-   of any law. You agree not to post any copyrighted material unless the
-   copyright is owned by you.</p>
-   
-   <p>We at this community also reserve the right to reveal your identity (or
-   whatever information we know about you) in the event of a complaint or legal
-   action arising from any message posted by you. We log all internet protocol
-   addresses accessing this web site.</p>
-   
-   <p>Please note that advertisements, chain letters, pyramid schemes, and
-   solicitations are inappropriate on this community.</p>
-   
-   <p>We reserve the right to remove any content for any reason or no reason at
-   all. We reserve the right to terminate any membership for any reason or no
-   reason at all.</p>
-   
-   <p>You must be at least 13 years of age to use this service.</p>
-";
+$Definition['TermsOfServiceText'] = 
+"You agree, through your use of this service, that you will not use this
+community to post any material which is knowingly false and/or defamatory,
+inaccurate, abusive, vulgar, hateful, harassing, obscene, profane, sexually
+oriented, threatening, invasive of a person's privacy, or otherwise violative
+of any law. You agree not to post any copyrighted material unless the
+copyright is owned by you.
+
+We at this community also reserve the right to reveal your identity (or
+whatever information we know about you) in the event of a complaint or legal
+action arising from any message posted by you. We log all internet protocol
+addresses accessing this web site.
+
+Please note that advertisements, chain letters, pyramid schemes, and
+solicitations are inappropriate on this community.
+
+We reserve the right to remove any content for any reason or no reason at
+all. We reserve the right to terminate any membership for any reason or no
+reason at all.
+
+You must be at least 13 years of age to use this service.";
 
 $Definition['Warning: This is for advanced users.'] = '<b>Warning</b>: This is for advanced users and requires that you make additional changes to your web server. This is usually only available if you have dedicated or vps hosting. Do not attempt this if you do not know what you are doing.';
 $Definition['Activity.Delete'] = '×';

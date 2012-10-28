@@ -1299,11 +1299,21 @@ class DiscussionModel extends VanillaModel {
       
       // Add & apply any extra validation rules:
       $this->Validation->ApplyRule('Body', 'Required');
+      $this->Validation->AddRule('MeAction', 'function:ValidateMeAction');
+      $this->Validation->ApplyRule('Body', 'MeAction');
       $MaxCommentLength = Gdn::Config('Vanilla.Comment.MaxLength');
       if (is_numeric($MaxCommentLength) && $MaxCommentLength > 0) {
          $this->Validation->SetSchemaProperty('Body', 'Length', $MaxCommentLength);
          $this->Validation->ApplyRule('Body', 'Length');
-      }      
+      }
+      
+      // Validate category permissions.
+      $CategoryID = GetValue('CategoryID', $FormPostValues);
+      if ($CategoryID > 0) {
+         $Category = CategoryModel::Categories($CategoryID);
+         if ($Category && !$Session->CheckPermission('Vanilla.Discussions.Add', TRUE, 'Category', GetValue('PermissionCategoryID', $Category)))
+            $this->Validation->AddValidationResult('CategoryID', 'You do not have permission to post in this category');
+      }
       
       // Get the DiscussionID from the form so we know if we are inserting or updating.
       $DiscussionID = ArrayValue('DiscussionID', $FormPostValues, '');
@@ -1330,11 +1340,18 @@ class DiscussionModel extends VanillaModel {
          }
             
          $this->AddInsertFields($FormPostValues);
+         
+         // The UpdateUserID used to be required. Just add it if it still is.
+         if (!$this->Schema->GetProperty('UpdateUserID', 'AllowNull', TRUE)) {
+            $FormPostValues['UpdateUserID'] = $FormPostValues['InsertUserID'];
+         }
+         
          // $FormPostValues['LastCommentUserID'] = $Session->UserID;
          $FormPostValues['DateLastComment'] = Gdn_Format::ToDateTime();
+      } else {
+         // Add the update fields.
+         $this->AddUpdateFields($FormPostValues);
       }
-      // Add the update fields because this table's default sort is by DateUpdated (see $this->Get()).
-      $this->AddUpdateFields($FormPostValues);
       
       // Set checkbox values to zero if they were unchecked
       if (ArrayValue('Announce', $FormPostValues, '') === FALSE)
@@ -1675,11 +1692,7 @@ class DiscussionModel extends VanillaModel {
     */
 	public function SetUserBookmarkCount($UserID) {
 		$Count = $this->UserBookmarkCount($UserID);
-      $this->SQL
-         ->Update('User')
-         ->Set('CountBookmarks', $Count)
-         ->Where('UserID', $UserID)
-         ->Put();
+      Gdn::UserModel()->SetField($UserID, 'CountBookmarks', $Count);
 		
 		return $Count;
 	}

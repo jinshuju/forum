@@ -700,7 +700,11 @@ if (!function_exists('FetchPageInfo')) {
          if (!defined('HDOM_TYPE_ELEMENT'))
             require_once(PATH_LIBRARY.'/vendors/simplehtmldom/simple_html_dom.php');
             
-         $PageHtml = ProxyRequest($Url, $Timeout, TRUE);
+         $Request = new ProxyRequest();
+         $PageHtml = $Request->Request(array(
+            'URL'       => $Url,
+            'Timeout'   => $Timeout
+         ));
          $Dom = str_get_html($PageHtml);
          if (!$Dom)
             throw new Exception('Failed to load page for parsing.');
@@ -935,9 +939,15 @@ function FormatString($String, $Args = array()) {
 }
 
 function _FormatStringCallback($Match, $SetArgs = FALSE) {
-   static $Args = array();
+   static $Args = array(), $ContextUserID = NULL;
    if ($SetArgs) {
       $Args = $Match;
+      
+      if (isset($Args['_ContextUserID']))
+         $ContextUserID = $Args['_ContextUserID'];
+      else
+         $ContextUserID = Gdn::Session() && Gdn::Session()->IsValid() ? Gdn::Session()->UserID : NULL;
+      
       return;
    }
 
@@ -1048,7 +1058,7 @@ function _FormatStringCallback($Match, $SetArgs = FALSE) {
             $Result = urlencode($Value);
             break;
          case 'gender':
-            // Format in the form of FieldName,gender,male,female,unknown
+            // Format in the form of FieldName,gender,male,female,unknown[,plural]
             
             if (is_array($Value) && count($Value) == 1)
                $Value = array_shift($Value);
@@ -1059,6 +1069,8 @@ function _FormatStringCallback($Match, $SetArgs = FALSE) {
                $User = Gdn::UserModel()->GetID($Value);
                if ($User)
                   $Gender = $User->Gender;
+            } else {
+               $Gender = 'p';
             }
             
             switch($Gender) {
@@ -1068,6 +1080,9 @@ function _FormatStringCallback($Match, $SetArgs = FALSE) {
                case 'f':
                   $Result = $FormatArgs;
                   break;
+               case 'p':
+                  $Result = GetValue(5, $Parts, GetValue(4, $Parts));
+               case 'u':
                default:
                   $Result = GetValue(4, $Parts);
             }
@@ -1084,42 +1099,49 @@ function _FormatStringCallback($Match, $SetArgs = FALSE) {
                $Value = array_shift($Value);
             
             if (is_array($Value)) {
-               $Max = C('Garden.FormatUsername.Max', 5);
+               if (isset($Value['UserID'])) {
+                  $User = $Value;
+                  $User['Name'] = FormatUsername($User, $Format, $ContextUserID);
                
-               $Count = count($Value);
-               $Result = '';
-               for ($i = 0; $i < $Count; $i++) {
-                  if ($i >= $Max && $Count > $Max + 1) {
-                     $Others = $Count - $i;
-                     $Result .= ' '.T('sep and', 'and').' '
-                        .Plural($Others, '%s other', '%s others');
-                     break;
-                  }
-                  
-                  $ID = $Value[$i];
-                  if (is_array($ID)) {
-                     continue;
-                  }
-                  
-                  if ($i == $Count - 1)
-                     $Result .= ' '.T('sep and', 'and').' ';
-                  elseif ($i > 0)
-                     $Result .= ', ';
-                  
-                  $Special = array(-1 => T('everyone'), -2 => T('moderators'), -3 => T('administrators'));
-                  if (isset($Special[$ID])) {
-                     $Result .= $Special[$ID];
-                  } else {
-                     $User = Gdn::UserModel()->GetID($ID);
-                     $User->Name = FormatUsername($User, $Format, Gdn::Session()->UserID);
+                  $Result = UserAnchor($User);
+               } else {
+                  $Max = C('Garden.FormatUsername.Max', 5);
+
+                  $Count = count($Value);
+                  $Result = '';
+                  for ($i = 0; $i < $Count; $i++) {
+                     if ($i >= $Max && $Count > $Max + 1) {
+                        $Others = $Count - $i;
+                        $Result .= ' '.T('sep and', 'and').' '
+                           .Plural($Others, '%s other', '%s others');
+                        break;
+                     }
+
+                     $ID = $Value[$i];
+                     if (is_array($ID)) {
+                        continue;
+                     }
+
+                     if ($i == $Count - 1)
+                        $Result .= ' '.T('sep and', 'and').' ';
+                     elseif ($i > 0)
+                        $Result .= ', ';
+
+                     $Special = array(-1 => T('everyone'), -2 => T('moderators'), -3 => T('administrators'));
+                     if (isset($Special[$ID])) {
+                        $Result .= $Special[$ID];
+                     } else {
+                        $User = Gdn::UserModel()->GetID($ID);
+                        $User->Name = FormatUsername($User, $Format, $ContextUserID);
 
 
-                     $Result .= UserAnchor($User);
+                        $Result .= UserAnchor($User);
+                     }
                   }
                }
             } else {
                $User = Gdn::UserModel()->GetID($Value);
-               $User->Name = FormatUsername($User, $Format, Gdn::Session()->UserID);
+               $User->Name = FormatUsername($User, $Format, $ContextUserID);
                
                $Result = UserAnchor($User);
             }
@@ -1328,6 +1350,36 @@ if (!function_exists('GetPostValue')) {
       return array_key_exists($FieldName, $_POST) ? $_POST[$FieldName] : $Default;
    }
 }
+
+if (!function_exists('GetRecord')):
+
+function GetRecord($RecordType, $ID) {
+   switch(strtolower($RecordType)) {
+      case 'discussion':
+         $Model = new DiscussionModel();
+         $Row = $Model->GetID($ID);
+         $Row->Url = DiscussionUrl($Row);
+         $Row->ShareUrl = $Row->Url;
+         return (array)$Row;
+      case 'comment':
+         $Model = new CommentModel();
+         $Row = $Model->GetID($ID, DATASET_TYPE_ARRAY);
+         $Row['Url'] = Url("/discussion/comment/$ID#Comment_$ID", TRUE);
+         
+         $Model = new DiscussionModel();
+         $Discussion = $Model->GetID($Row['DiscussionID']);
+         $Discussion->Url = DiscussionUrl($Discussion);
+         $Row['ShareUrl'] = $Discussion->Url;
+         $Row['Name'] = $Discussion->Name;
+         $Row['Discussion'] = (array)$Discussion;
+         
+         return $Row;
+      default:
+         throw new Gdn_UserException(sprintf("I don't know what a %s is.", strtolower($RecordType)));
+   }
+}
+
+endif;
 
 if (!function_exists('GetValue')) {
 	/**
@@ -1737,6 +1789,31 @@ if (!function_exists('parse_ini_string')) {
          }
       }
       return $Result;
+   }
+}
+
+if (!function_exists('RecordType')) {
+   /**
+    * Return the record type and id of a row.
+    * 
+    * @param array|object $Row The record we are looking at.
+    * @return array An array with the following items
+    *  - 0: record type
+    *  - 1: record ID
+    * @since 2.1
+    */
+   function RecordType($Row) {
+      if ($RecordType = GetValue('RecordType', $Row)) {
+         return array($RecordType, GetValue('RecordID', $Row));
+      } elseif ($CommentID = GetValue('CommentID', $Row)) {
+         return array('Comment', $CommentID);
+      } elseif ($DiscussionID = GetValue('DiscussionID', $Row)) {
+         return array('Discussion', $DiscussionID);
+      } elseif ($ActivityID = GetValue('ActivityID', $Row)) {
+         return array('Activity', $ActivityID);
+      } else {
+         return array(null, null);
+      }
    }
 }
 
@@ -2178,7 +2255,11 @@ if (!function_exists('ProxyRequest')) {
        * - pop the first (only) element off it... 
        * - return that.
        */
-      $ResponseHeaders['StatusCode'] = array_pop(array_slice(explode(' ',trim($Status)),1,1));
+      $Status = trim($Status);
+      $Status = explode(' ',$Status);
+      $Status = array_slice($Status,1,1);
+      $Status = array_pop($Status);
+      $ResponseHeaders['StatusCode'] = $Status;
       foreach ($ResponseHeaderLines as $Line) {
          $Line = explode(':',trim($Line));
          $Key = trim(array_shift($Line));
@@ -2735,6 +2816,20 @@ if (!function_exists('TouchValue')) {
 	}
 }
 
+if (!function_exists('TouchFolder')) {
+   /**
+    * Ensure that a folder exists.
+    * 
+    * @param string $Path
+    * @param int $Perms
+    * @since 2.1
+    */
+   function TouchFolder($Path, $Perms = 0777) {
+      if (!file_exists($Path))
+         mkdir($Path, $Perms, TRUE);
+   }
+}
+
 if (!function_exists('Trace')) {
    function Trace($Value = NULL, $Type = TRACE_INFO) {
       static $Traces = array();
@@ -2763,5 +2858,72 @@ if (!function_exists('Url')) {
    function Url($Path = '', $WithDomain = FALSE, $RemoveSyndication = FALSE) {
       $Result = Gdn::Request()->Url($Path, $WithDomain);
       return $Result;
+   }
+}
+
+
+if (!function_exists('ViewLocation')) {
+   /**
+    * Get the path of a view.
+    * 
+    * @param string $View The name of the view.
+    * @param string $Controller The name of the controller invoking the view or blank.
+    * @param string $Folder The application folder or plugins/plugin folder.
+    * @return string|false The path to the view or false if it wasn't found.
+    */
+   function ViewLocation($View, $Controller, $Folder) {
+      $Paths = array();
+      
+      if (strpos($View, '/') !== FALSE) {
+         // This is a path to the view from the root.
+         $Paths[] = $View;
+      } else {
+         $View = strtolower($View);
+         $Controller = strtolower(StringEndsWith($Controller, 'Controller', TRUE, TRUE));
+         if ($Controller) {
+            $Controller = '/'.$Controller;
+         }
+
+         $Extensions = array('tpl', 'php');
+         
+         // 1. First we check the theme.
+         if ($Theme = Gdn::Controller()->Theme) {
+            foreach ($Extensions as $Ext) {
+               $Paths[] = PATH_THEMES."/{$Theme}/views{$Controller}/$View.$Ext";
+            }
+         }
+
+         // 2. Then we check the application/plugin.
+         if (StringBeginsWith($Folder, 'plugins/')) {
+            // This is a plugin view.
+            foreach ($Extensions as $Ext) {
+               $Paths[] = PATH_ROOT."/{$Folder}/views{$Controller}/$View.$Ext";
+            }
+         } else {
+            // This is an application view.
+            $Folder = strtolower($Folder);
+            foreach ($Extensions as $Ext) {
+               $Paths[] = PATH_APPLICATIONS."/{$Folder}/views{$Controller}/$View.$Ext";
+            }
+
+            if ($Folder != 'dashboard' && StringEndsWith($View, '.master')) {
+               // This is a master view that can always fall back to the dashboard.
+               foreach ($Extensions as $Ext) {
+               $Paths[] = PATH_APPLICATIONS."/dashboard/views{$Controller}/$View.$Ext";
+            }
+            }
+         }
+      }
+      
+      // Now let's search the paths for the view.
+      foreach ($Paths as $Path) {
+         if (file_exists($Path))
+            return $Path;
+      }
+      
+      Trace($View, 'View');
+      Trace($Paths, 'ViewLocation()');
+      
+      return FALSE;
    }
 }

@@ -53,8 +53,8 @@ class TaggingPlugin extends Gdn_Plugin {
    /**
     * Display the tag module in a discussion.
     */
-   public function DiscussionController_Render_Before($Sender) {
-      $Sender->AddCSSFile('plugins/Tagging/design/tag.css');
+   public function AssetModel_StyleCss_Handler($Sender) {
+      $Sender->AddCSSFile('tag.css', 'plugins/Tagging');
    }
    
    /**
@@ -116,9 +116,6 @@ class TaggingPlugin extends Gdn_Plugin {
 
       if ($Sender->Head) {
          $Sender->AddJsFile('discussions.js');
-         $Sender->AddJsFile('bookmark.js');
-			$Sender->AddJsFile('js/library/jquery.menu.js');
-         $Sender->AddJsFile('options.js');
          $Sender->Head->AddRss($Sender->SelfUrl.'/feed.rss', $Sender->Head->Title());
       }
       
@@ -407,7 +404,7 @@ class TaggingPlugin extends Gdn_Plugin {
     * @param Gdn_Controller $Sender
     */
    public function PostController_AfterDiscussionFormOptions_Handler($Sender) {
-      if (in_array($Sender->RequestMethod, array('discussion', 'editdiscussion'))) {         
+      if (in_array($Sender->RequestMethod, array('discussion', 'editdiscussion', 'question'))) {         
          echo '<div class="Form-Tags P">';
          echo $Sender->Form->Label('Tags', 'Tags');
          echo $Sender->Form->TextBox('Tags', array('maxlength' => 255));
@@ -550,7 +547,6 @@ class TaggingPlugin extends Gdn_Plugin {
     * Adds the tag module to the page.
     */
    private function _AddTagModule($Sender) {
-      $Sender->AddCSSFile('plugins/Tagging/design/tag.css');
       $DiscussionID = property_exists($Sender, 'DiscussionID') ? $Sender->DiscussionID : 0;
       include_once(PATH_PLUGINS.'/Tagging/class.tagmodule.php');
       $TagModule = new TagModule($Sender);

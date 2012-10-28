@@ -34,7 +34,7 @@ jQuery(document).ready(function($) {
    
    // Hijack comment form button clicks.
    var draftSaving = 0;
-   $('.EditCommentForm :submit, div.CommentForm :submit, a.PreviewButton, a.DraftButton').livequery('click', function() {
+   $('.CommentButton, a.PreviewButton, a.DraftButton').livequery('click', function() {
       var btn = this;
       var parent = $(btn).parents('div.CommentForm, div.EditCommentForm');
       var frm = $(parent).find('form');
@@ -327,6 +327,7 @@ jQuery(document).ready(function($) {
          } else {
             // Remove the affected row
             $(row).slideUp('fast', function() {$(this).remove();});
+            gdn.processTargets(json.Targets);
          }
       }
    });

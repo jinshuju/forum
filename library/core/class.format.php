@@ -616,16 +616,29 @@ class Gdn_Format {
    }
 
    /**
-    * Formats an email address in a non-scrapable format that Garden can then
-    * make linkable using jquery.
+    * Formats an email address in a non-scrapable format.
     * 
     * @param string $Email
     * @return string
     */
    public static function Email($Email) {
-      $At = T('at');
-      $Dot = T('dot');
-      return '<span class="Email EmailUnformatted">' . str_replace(array('@', '.'), array('<strong>' . $At . '</strong>', '<em>' . $Dot . '</em>'), $Email) . '</span>';
+      $Max = max(3, floor(strlen($Email) / 2));
+      $Chunks = str_split($Email, mt_rand(3, $Max));
+      $Chunks = array_map('htmlentities', $Chunks);
+      
+      $St = mt_rand(0,1);
+      $End = count($Chunks) - mt_rand(1, 4);
+      
+      $Result = '';
+      foreach ($Chunks as $i => $Chunk) {
+         if ($i >= $St && $i <= $End) {
+            $Result .= '<span style="display:inline;display:none">'.str_rot13($Chunk).'</span>';
+         }
+         
+         $Result .= '<span style="display:none;display:inline">'.$Chunk.'</span>';
+      }
+      
+      return '<span class="Email">'.$Result.'</span>';
    }
 
    /**
@@ -815,6 +828,28 @@ class Gdn_Format {
    }
    
    /**
+    * Format a serialized string of image properties as html.
+    * @param string $Body a serialized array of image properties (Image, Thumbnail, Caption)
+    */
+   public static function Image($Body) {
+      if (is_string($Body)) {
+         $Image = @unserialize($Body);
+      
+         if (!$Image) 
+            return Gdn_Format::Html($Body);
+      }
+      
+      $Url = GetValue('Image', $Image);
+      $Caption = Gdn_Format::PlainText(GetValue('Caption', $Image));
+      return '<div class="ImageWrap">'
+         .'<div class="Image">'
+            .Img($Url, array('alt' => $Caption, 'title' => $Caption))
+         .'</div>'
+         .'<div class="Caption">'.$Caption.'</div>'
+      .'</div>';
+   }
+   
+   /**
     * Format a string as plain text.
     * @param string $Body The text to format.
     * @param string $Format The current format of the text.
@@ -826,7 +861,7 @@ class Gdn_Format {
       
       if ($Format != 'Text') {
          // Remove returns and then replace html return tags with returns.
-         $Result = str_replace(array("\n", "\r"), '', $Result);
+         $Result = str_replace(array("\n", "\r"), ' ', $Result);
          $Result = preg_replace('`<br\s*/?>`', "\n", $Result);
          
          // Fix lists.
@@ -974,13 +1009,16 @@ class Gdn_Format {
          && C('Garden.Format.YouTube')) {
          $ID = $Matches['ID'];
          $TimeMarker = isset($Matches['HasTime']) ? '&amp;start='.$Matches['Time'] : '';
-         $Result = <<<EOT
-<div class="Video"><object width="$Width" height="$Height"><param name="movie" value="http://www.youtube.com/v/$ID&amp;hl=en_US&amp;fs=1&amp;"></param><param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param><embed src="http://www.youtube.com/v/$ID&amp;hl=en_US&amp;fs=1$TimeMarker" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="$Width" height="$Height"></embed></object></div>
-EOT;
+         $Result = '<div class="VideoWrap">';
+            $Result .= '<div class="Video YouTube" id="youtube-'.$ID.'">';
+               $Result .= '<div class="VideoPreview"><a href="http://youtube.com/watch?v='.$ID.'"><img src="http://img.youtube.com/vi/'.$ID.'/0.jpg" width="'.$Width.'" height="'.$Height.'" border="0" /></a></div>';
+               $Result .= '<div class="VideoPlayer"></div>';
+            $Result .= '</div>';
+         $Result .= '</div>';
       } elseif (preg_match('`(?:https?|ftp)://(www\.)?vimeo\.com\/(\d+)`', $Url, $Matches) && C('Garden.Format.Vimeo')) {
          $ID = $Matches[2];
          $Result = <<<EOT
-<div class="Video"><object width="$Width" height="$Height"><param name="allowfullscreen" value="true" /><param name="allowscriptaccess" value="always" /><param name="movie" value="http://vimeo.com/moogaloop.swf?clip_id=$ID&amp;server=vimeo.com&amp;show_title=1&amp;show_byline=1&amp;show_portrait=0&amp;color=&amp;fullscreen=1" /><embed src="http://vimeo.com/moogaloop.swf?clip_id=$ID&amp;server=vimeo.com&amp;show_title=1&amp;show_byline=1&amp;show_portrait=0&amp;color=&amp;fullscreen=1" type="application/x-shockwave-flash" allowfullscreen="true" allowscriptaccess="always" width="$Width" height="$Height"></embed></object></div>
+<div class="VideoWrap"><div class="Video Vimeo"><object width="$Width" height="$Height"><param name="allowfullscreen" value="true" /><param name="allowscriptaccess" value="always" /><param name="movie" value="http://vimeo.com/moogaloop.swf?clip_id=$ID&amp;server=vimeo.com&amp;show_title=1&amp;show_byline=1&amp;show_portrait=0&amp;color=&amp;fullscreen=1" /><embed src="http://vimeo.com/moogaloop.swf?clip_id=$ID&amp;server=vimeo.com&amp;show_title=1&amp;show_byline=1&amp;show_portrait=0&amp;color=&amp;fullscreen=1" type="application/x-shockwave-flash" allowfullscreen="true" allowscriptaccess="always" width="$Width" height="$Height"></embed></object></div></div>
 EOT;
       } elseif (!self::$FormatLinks) {
          $Result = $Url;
@@ -1102,13 +1140,6 @@ EOT;
             );
          }
          
-         // This one handles all other mentions
-//         $Mixed = preg_replace(
-//            '/([\s]+)(@([\d\w_]{1,20}))/si',
-//            '\\1'.Anchor('\\2', '/profile/\\3'),
-//            $Mixed
-//         );
-         
          // Handle #hashtag searches
 			if(C('Garden.Format.Hashtags')) {
 				$Mixed = preg_replace(
@@ -1127,11 +1158,6 @@ EOT;
             );
          }
          
-//         $Mixed = preg_replace(
-//            '/([\s]+)(#([\d\w_]+))/si',
-//            '\\1'.Anchor('\\2', '/search?Search=%23\\3'),
-//            $Mixed
-//         );
          return $Mixed;
       }
    }
