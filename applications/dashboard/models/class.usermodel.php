@@ -85,10 +85,10 @@ class UserModel extends Gdn_Model {
    }
    
    /**
-    * Checks the currently authenticated user's permissions for the specified
-    * permission. Returns a boolean value indicating if the action is
-    * permitted.
+    * Checks the specified user's for the given permission. Returns a boolean 
+    * value indicating if the action is permitted.
     *
+    * @param mixed $User The user to check
     * @param mixed $Permission The permission (or array of permissions) to check.
     * @param int $JunctionID The JunctionID associated with $Permission (ie. A discussion category identifier).
 	 * @return boolean
@@ -387,8 +387,10 @@ class UserModel extends Gdn_Model {
          
          // Check to auto-connect based on email address.
          if (C('Garden.SSO.AutoConnect', C('Garden.Registration.AutoConnect')) && isset($UserData['Email'])) {
-            $User = (array)$this->GetByEmail($UserData['Email']);
+            $User = $this->GetByEmail($UserData['Email']);
+            Trace($User, "Autoconnect User");
             if ($User) {
+               $User = (array)$User;
                // Save the user.
                $this->SynchUser($User, $UserData);
                $UserID = $User['UserID'];
@@ -2363,11 +2365,12 @@ class UserModel extends Gdn_Model {
          $Content = NULL;
 
       // Remove photos
-      $PhotoData = $this->SQL->Select()->From('Photo')->Where('InsertUserID', $UserID)->Get();
+      /*$PhotoData = $this->SQL->Select()->From('Photo')->Where('InsertUserID', $UserID)->Get();
       foreach ($PhotoData->Result() as $Photo) {
          @unlink(PATH_UPLOADS.DS.$Photo->Name);
       }
       $this->SQL->Delete('Photo', array('InsertUserID' => $UserID));
+      */
       
       // Remove invitations
       $this->GetDelete('Invitation', array('InsertUserID' => $UserID), $Content);

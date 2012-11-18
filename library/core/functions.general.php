@@ -391,8 +391,8 @@ if (!function_exists('ChangeBasename')) {
 
 // Smarty
 if (!function_exists('CheckPermission')) {
-   function CheckPermission($PermissionName) {
-      $Result = Gdn::Session()->CheckPermission($PermissionName);
+   function CheckPermission($PermissionName, $Type = '') {
+      $Result = Gdn::Session()->CheckPermission($PermissionName, FALSE, $Type ? 'Category' : '', $Type);
       return $Result;
    }
 }
@@ -910,6 +910,18 @@ if (!function_exists('fnmatch')) {
          . $modifiers; 
 
       return (boolean)preg_match($pattern, $string); 
+   }
+}
+
+/**
+ * If a ForeignID is longer than 32 characters, use its hash instead.
+ *
+ * @param $ForeignID string Current foreign ID value.
+ * @return string 32 characters or less.
+ */
+if (!function_exists('ForeignIDHash')) {
+   function ForeignIDHash($ForeignID) {
+      return strlen($ForeignID) > 32 ? md5($ForeignID) : $ForeignID;
    }
 }
 
@@ -1622,6 +1634,23 @@ if (!function_exists('IsTimestamp')) {
          @date("d", $Stamp),
          @date("Y", $Stamp)
       );
+   }
+}
+
+if (!function_exists('IsUrl')) {
+   /**
+    * Whether or not a string is a url in the form http://, https://, or //
+    * 
+    * @param string $Str The string to check.
+    * @return bool
+    * @since 2.1
+    */
+   function IsUrl($Str) {
+      if (substr($Str, 0, 2) == '//')
+         return TRUE;
+      if (strpos($Str, '://', 1) !== FALSE)
+         return TRUE;
+      return FALSE;
    }
 }
 
