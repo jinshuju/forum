@@ -215,7 +215,7 @@ class Gdn_Form extends Gdn_Pluggable {
     *   ------------------------------------------------------------------------
     *   Value         The ID of the category that    FALSE
     *                 is selected.
-    *   IncludeNull   Include a blank row?           FALSE
+    *   IncludeNull   Include a blank row?           TRUE
     *   CategoryData  Custom set of categories to    CategoryModel::Categories()
     *                 display.
     *
@@ -267,7 +267,7 @@ class Gdn_Form extends Gdn_Pluggable {
       // Start with null option?
       $IncludeNull = GetValue('IncludeNull', $Options);
       if ($IncludeNull === TRUE)
-         $Return .= '<option value=""></option>';
+         $Return .= '<option value="">'.T('Select a category...').'</option>';
       elseif ($IncludeNull)
          $Return .= "<option value=\"\">$IncludeNull</option>\n";
       elseif (!$HasValue)
@@ -339,7 +339,7 @@ class Gdn_Form extends Gdn_Pluggable {
 
       $Input = $this->Input($FieldName, 'checkbox', $Attributes);
       if ($Label != '') $Input = '<label for="' . ArrayValueI('id', $Attributes,
-         $this->EscapeID($FieldName, FALSE)) . '" class="CheckBoxLabel">' . $Input . ' ' .
+         $this->EscapeID($FieldName, FALSE)) . '" class="CheckBoxLabel"'.Attribute('title', GetValue('title', $Attributes)).'>' . $Input . ' ' .
           T($Label) . '</label>';
           
       // Append validation error message
@@ -663,6 +663,7 @@ class Gdn_Form extends Gdn_Pluggable {
     * @return string
     */
    public function Date($FieldName, $Attributes = FALSE) {
+      $Return = '';
       $YearRange = ArrayValueI('yearrange', $Attributes, FALSE);
       $StartYear = 0;
       $EndYear = 0;
@@ -716,7 +717,7 @@ class Gdn_Form extends Gdn_Pluggable {
                   $Attributes['class'] = trim($CssClass . ' Month');
                   if ($SubmittedTimestamp)
                      $Attributes['Value'] = date('n', $SubmittedTimestamp);
-                  $Return = $this->DropDown($FieldName . '_Month', $Months, $Attributes);
+                  $Return .= $this->DropDown($FieldName . '_Month', $Months, $Attributes);
                   break;
                case 'day':
                   // Day select
@@ -840,6 +841,70 @@ class Gdn_Form extends Gdn_Pluggable {
       // Append validation error message
       if ($ShowErrors && ArrayValueI('InlineErrors', $Attributes, TRUE))  
          $Return .= $this->InlineError($FieldName);
+      
+      return $Return;
+   }
+   
+   /**
+    * Returns the xhtml for a dropdown list with option groups.
+    * @param string $FieldName
+    * @param array $Data
+    * @param string $GroupField
+    * @param string $TextField
+    * @param string $ValueField
+    * @param array $Attributes
+    * @return string
+    */
+   public function DropDownGroup($FieldName, $Data, $GroupField, $TextField, $ValueField, $Attributes = array()) {
+      $Return = '<select'
+         . $this->_IDAttribute($FieldName, $Attributes)
+         . $this->_NameAttribute($FieldName, $Attributes)
+         . $this->_AttributesToString($Attributes)
+         . ">\n";
+     
+      // Get the current value.
+      $CurrentValue = GetValue('Value', $Attributes, FALSE);
+      if ($CurrentValue === FALSE) 
+         $CurrentValue = $this->GetValue($FieldName, GetValue('Default', $Attributes));
+      
+      // Add a null option?
+      $IncludeNull = ArrayValueI('IncludeNull', $Attributes, FALSE);
+      if ($IncludeNull === TRUE) 
+         $Return .= "<option value=\"\"></option>\n";
+      elseif ($IncludeNull)
+         $Return .= "<option value=\"\">$IncludeNull</option>\n";
+      
+      $LastGroup = NULL;
+      
+      foreach ($Data as $Row) {
+         $Group = $Row[$GroupField];
+         
+         // Check for a group header.
+         if ($LastGroup !== $Group) {
+            // Close off the last opt group.
+            if ($LastGroup !== NULL) {
+               $Return .= '</optgroup>';
+            }
+            
+            $Return .= '<optgroup label="'.htmlspecialchars($Group)."\">\n";
+            $LastGroup = $Group;
+         }
+         
+         $Value = $Row[$ValueField];
+         
+         if ($CurrentValue == $Value) {
+            $Selected = ' selected="selected"';
+         } else
+            $Selected = '';
+         
+         $Return .= '<option value="'.htmlspecialchars($Value).'"'.$Selected.'>'.htmlspecialchars($Row[$TextField])."</option>\n";
+         
+      }
+      
+      if ($LastGroup)
+         $Return .= '</optgroup>';
+      
+      $Return .= '</select>';
       
       return $Return;
    }
@@ -1589,6 +1654,8 @@ class Gdn_Form extends Gdn_Pluggable {
          $this->_FormValues = $NewValue;
          return;
       }
+      
+      $MagicQuotes = get_magic_quotes_gpc();
 
       if (!is_array($this->_FormValues)) {
          $TableName = $this->InputPrefix;
@@ -1605,6 +1672,16 @@ class Gdn_Form extends Gdn_Pluggable {
             $FieldName = substr($Field, $TableNameLength);
             $FieldName = $this->_UnescapeString($FieldName);
             if (substr($Field, 0, $TableNameLength) == $TableName) {
+               if ($MagicQuotes) {
+                  if (is_array($Value)) {
+                     foreach ($Value as $i => $v) {
+                        $Value[$i] = stripcslashes($v);
+                     }
+                  } else {
+                     $Value = stripcslashes($Value);
+                  }
+               }
+               
                $this->_FormValues[$FieldName] = $Value;
             }
          }

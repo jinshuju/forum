@@ -57,15 +57,20 @@ blockquote, q {
 }
 
 /* ==================== Pages that hide the panel and have full-width content */
+body.NoPanel #Panel,
 body.Entry #Panel,
 body.Conversations.add #Panel,
 body.Vanilla.Post #Panel {
    display: none;
 }
+body.NoPanel #Content,
 body.Conversations.add #Content,
 body.Vanilla.Post #Content {
-   width: 100%;
+   width: auto;
    margin: 0;
+}
+body.NoPanel #Content {
+   margin: auto;
 }
 body.Entry #Content {
    float: none;
@@ -96,6 +101,9 @@ body {
 }
 .Hidden {
    display: none;
+}
+.Invisible {
+   opacity: 0;
 }
 .ClearFix:after {
 	visibility: hidden;
@@ -149,8 +157,13 @@ a {
    text-decoration: none;
    color: #1e79a7;
 }
-a:hover {
+a:hover,
+a.TextColor:hover,
+a:hover .TextColor {
    color: #ff0084;
+}
+a.TextColor, a .TextColor {
+   color: black;
 }
 img.Thumbnail {
 	max-height: 300px;
@@ -248,12 +261,49 @@ select {
    color: #111;
    border-color: #666;
 }
-.ButtonGroup.Open .Button.Handle {
+.NavLabel {
+   font-weight: bold;
+   margin-right: 4px;
+}
+.NavBar > .Button {
+   border-radius: 0;
+   -moz-border-radius: 0;
+   -webkit-border-radius: 0;
+   border-right-width: 0;
+}
+.NavBar > .Button:first-child {
+   border-radius: 2px 0 0 2px;
+}
+.NavBar > .Button:last-child {
+   border-radius: 0 2px 2px 0;
+   border-right-width: 1px;
+}
+.Button.Active,
+.ButtonGroup.Open .Button.Handle,
+.Button:focus,
+.Button:active {
    border-color: #aaa;
    background: #f7f7f7;
    box-shadow: none;
    -moz-box-shadow: none;
    -webkit-box-shadow: none;
+}
+.Button.FileInput > input {
+  position: absolute;
+  top: 0;
+  right: 0;
+  margin: 0;
+  border: solid transparent;
+  border-width: 0 0 100px 200px;
+  opacity: 0;
+  filter: alpha(opacity=0);
+  -moz-transform: translate(-300px, 0) scale(4);
+  direction: ltr;
+  cursor: pointer;
+}
+.Button.FileInput {
+   position: relative;
+   overflow: hidden;
 }
 .BigButton {
    display: block;
@@ -273,7 +323,6 @@ select {
    min-width: 65px;
 }
 
-.NavButton:hover,
 .NavButton {
    color: #333;
    text-shadow: 0 0 1px #fff;
@@ -309,23 +358,32 @@ select {
 }
 
 /* Split Button Dropdown */
-.ButtonGroup > .NavButton:first-child,
-.ButtonGroup > .Button:first-child {
+.ButtonGroup.Multi > .NavButton:first-child,
+.ButtonGroup.Multi > .Button:first-child {
    border-top-right-radius: 0;
    border-bottom-right-radius: 0;
 }
-.Button.Handle {
+
+.ButtonGroup.Multi > .NavButton.Handle,
+.ButtonGroup.Multi > .Button.Handle {
+   border-top-left-radius: 0;
+   border-bottom-left-radius: 0;
+   border-left: 0;
+}
+
+/*.Multi .Button:last {
    border-top-left-radius: 0;
    border-bottom-left-radius: 0;
    font-size: 12px;
    line-height: 1;
    border-left: 0;
 }
-.NavButton.Handle {
-    border-radius: 0 2px 2px 0;
-    border-left: 0;
-    margin: 0;
-}
+.Multi .NavButton.Handle {
+   border-top-left-radius: 0;
+   border-bottom-left-radius: 0;
+   border-left: 0;
+   margin: 0;
+}*/
 .NavButton.Handle .Sprite,
 .Button.Handle .Sprite {
     display: inline-block;
@@ -334,6 +392,10 @@ select {
     border-color: #000 transparent transparent transparent;
     position: relative;
     top: 2px;
+    margin: 0;
+    height: initial;
+    width: initial;
+    vertical-align: middle;
 }
 .ButtonGroup.Big .NavButton.Handle .Sprite,
 .ButtonGroup.Big .Button.Handle .Sprite {
@@ -375,6 +437,22 @@ select {
 #Panel .ButtonGroup.Big > .NavButton:first-child,
 #Panel .ButtonGroup.Big > .Button:first-child {
     width: 78%;
+}
+
+.ActivateSlider {
+   display: inline-block;
+   background: #bbb;
+   /*background: rgba(0, 0, 0, .2);*/
+   box-shadow: 0 10px 30px rgba(0, 0, 0, .5) inset;
+   border: solid 1px #ccc;
+   width: 125px;
+   border-radius: 4px;
+   padding: 1px;
+   position: relative;
+}
+
+.ActivateSlider-Active {
+   text-align: right;
 }
 
 .Gloss {
@@ -544,39 +622,25 @@ a.Small img {
 .DismissMessage a.Dismiss {
 	font-family: arial;
    position: absolute;
-	font-size: 22px;
+	font-size:16px;
 	font-weight: bold;
    line-height: 1;
-   color: #999;
-	top: 3px;
-	right: 5px;
-}
-.DismissMessage a.Dismiss,
-.DismissMessage a.Dismiss:hover {
-   border-radius: 0;
-   -moz-border-radius: 0;
-   -webkit-border-radius: 0;
    color: #777;
-   display: block;
-   height:14px;
-   margin:0;
-   padding:1px 3px 2px 4px;
-   width:auto;
-   font-family:arial;
-   font-size:16px;
-   font-weight:bold;
-   right: -1px;
-   top: -1px;
-}
-.DismissMessage strong,
-.DismissMessage b {
-	font-weight: bold;
+	top: -1px;
+	right: -1px;
+   padding:1px 3px;
+   text-decoration: none;
 }
 .DismissMessage a.Dismiss:hover {
-   text-decoration: none;
    border: none;
    background: #333;
    color: #fff;
+}
+
+
+.DismissMessage strong,
+.DismissMessage b {
+	font-weight: bold;
 }
 .DismissMessage {
 	font-size: 13px;
@@ -745,7 +809,6 @@ div.Discussion:hover .OptionsTitle:hover,
 .Item:hover .OptionsTitle, .Item.Open .OptionsTitle {
    visibility: visible;
 }
-
 .Flyout:before,
 .Flyout:after {
    border-bottom: 7px solid #444444;
@@ -896,6 +959,23 @@ a.Bookmarking:hover {
 	padding: 0;
 }
 
+
+/* ======================================================== Full Page Errors */
+
+.SplashMessage #Body h1 {
+    font-size: 64px;
+    line-height: 1.4;
+}
+
+.SplashMessage #Message {
+    font-size: 18px;
+    margin-bottom: 3em;
+}
+
+.SplashMessage .SplashInfo {
+   max-width: 640px;
+   margin: auto;
+}
 
 /* ======================================================== Panels / Sidebars */
 #Panel {
@@ -1084,7 +1164,7 @@ overflow: hidden;
    float: right;
 }
 .PanelInfo .Heading {
-   color: #000;
+   /*color: #000;*/
    font-weight: bold;
 }
 .PanelInfo li strong {
@@ -1147,9 +1227,21 @@ overflow: hidden;
 #Panel .BoxFilter {
    margin: 10px 0;
 }
+#Content .FilterMenu {
+	margin: 10px 0;
+}
 #Content .FilterMenu li,
 #Content .FilterMenu li.Active {
 	display: inline-block;
+   white-space: nowrap;
+	margin: 0 6px;
+}
+#Content .FilterMenu li a {
+	padding: 4px 0;
+}
+#Content .FilterMenu li.Active a {
+	border-bottom: 2px solid #ddd;
+	border-bottom: 2px solid rgba(0, 0, 0, 0.1);
 }
 #Content .BoxFilter a {
 	margin: 0 10px 0 0;
@@ -1492,6 +1584,11 @@ overflow: hidden;
     -webkit-border-radius: 6px;
 }
 
+.Hero h3 {
+   font-size: 24px;
+   font-weight: normal;
+}
+
 .ChildCategoryList {
     overflow: hidden;
     margin-bottom: 8px;
@@ -1612,6 +1709,24 @@ img.LeftAlign {
    margin: 0 10px 5px 0;
    max-width: 300px;
 }
+
+.Message dt {
+    font-weight: bold;
+    margin: 10px 0 4px;
+}
+
+.Message dd {
+    margin-left: 30px;
+}
+
+.Message dd > p {
+    margin-top: 4px;
+}
+
+.Message li {
+    margin: 5px 0;
+}
+
 .ClearFix {
    clear: both;
 }
@@ -1715,8 +1830,7 @@ a.ChangePicuture:hover {
 
 .ProfileOptions {
 	float: right;
-    position: relative;
-    top: -6px;
+   position: relative;
 }
 /* Hiding form headings with CSS in case the forms get popped */
 body.Profile.picture .SmallPopup h1 {
@@ -1771,6 +1885,7 @@ table.PreferenceGroup th,
 }
 
 /* About in content area */
+.ContentColumn .About h2 { display: none; }
 dl.About dt,
 dl.About dd {
    padding: 0;
@@ -1906,10 +2021,6 @@ form.Thumbnail .Warning {
 /* =================================================================== Popups */
 .Popup .Info {
 	margin-top: 10px;
-}
-.Popup .Loading {
-   display: block;
-	width: 200px;
 }
 .Overlay {
   position: absolute;
@@ -2246,8 +2357,7 @@ tr.CategoryHeading td {
 .SpNewConversation,
 .SpAskQuestion,
 .SpNewPoll,
-.SpNewDiscussion,
-.SpWarn {
+.SpNewDiscussion {
 	display: inline-block;
 	height: 16px;
 	width: 16px;
@@ -2264,11 +2374,6 @@ tr.CategoryHeading td {
    height: 14px;
    vertical-align: middle;
    width: 14px;
-}
-
-.SpWarn {
-   background-position: -96px -84px;
-   width: 18px;
 }
 
 /*
@@ -2292,7 +2397,9 @@ tr.CategoryHeading td {
 .SpDelete:after {
    background-position: -79px -38px;
 }
-*/
+
+Obselete in favour of .FilterMenu for style and .ToggleMenu for functionality.
+
 .FormType {
 	margin: 0 0 10px;
 }
@@ -2309,6 +2416,7 @@ tr.CategoryHeading td {
 	border-bottom: 2px solid #ddd;
 	border-bottom: 2px solid rgba(0, 0, 0, 0.1);
 }
+*/
 .DiscussionForm label {
    font-size: 14px;
    font-weight: bold;
@@ -2348,6 +2456,10 @@ tr.CategoryHeading td {
    color: #555;
 }
 
+.List.Inline * {
+   line-height: 16px;
+}
+
 /* ============================== Conversations ============================= */
 textarea.MultiComplete {
 	width: 100%;
@@ -2364,7 +2476,7 @@ textarea.MultiComplete {
 }
 .ac_results {
    padding: 0;
-   border: 1px solid #bbb;
+   border: 1px solid #d7d8da;
    border-top: 0;
    background-color: white;
    overflow: hidden;
@@ -2394,7 +2506,7 @@ textarea.MultiComplete {
    */
    line-height: 16px;
    overflow: hidden;
-   border-bottom: 1px solid #bbb;
+   border-bottom: 1px solid #d7d8da;
    text-align: left;
 }
 .ac_lastitem {
@@ -2402,14 +2514,14 @@ textarea.MultiComplete {
 }
 .ac_results strong {
    font-weight: bold;
-   background: #daf4fd;
+   background: #c7e2ff;
 }
 .ac_over strong {
    font-weight: bold;
-   background: #2ab0de;
+   background: #216ebf;
 }
 .ac_over {
-   background: #44c7f4;
+   background: #004D9F;
    color: #fff;
 }
 .AddPeople h4 {
@@ -3016,7 +3128,8 @@ span.InformSprite.Dice { background-position: -442px -586px; }
 
 /* 16px Sprites White */
 .SpDashboard,
-.SpCog { background-position: 0 -212px; }
+.SpOptions,
+.SpCog { background-position: 0 -148px; }
 .SpSettings { background-position: -16px -212px; }
 .SpNotifications,
 .SpGlobe { background-position: -32px -212px; }
@@ -3322,6 +3435,20 @@ body.embed .InformMessages {
    margin-right: 2px;
 }
 
+.SpEditProfile {
+   background-image: url("images/sprites-14-000000.png");
+   background-position: -245px -29px;
+}
+.Handle > .SpEditProfile,
+.NavButton > .SpEditProfile {
+   display: inline-block;
+   width: 14px;
+   height: 14px;
+   line-height: 14px;
+   vertical-align: top;
+   
+}
+
 /* === Reaction Sprites === */
 .ReactSprite {
   display: inline-block;
@@ -3330,13 +3457,21 @@ body.embed .InformMessages {
   *margin-right: .3em;
   line-height: 14px;
   vertical-align: text-top;
-  background-image: url("http://cdn.vanillaforums.com/images/sprites-14-000.png");
+  background-image: url("images/sprites-14-000000.png");
   background-position: 14px 14px;
   background-repeat: no-repeat;
 }
+
+.ReactLabel {
+   display: inline-block;
+   line-height: 14px;
+   vertical-align: top;
+}
+
 .InProgress .ReactSprite {
    background-image: none !important;
 }
+.ReactEverything { background-position: -197px -53px; }
 .ReactAwesome { background-position: -269px -6px; }
 .ReactFlag { background-position: -54px -52px; }
 .ReactInsightful { background-position: -149px -6px; }
@@ -3357,6 +3492,10 @@ body.embed .InformMessages {
 .ReactInfraction { background-position: -100px -53px; }
 .ReactAccept { background-position: -6px -102px; }
 .ReactReject { background-position: -342px -6px; }
+.ReactFacebook { background-position: -29px -124px; }
+.ReactTwitter { background-position: -53px -124px; }
+.ReactGooglePlus { background-position: -77px -124px; }
+.ReactMessage { background-position: -101px -102px; }
 
 /* Switch to the white icons when hovering over a menuitem sprite */
 .Reactions .MenuItems a:hover .ReactSprite,
@@ -3367,8 +3506,32 @@ body.embed .InformMessages {
 .UserReactionWrap .ReactSprite {
    background-image: url('http://cdn.vanillaforums.com/images/sprites-14-000-bordered.png');
 }
-
 .ActionBlock {
     margin: 15px 0 5px;
     font-style: italic;
+}
+
+/* Embedded Video Preview Hide/Reveal */
+.Video.YouTube .VideoPlayer {
+    display: none;
+}
+.Video.YouTube .VideoPreview {
+    cursor: pointer;
+    position: relative;
+    display: inline-block;
+}
+.Video.YouTube .VideoPreview:after {
+    background: url('http://cdn.vanillaforums.com/images/youtube-overlay-button.png') 0 -44px no-repeat transparent;
+    position: absolute;
+    display: block;
+    content: '';
+    top: 50%;
+    left: 50%;
+    margin-left: -30px;
+    margin-top: -22px;
+    height: 44px;
+    width: 60px;
+}
+.Video.YouTube .VideoPreview:hover:after {
+    background-position: 0 0;
 }

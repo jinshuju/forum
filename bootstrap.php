@@ -84,7 +84,7 @@ Gdn::FactoryInstall(Gdn::AliasThemeManager, 'Gdn_ThemeManager');
 // PluginManager
 Gdn::FactoryInstall(Gdn::AliasPluginManager, 'Gdn_PluginManager');
 
-// Load the configurations for the installed items.
+// Load the configurations for enabled Applications
 foreach (Gdn::ApplicationManager()->EnabledApplicationFolders() as $ApplicationName => $ApplicationFolder)
    Gdn::Config()->Load(PATH_APPLICATIONS."/{$ApplicationFolder}/settings/configuration.php");
    
@@ -216,3 +216,6 @@ if (file_exists(PATH_ROOT.'/conf/bootstrap.after.php'))
    
 // Include "Render" functions now - this way pluggables and custom confs can override them.
 require_once(PATH_LIBRARY_CORE.'/functions.render.php');
+
+if (!defined('CLIENT_NAME'))
+   define('CLIENT_NAME', 'vanilla');

@@ -124,11 +124,6 @@ class VanillaHooks implements Gdn_IPlugin {
             ->Set('Format', 'Deleted')
             ->Where('InsertUserID', $UserID)
             ->Put();
-         
-         // Erase the user's comments
-			$SQL->From('Comment')
-				->Join('Discussion d', 'c.DiscussionID = d.DiscussionID')
-				->Delete('Comment c', array('d.InsertUserID' => $UserID));
 
          $SQL->Update('Comment')
             ->Set('Body', T('The user and all related content has been deleted.'))
@@ -229,8 +224,8 @@ class VanillaHooks implements Gdn_IPlugin {
       if (is_object($Sender->User) && $Sender->User->UserID > 0) {
          $UserID = $Sender->User->UserID;
          // Add the discussion tab
-         $DiscussionsLabel = Sprite('SpDiscussions').T('Discussions');
-         $CommentsLabel = Sprite('SpComments').T('Comments');
+         $DiscussionsLabel = Sprite('SpDiscussions').' '.T('Discussions');
+         $CommentsLabel = Sprite('SpComments').' '.T('Comments');
          if (C('Vanilla.Profile.ShowCounts', TRUE)) {
             $DiscussionsLabel .= '<span class="Aside">'.CountString(GetValueR('User.CountDiscussions', $Sender, NULL), "/profile/count/discussions?userid=$UserID").'</span>';
             $CommentsLabel .= '<span class="Aside">'.CountString(GetValueR('User.CountComments', $Sender, NULL), "/profile/count/comments?userid=$UserID").'</span>';

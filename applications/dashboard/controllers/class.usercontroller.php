@@ -431,9 +431,9 @@ class UserController extends DashboardController {
          Gdn::UserModel()->DeleteContent($UserID, array('Log' => TRUE));
 
          if ($this->Request->Get('Target')) {
-            $this->RedirectUrl = $this->Request->Get('Target');
+            $this->RedirectUrl = Url($this->Request->Get('Target'));
          } else {
-            $this->RedirectUrl = UserUrl($User);
+            $this->RedirectUrl = Url(UserUrl($User));
          }
       } else {
          $this->SetData('Title', T('Are you sure you want to do this?'));
@@ -628,6 +628,10 @@ class UserController extends DashboardController {
                
                $Email = new Gdn_Email();
                $Result = $UserModel->$Action($UserID, $Email);
+               
+               // Re-calculate applicant count
+               $RoleModel = new RoleModel();
+               $RoleModel->GetApplicantCount(TRUE);
                
                $this->FireEvent("After{$Action}User");
             } catch(Exception $ex) {

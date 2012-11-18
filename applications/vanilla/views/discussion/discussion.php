@@ -5,15 +5,19 @@ $Discussion = $this->Data('Discussion');
 $Author = Gdn::UserModel()->GetID($Discussion->InsertUserID); // UserBuilder($Discussion, 'Insert');
 
 // Prep event args
+$CssClass = CssClass($Discussion);
 $this->EventArguments['Discussion'] = &$Discussion;
 $this->EventArguments['Author'] = &$Author;
+$this->EventArguments['CssClass'] = &$CssClass;
 
 // DEPRECATED ARGUMENTS (as of 2.1)
 $this->EventArguments['Object'] = &$Discussion; 
 $this->EventArguments['Type'] = 'Discussion';
 
+// Discussion template event
+$this->FireEvent('BeforeDiscussionDisplay');
 ?>
-<div id="<?php echo 'Discussion_'.$Discussion->DiscussionID; ?>" class="<?php echo CssClass($Discussion); ?>">
+<div id="<?php echo 'Discussion_'.$Discussion->DiscussionID; ?>" class="<?php echo $CssClass; ?>">
    <div class="Discussion">
       <div class="Item-Header DiscussionHeader">
          <div class="AuthorWrap">
@@ -21,9 +25,9 @@ $this->EventArguments['Type'] = 'Discussion';
                <?php
                if ($UserPhotoFirst) {
                   echo UserPhoto($Author);
-                  echo UserAnchor($Author);
+                  echo UserAnchor($Author, 'Username');
                } else {
-                  echo UserAnchor($Author);
+                  echo UserAnchor($Author, 'Username');
                   echo UserPhoto($Author);
                }
                ?>
@@ -31,6 +35,7 @@ $this->EventArguments['Type'] = 'Discussion';
             <span class="AuthorInfo">
                <?php
                echo WrapIf(htmlspecialchars(GetValue('Title', $Author)), 'span', array('class' => 'MItem AuthorTitle'));
+               echo WrapIf(htmlspecialchars(GetValue('Location', $Author)), 'span', array('class' => 'MItem AuthorLocation'));
                $this->FireEvent('AuthorInfo'); 
                ?>
             </span>
@@ -42,6 +47,10 @@ $this->EventArguments['Type'] = 'Discussion';
                ?>
             </span>
             <?php
+            // Include source if one was set
+            if ($Source = GetValue('Source', $Discussion))
+               echo ' '.Wrap(sprintf(T('via %s'), T($Source.' Source', $Source)), 'span', array('class' => 'MItem MItem-Source')).' ';
+            
             // Category
             if (C('Vanilla.Categories.Use')) {
                echo ' <span class="MItem Category">';

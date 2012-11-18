@@ -250,7 +250,8 @@ $PermissionModel->SQL = $SQL;
 $PermissionModel->Define(array(
 	'Vanilla.Settings.Manage',
 	'Vanilla.Categories.Manage',
-	'Vanilla.Approval.Require'
+	'Vanilla.Approval.Require',
+   'Vanilla.Comments.Me' => 1,
 	));
 
 // Define some permissions for the Vanilla categories.
@@ -409,6 +410,7 @@ $DateInsertedExists = $Construct->ColumnExists('DateInserted');
 $Construct
    ->Column('TagID', 'int', FALSE, 'primary')
    ->Column('DiscussionID', 'int', FALSE, 'primary')
+   ->Column('CategoryID', 'int', FALSE, 'index')
    ->Column('DateInserted', 'datetime', !$DateInsertedExists)
    ->Engine('InnoDB')
    ->Set($Explicit, $Drop);

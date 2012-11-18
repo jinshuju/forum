@@ -51,6 +51,32 @@ if (!function_exists('ValidateRequired')) {
    }
 }
 
+if (!function_exists('ValidateMeAction')) {
+   function ValidateMeAction($Value) {
+      $Matched = preg_match('`^/me .*`i', $Value);
+      if ($Matched) {
+         $HasPermission = Gdn::Session()->CheckPermission('Vanilla.Comments.Me');
+         if (!$HasPermission)
+            return T('ErrorPermission');
+      }
+      return TRUE;
+   }
+}
+
+if (!function_exists('ValidateNoLinks')) {
+   /**
+    * Check whether or not a
+    * 
+    * @param string $Value
+    * @return bool
+    * @since 2.1
+    */
+   function ValidateNoLinks($Value) {
+      $Matched = preg_match('`https?://`i', $Value);
+      return !$Matched;
+   }
+}
+
 if (!function_exists('ValidateRequiredArray')) {
    /**
     * Checkbox lists and DropDown lists that have no values selected return a

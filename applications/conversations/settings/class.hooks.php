@@ -85,28 +85,14 @@ class ConversationsHooks implements Gdn_IPlugin {
     * @since 2.0.0
     * @access public
     */
-   public function ProfileController_AfterAddSideMenu_Handler($Sender) {
-      $Session = Gdn::Session();
-      if ($Session->IsValid() && $Session->UserID != $Sender->User->UserID && C('Conversations.Moderation.Allow', FALSE)) {
-         $SideMenu = $Sender->EventArguments['SideMenu'];
-         $SideMenu->AddLink('Options', T('Inbox'), '/messages/inbox?userid='.$Sender->User->UserID, 'Conversations.Moderation.Manage', array('class' => 'InboxLink'));
-         $Sender->EventArguments['SideMenu'] = $SideMenu;
-      }
-   }
-   
-   /**
-    * Add 'Inbox' to profile menu.
-    *
-    * @since 2.0.0
-    * @access public
-    */
    public function ProfileController_AddProfileTabs_Handler($Sender) {
       if (Gdn::Session()->IsValid()) {
          $Inbox = T('Inbox');
-         $InboxHtml = Sprite('SpInbox').$Inbox;
+         $InboxHtml = Sprite('SpInbox').' '.$Inbox;
          $InboxLink = '/messages/all';
          
          if (Gdn::Session()->UserID != $Sender->User->UserID) {
+            // Accomodate admin access
             if (C('Conversations.Moderation.Allow', FALSE) && Gdn::Session()->CheckPermission('Conversations.Moderation.Manage')) {
                $CountUnread = $Sender->User->CountUnreadConversations;
                $InboxLink .= "?userid={$Sender->User->UserID}";
@@ -114,7 +100,7 @@ class ConversationsHooks implements Gdn_IPlugin {
                return;
             }
          } else {
-            // Nothing
+            // Current user
             $CountUnread = Gdn::Session()->User->CountUnreadConversations;
          }
          
@@ -130,7 +116,7 @@ class ConversationsHooks implements Gdn_IPlugin {
    public function ProfileController_BeforeProfileOptions_Handler($Sender, $Args) {
       if (!$Sender->EditMode && Gdn::Session()->IsValid() && Gdn::Session()->UserID != $Sender->User->UserID)
          $Sender->EventArguments['MemberOptions'][] = array(
-            'Text' => Sprite('SpMessage').T('Message'),
+            'Text' => Sprite('SpMessage').' '.T('Message'),
             'Url' => '/messages/add/'.$Sender->User->Name,
             'CssClass' => 'MessageUser'
          );

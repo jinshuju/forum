@@ -5,6 +5,7 @@ if (Gdn::Config('Garden.Profile.ShowAbout')) {
    
 ?>
 <div class="About P">
+   <h2 class="H"><?php echo T('About'); ?></h2>
    <dl class="About">
       <?php
       if ($this->User->Banned) {
@@ -14,7 +15,7 @@ if (Gdn::Config('Garden.Profile.ShowAbout')) {
       <dt class="Name"><?php echo T('Username'); ?></dt>
       <dd class="Name" itemprop="name"><?php echo $this->User->Name; ?></dd>
       <?php               
-      if ($this->User->ShowEmail == 1 || $Session->CheckPermission('Garden.Registration.Manage')) {
+      if ($this->User->Email && ($this->User->ShowEmail || $Session->CheckPermission('Garden.Moderation.Manage'))) {
          echo '<dt class="Email">'.T('Email').'</dt>
          <dd class="Email" itemprop="email">'.Gdn_Format::Email($this->User->Email).'</dd>';
       }
@@ -37,7 +38,13 @@ if (Gdn::Config('Garden.Profile.ShowAbout')) {
             echo htmlspecialchars(implode(', ', ConsolidateArrayValuesByKey($this->Roles, 'Name'))); 
       
       ?></dd>
-      <?php if ($Session->CheckPermission('Garden.Moderation.Manage')): ?>
+      <?php if ($Points = GetValueR('User.Points', $this, 0)) : // Only show positive point totals ?>
+      <dt class="Points"><?php echo T('Points'); ?></dt>
+      <dd class="Points"><?php echo number_format($Points); ?></dd>
+      <?php 
+      endif; 
+      
+      if ($Session->CheckPermission('Garden.Moderation.Manage')): ?>
       <dt class="IP"><?php echo T('Register IP'); ?></dt>
       <dd class="IP"><?php 
          $IP = IPAnchor($this->User->InsertIPAddress);

@@ -34,7 +34,7 @@ function WriteBookmarkLink() {
    echo Anchor(
       $Title,
       '/vanilla/discussion/bookmark/'.$Discussion->DiscussionID.'/'.Gdn::Session()->TransientKey().'?Target='.urlencode(Gdn::Controller()->SelfUrl),
-      'Bookmark' . ($Discussion->Bookmarked == '1' ? ' Bookmarked' : ''),
+      'Hijack Bookmark' . ($Discussion->Bookmarked == '1' ? ' Bookmarked' : ''),
       array('title' => $Title)
    );
 }
@@ -77,6 +77,7 @@ function WriteComment($Comment, $Sender, $Session, $CurrentOffset) {
    $Sender->FireEvent('BeforeCommentDisplay'); ?>
 <li class="<?php echo $CssClass; ?>" id="<?php echo 'Comment_'.$Comment->CommentID; ?>">
    <div class="Comment">
+      
       <?php
       // Write a stub for the latest comment so it's easy to link to it from outside.
       if ($CurrentOffset == Gdn::Controller()->Data('_LatestItem')) {
@@ -99,11 +100,13 @@ function WriteComment($Comment, $Sender, $Session, $CurrentOffset) {
                   echo UserPhoto($Author);
                }
                echo FormatMeAction($Comment);
+               $Sender->FireEvent('AuthorPhoto'); 
                ?>
             </span>
             <span class="AuthorInfo">
                <?php
                echo ' '.WrapIf(htmlspecialchars(GetValue('Title', $Author)), 'span', array('class' => 'MItem AuthorTitle'));
+               echo ' '.WrapIf(htmlspecialchars(GetValue('Location', $Author)), 'span', array('class' => 'MItem AuthorLocation'));
                $Sender->FireEvent('AuthorInfo'); 
                ?>
             </span>   
@@ -150,7 +153,15 @@ endif;
 
 if (!function_exists('WriteReactions')):
 function WriteReactions($Row, $Type = 'Comment') {
+   list($RecordType, $RecordID) = RecordType($Row);
+   
+   Gdn::Controller()->EventArguments['RecordType'] = strtolower($RecordType);
+   Gdn::Controller()->EventArguments['RecordID'] = $RecordID;
+   
    echo '<div class="Reactions">';
+      Gdn_Theme::BulletRow();
+      Gdn::Controller()->FireEvent('AfterFlag');
+   
       Gdn::Controller()->FireEvent('AfterReactions');
    echo '</div>';
 }
@@ -176,7 +187,7 @@ function GetDiscussionOptions($Discussion = NULL) {
 	$CategoryID = GetValue('CategoryID', $Discussion);
 	if(!$CategoryID && property_exists($Sender, 'Discussion'))
 		$CategoryID = GetValue('CategoryID', $Sender->Discussion);
-   $PermissionCategoryID = GetValue('PermissionCategoryID', $Discussion, GetValue('PermissionCategoryID', $Sender->Discussion));
+   $PermissionCategoryID = GetValue('PermissionCategoryID', $Discussion, GetValue('PermissionCategoryID', $Discussion));
    
    // Determine if we still have time to edit
    $EditContentTimeout = C('Garden.EditContentTimeout', -1);
@@ -200,21 +211,28 @@ function GetDiscussionOptions($Discussion = NULL) {
       $Options['AnnounceDiscussion'] = array('Label' => T('Announce...'), 'Url' => 'vanilla/discussion/announce?discussionid='.$Discussion->DiscussionID.'&Target='.urlencode($Sender->SelfUrl.'#Head'), 'Class' => 'Popup');
 
    // Can the user sink?
-   if ($Session->CheckPermission('Vanilla.Discussions.Sink', TRUE, 'Category', $PermissionCategoryID))
-      $Options['SinkDiscussion'] = array('Label' => T($Discussion->Sink ? 'Unsink' : 'Sink'), 'Url' => 'vanilla/discussion/sink/'.$Discussion->DiscussionID.'/'.$Session->TransientKey().'?Target='.urlencode($Sender->SelfUrl.'#Head'), 'Class' => 'Hijack');
+   if ($Session->CheckPermission('Vanilla.Discussions.Sink', TRUE, 'Category', $PermissionCategoryID)) {
+      $NewSink = (int)!$Discussion->Sink;
+      $Options['SinkDiscussion'] = array('Label' => T($Discussion->Sink ? 'Unsink' : 'Sink'), 'Url' => "/discussion/sink?discussionid={$Discussion->DiscussionID}&sink=$NewSink", 'Class' => 'Hijack');
+   }
 
    // Can the user close?
-   if ($Session->CheckPermission('Vanilla.Discussions.Close', TRUE, 'Category', $PermissionCategoryID))
-      $Options['CloseDiscussion'] = array('Label' => T($Discussion->Closed ? 'Reopen' : 'Close'), 'Url' => 'vanilla/discussion/close/'.$Discussion->DiscussionID.'/'.$Session->TransientKey().'?Target='.urlencode($Sender->SelfUrl.'#Head'), 'Class' => 'Hijack');
-   
+   if ($Session->CheckPermission('Vanilla.Discussions.Close', TRUE, 'Category', $PermissionCategoryID)) {
+      $NewClosed = (int)!$Discussion->Closed;
+      $Options['CloseDiscussion'] = array('Label' => T($Discussion->Closed ? 'Reopen' : 'Close'), 'Url' => "/discussion/close?discussionid={$Discussion->DiscussionID}&close=$NewClosed", 'Class' => 'Hijack');
+   }
+      
    if ($CanEdit && GetValueR('Attributes.ForeignUrl', $Discussion)) {
       $Options['RefetchPage'] = array('Label' => T('Refetch Page'), 'Url' => '/discussion/refetchpageinfo.json?discussionid='.$Discussion->DiscussionID, 'Class' => 'Hijack');
    }
 
    // Can the user delete?
-   if ($Session->CheckPermission('Vanilla.Discussions.Delete', TRUE, 'Category', $PermissionCategoryID))
-      $Options['DeleteDiscussion'] = array('Label' => T('Delete Discussion'), 'Url' => 'vanilla/discussion/delete/'.$Discussion->DiscussionID.'/'.$Session->TransientKey());
-   
+   if ($Session->CheckPermission('Vanilla.Discussions.Delete', TRUE, 'Category', $PermissionCategoryID)) {
+      $Category = CategoryModel::Categories($CategoryID);
+      
+      $Options['DeleteDiscussion'] = array('Label' => T('Delete Discussion'), 'Url' => '/discussion/delete?discussionid='.$Discussion->DiscussionID.'&target='.urlencode(CategoryUrl($Category)), 'Class' => 'Popup');
+   }
+      
    // DEPRECATED (as of 2.1)
    $Sender->EventArguments['Type'] = 'Discussion';
    
@@ -252,17 +270,16 @@ function WriteDiscussionOptions($Discussion = NULL) {
    
    if (empty($Options))
       return; 
-   ?>
-   <span class="ToggleFlyout OptionsMenu">
-      <span class="OptionsTitle" title="<?php echo T('Options'); ?>"><?php echo T('Options'); ?></span>
-		<span class="SpFlyoutHandle"></span>
-      <ul class="Flyout MenuItems" style="display: none;">
-      <?php foreach ($Options as $Code => $Option) : ?>
-			<li><?php echo Anchor($Option['Label'], $Option['Url'], GetValue('Class', $Option, $Code)); ?></li>
-		<?php endforeach; ?>
-      </ul>
-   </span>
-   <?php
+
+   echo ' <span class="ToggleFlyout OptionsMenu">';
+      echo '<span class="OptionsTitle" title="'.T('Options').'">'.T('Options').'</span>';
+		echo Sprite('SpFlyoutHandle', 'Arrow'); 
+      echo '<ul class="Flyout MenuItems" style="display: none;">';
+      foreach ($Options as $Code => $Option):
+			echo Wrap(Anchor($Option['Label'], $Option['Url'], GetValue('Class', $Option, $Code)), 'li');
+		endforeach;
+      echo '</ul>';
+   echo '</span>';
 }
 endif;
 
@@ -331,17 +348,16 @@ function WriteCommentOptions($Comment) {
 	$Options = GetCommentOptions($Comment);
 	if (empty($Options))
 		return;
-   ?>
-   <span class="ToggleFlyout OptionsMenu">
-      <span class="OptionsTitle" title="<?php echo T('Options'); ?>"><?php echo T('Options'); ?></span>
-		<span class="SpFlyoutHandle"></span>
-      <ul class="Flyout MenuItems">
-      <?php foreach ($Options as $Code => $Option) : ?>
-         <li><?php echo Anchor($Option['Label'], $Option['Url'], GetValue('Class', $Option, $Code)); ?></li>
-      <?php endforeach; ?>
-      </ul>
-   </span>
-   <?php
+
+   echo '<span class="ToggleFlyout OptionsMenu">';
+      echo '<span class="OptionsTitle" title="'.T('Options').'">'.T('Options').'</span>';
+		echo Sprite('SpFlyoutHandle', 'Arrow'); 
+      echo '<ul class="Flyout MenuItems">';
+      foreach ($Options as $Code => $Option):
+         echo Wrap(Anchor($Option['Label'], $Option['Url'], GetValue('Class', $Option, $Code)), 'li');
+      endforeach;
+      echo '</ul>';
+   echo '</span>';
    if (C('Vanilla.AdminCheckboxes.Use')) {
       // Only show the checkbox if the user has permission to affect multiple items
       $Discussion = Gdn::Controller()->Data('Discussion');

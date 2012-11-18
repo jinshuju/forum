@@ -1,25 +1,15 @@
 <?php if (!defined('APPLICATION')) exit();
-/*
-Copyright 2008, 2009 Vanilla Forums Inc.
-This file is part of Garden.
-Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
-Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
-*/
-/**
- * Discussions Controller
- *
- * @package Vanilla
- */
- 
+
 /**
  * Handles displaying discussions in most contexts.
  *
+ * @copyright Copyright 2008, 2009 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
  * @since 2.0.0
  * @package Vanilla
  * @todo Resolve inconsistency between use of $Page and $Offset as parameters.
  */
+
 class DiscussionsController extends VanillaController {
    /**
     * Models to include.
@@ -182,6 +172,10 @@ class DiscussionsController extends VanillaController {
          $this->AddDefinition('SetClientHour', $ClientHour);
       }
       
+      // We don't want search engines to index these pages because they can go in through the individual categories MUCH faster.
+      if ($this->Head)
+         $this->Head->AddTag('meta', array('name' => 'robots', 'content' => 'noindex,noarchive'));
+      
       $this->Render();
    }
    
@@ -299,9 +293,7 @@ class DiscussionsController extends VanillaController {
       $this->ShowOptions = TRUE;
       $this->Menu->HighlightRoute('/discussions');
       $this->AddCssFile('vanilla.css');
-		$this->AddJsFile('bookmark.js');
 		$this->AddJsFile('discussions.js');
-		$this->AddJsFile('options.js');
 			
 		// Inform moderator of checked comments in this discussion
 		$CheckedDiscussions = Gdn::Session()->GetAttribute('CheckedDiscussions', array());
@@ -323,6 +315,18 @@ class DiscussionsController extends VanillaController {
     */
    public function Bookmarked($Page = '0') {
       $this->Permission('Garden.SignIn.Allow');
+
+      // Figure out which discussions layout to choose (Defined on "Homepage" settings page).
+      $Layout = C('Vanilla.Discussions.Layout');
+      switch($Layout) {
+         case 'table':
+            if ($this->SyndicationMethod == SYNDICATION_NONE)
+               $this->View = 'table';
+            break;
+         default:
+            $this->View = 'index';
+            break;
+      }
       
       // Determine offset from $Page
       list($Page, $Limit) = OffsetLimit($Page, C('Vanilla.Discussions.PerPage', 30));
@@ -380,7 +384,7 @@ class DiscussionsController extends VanillaController {
       // Render default view (discussions/bookmarked.php)
       $this->SetData('Title', T('My Bookmarks'));
 		$this->SetData('Breadcrumbs', array(array('Name' => T('My Bookmarks'), 'Url' => '/discussions/bookmarked')));
-      $this->Render('index');
+      $this->Render();
    }
    
    public function BookmarkedPopin() {
@@ -503,13 +507,19 @@ class DiscussionsController extends VanillaController {
       $FinalData = array_fill_keys($vanilla_identifier, 0);
       $Misses = array();
       $CacheKey = 'embed.comments.count.%s';
+      $OriginalIDs = array();
       foreach ($vanilla_identifier as $ForeignID) {
-         $RealCacheKey = sprintf($CacheKey, $ForeignID);
+         $HashedForeignID = ForeignIDHash($ForeignID);
+         
+         // Keep record of non-hashed identifiers for the reply
+         $OriginalIDs[$HashedForeignID] = $ForeignID;
+         
+         $RealCacheKey = sprintf($CacheKey, $HashedForeignID);
          $Comments = Gdn::Cache()->Get($RealCacheKey);
          if ($Comments !== Gdn_Cache::CACHEOP_FAILURE)
             $FinalData[$ForeignID] = $Comments;
          else
-            $Misses[] = $ForeignID;
+            $Misses[] = $HashedForeignID;
       }
       
       if (sizeof($Misses)) {
@@ -521,12 +531,15 @@ class DiscussionsController extends VanillaController {
             ->Get()->ResultArray();
          
          foreach ($CountData as $Row) {
-            $FinalData[$Row['ForeignID']] = $Row['CountComments'];
+            // Get original identifier to send back
+            $ForeignID = $OriginalIDs[$Row['ForeignID']];
+            $FinalData[$ForeignID] = $Row['CountComments'];
+            
+            // Cache using the hashed identifier
             $RealCacheKey = sprintf($CacheKey, $Row['ForeignID']);
             Gdn::Cache()->Store($RealCacheKey, $Row['CountComments'], array(
                Gdn_Cache::FEATURE_EXPIRY     => 60
             ));
-            
          }         
       }
       

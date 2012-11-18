@@ -146,7 +146,7 @@ class CategoryModel extends Gdn_Model {
 		foreach ($Data as &$Category) {
          $Category['CountAllDiscussions'] = $Category['CountDiscussions'];
          $Category['CountAllComments'] = $Category['CountComments'];
-         $Category['Url'] = CategoryUrl($Category);
+         $Category['Url'] = CategoryUrl($Category, FALSE, '//');
          $Category['ChildIDs'] = array();
          
          if (!GetValue('CssClass', $Category))
@@ -348,7 +348,7 @@ class CategoryModel extends Gdn_Model {
             $Row['LastUserID'] = $Discussion['InsertUserID'];
             $Row['LastDateInserted'] = $Discussion['DateInserted'];
             $NameUrl = Gdn_Format::Text($Discussion['Name'], TRUE);
-            $Row['LastUrl'] = DiscussionUrl($Discussion).'#latest';
+            $Row['LastUrl'] = DiscussionUrl($Discussion, FALSE, '//').'#latest';
          }
          $Comment = GetValue($Row['LastCommentID'], $Comments);
          if ($Comment) {
@@ -511,6 +511,19 @@ class CategoryModel extends Gdn_Model {
                ->Update('Category')->Set('CountDiscussions', $Count)
                ->Where('CategoryID', $ReplacementCategoryID)
                ->Put();
+            
+            // Update tags
+            $this->SQL
+               ->Update('Tag')
+               ->Set('CategoryID', $ReplacementCategoryID)
+               ->Where('CategoryID', $Category->CategoryID)
+               ->Put();
+            
+            $this->SQL
+               ->Update('TagDiscussion')
+               ->Set('CategoryID', $ReplacementCategoryID)
+               ->Where('CategoryID', $Category->CategoryID)
+               ->Put();
          } else {
             // Delete comments in this category
             // Resorted to Query because of incompatibility of aliasing in MySQL 5.5 -mlr 2011-12-13
@@ -530,6 +543,10 @@ class CategoryModel extends Gdn_Model {
                ->Where('PermissionCategoryID', $Category->CategoryID)
                ->Where('CategoryID <>', $Category->CategoryID)
                ->Put();
+            
+            // Delete tags
+            $this->SQL->Delete('Tag', array('CategoryID' => $Category->CategoryID));
+            $this->SQL->Delete('TagDiscussion', array('CategoryID' => $Category->CategoryID));
          }
          
          // Delete the category
@@ -1433,7 +1450,7 @@ class CategoryModel extends Gdn_Model {
                 'CategoryID' => 'CategoryID',
                 'LastTitle' => 'Name'));
             
-            SetValue('LastUrl', $Category, DiscussionUrl($LastDiscussion).'#latest');
+            SetValue('LastUrl', $Category, DiscussionUrl($LastDiscussion, FALSE, '//').'#latest');
             
             if (is_null($LastDateInserted))
                SetValue('LastDateInserted', $Category, GetValue('DateLastDiscussion', $Category, NULL));
@@ -1445,7 +1462,7 @@ class CategoryModel extends Gdn_Model {
             ));
             
             SetValue('LastUserID', $Category, GetValue('LastCommentUserID', $Category, NULL));
-            SetValue('LastUrl', $Category, DiscussionUrl($LastDiscussion, FALSE).'#latest');
+            SetValue('LastUrl', $Category, DiscussionUrl($LastDiscussion, FALSE, '//').'#latest');
             
             if (is_null($LastDateInserted))
                SetValue('LastDateInserted', $Category, GetValue('DateLastComment', $Category, NULL));

@@ -187,6 +187,9 @@ class SettingsController extends DashboardController {
       $Favicon = C('Garden.FavIcon');
       $this->SetData('Favicon', $Favicon);
       
+      $ShareImage = C('Garden.ShareImage');
+      $this->SetData('ShareImage', $ShareImage);
+      
       // If seeing the form for the first time...
       if (!$this->Form->AuthenticatedPostBack()) {
          // Apply the config settings to the form.
@@ -231,6 +234,20 @@ class SettingsController extends DashboardController {
                   $Parts = $ImgUpload->SaveImageAs($TmpFavicon, $ICOName, 16, 16, array('OutputType' => 'ico', 'Crop' => TRUE));
                   $SaveData['Garden.FavIcon'] = $Parts['SaveName'];
                   $this->SetData('Favicon', $Parts['SaveName']);
+               }
+               
+               $TmpShareImage = $Upload->ValidateUpload('ShareImage', FALSE);
+               if ($TmpShareImage) {
+                  $TargetImage = $Upload->GenerateTargetName(PATH_UPLOADS, FALSE);
+                  $ImageBaseName = pathinfo($TargetImage, PATHINFO_BASENAME);
+                  
+                  if ($ShareImage)
+                     $Upload->Delete($ShareImage);
+                  
+                  $Parts = $Upload->SaveAs($TmpShareImage, $ImageBaseName);
+                  $SaveData['Garden.ShareImage'] = $Parts['SaveName'];
+                  $this->SetData('ShareImage', $Parts['SaveName']);
+                  
                }
             } catch (Exception $ex) {
                $this->Form->AddError($ex);
@@ -340,7 +357,39 @@ class SettingsController extends DashboardController {
       }
       
       $this->Render();      
-   }      
+   }
+   
+   public function Configuration() {
+      $this->Permission('Garden.Settings.Manage');
+      $this->DeliveryMethod(DELIVERY_METHOD_JSON);
+      $this->DeliveryType(DELIVERY_TYPE_DATA);
+      
+      $ConfigData = array(
+         'Title'        => C('Garden.Title'),
+         'Domain'       => C('Garden.Domain'),
+         'Cookie'       => C('Garden.Cookie'),
+         'Theme'        => C('Garden.Theme'),
+         'Analytics'    => array(
+            'InstallationID'    => C('Garden.InstallationID'),
+            'InstallationSecret'=> C('Garden.InstallationSecret')
+         )
+      );
+      
+      $Config = Gdn_Configuration::Format($ConfigData, array(
+         'FormatStyle'  => 'Dotted',
+         'WrapPHP'      => FALSE,
+         'SafePHP'      => FALSE,
+         'Headings'     => FALSE,
+         'ByLine'       => FALSE,
+      ));
+      
+      $Configuration = array();
+      eval($Config);
+      
+      $this->SetData('Configuration', $Configuration);
+      
+      $this->Render();
+   }
 
    /**
     * Outgoing Email management screen.

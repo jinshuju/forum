@@ -164,6 +164,8 @@ class CommentModel extends VanillaModel {
       
       Gdn::UserModel()->JoinUsers($Result, array('InsertUserID', 'UpdateUserID'));
       
+      $this->SetCalculatedFields($Result);
+      
       $this->EventArguments['Comments'] =& $Result;
       $this->FireEvent('AfterGet');
       
@@ -592,10 +594,13 @@ class CommentModel extends VanillaModel {
 	 */
    public function GetID($CommentID, $ResultType = DATASET_TYPE_OBJECT) {
       $this->CommentQuery(FALSE); // FALSE supresses FireEvent
-      return $this->SQL
+      $Comment = $this->SQL
          ->Where('c.CommentID', $CommentID)
          ->Get()
          ->FirstRow($ResultType);
+      
+      $this->Calculate($Comment);
+      return $Comment;
    }
    
    /**
@@ -631,10 +636,13 @@ class CommentModel extends VanillaModel {
       $this->CommentQuery();
       $this->FireEvent('BeforeGetNew');
       $this->OrderBy($this->SQL);
-      return $this->SQL
+      $Comments = $this->SQL
          ->Where('c.DiscussionID', $DiscussionID)
          ->Where('c.CommentID >', $LastCommentID)
          ->Get();
+      
+      $this->SetCalculatedFields($Comments);
+      return $Comments;
    }
    
    /**
@@ -751,6 +759,8 @@ class CommentModel extends VanillaModel {
       
       // Add & apply any extra validation rules:      
       $this->Validation->ApplyRule('Body', 'Required');
+      $this->Validation->AddRule('MeAction', 'function:ValidateMeAction');
+      $this->Validation->ApplyRule('Body', 'MeAction');
       $MaxCommentLength = Gdn::Config('Vanilla.Comment.MaxLength');
       if (is_numeric($MaxCommentLength) && $MaxCommentLength > 0) {
          $this->Validation->SetSchemaProperty('Body', 'Length', $MaxCommentLength);
@@ -1208,6 +1218,37 @@ class CommentModel extends VanillaModel {
       // Clear the page cache.
       $this->RemovePageCache($Comment['DiscussionID']);
       return TRUE;
+   }
+   
+   /**
+    * Modifies comment data before it is returned.
+    * 
+    * @since 2.1a32
+    * @access public
+    *
+    * @param object $Data SQL result.
+    */
+	public function SetCalculatedFields(&$Data) {
+		$Result = &$Data->Result();
+		foreach($Result as &$Comment) {
+         $this->Calculate($Comment);
+      }
+   }
+   
+   /**
+    * Modifies comment data before it is returned.
+    * 
+    * @since 2.1a32
+    * @access public
+    *
+    * @param object $Data SQL result.
+    */
+   public function Calculate($Comment) {
+      
+      // Do nothing yet
+      
+      $this->EventArguments['Comment'] = $Comment;
+      $this->FireEvent('SetCalculatedFields');
    }
    
    public function Where($Value = NULL) {
