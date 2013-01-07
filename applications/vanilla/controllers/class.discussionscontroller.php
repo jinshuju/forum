@@ -173,8 +173,8 @@ class DiscussionsController extends VanillaController {
       }
       
       // We don't want search engines to index these pages because they can go in through the individual categories MUCH faster.
-      if ($this->Head)
-         $this->Head->AddTag('meta', array('name' => 'robots', 'content' => 'noindex,noarchive'));
+      // if ($this->Head)
+         // $this->Head->AddTag('meta', array('name' => 'robots', 'content' => 'noindex,noarchive'));
       
       $this->Render();
    }
