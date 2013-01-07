@@ -9,7 +9,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
 class UserModel extends Gdn_Model {
-   const DEFAULT_CONFIRM_EMAIL = 'You need to confirm your email address before you can continue. Please confirm your email address by clicking on the following link: {/entry/emailconfirm,url,domain}/{User.UserID,rawurlencode}/{EmailKey,rawurlencode}';
+   const DEFAULT_CONFIRM_EMAIL = 'You need to confirm your email address before you can continue. Please confirm your email address by clicking on the following link: {/entry/emailconfirm,exurl,domain}/{User.UserID,rawurlencode}/{EmailKey,rawurlencode}';
    const USERID_KEY = 'user.{UserID}';
    const USERNAME_KEY = 'user.{Name}.name';
    const USERROLES_KEY = 'user.{UserID}.roles';
@@ -553,7 +553,7 @@ class UserModel extends Gdn_Model {
                      if (!$Value) {
                         if ($UserPhotoDefaultUrl)
                            $Value = UserPhotoDefaultUrl($User);
-                     } elseif (!preg_match('`^https?://`i', $Value)) {
+                     } elseif (!IsUrl($Value)) {
                         $Value = Gdn_Upload::Url(ChangeBasename($Value, 'n%s'));
                      }
                   }
@@ -2690,7 +2690,7 @@ class UserModel extends Gdn_Model {
       if ($v = GetValue('Preferences', $User))
          SetValue('Preferences', $User, @unserialize($v));
       if ($v = GetValue('Photo', $User)) {
-         if (!preg_match('`^https?://`i', $v)) {
+         if (!IsUrl($v)) {
             $PhotoUrl = Gdn_Upload::Url(ChangeBasename($v, 'n%s'));
          } else {
             $PhotoUrl = $v;
@@ -2856,7 +2856,7 @@ class UserModel extends Gdn_Model {
 
       // Add the email confirmation key.
       if ($Data['EmailKey']) {
-         $Message .= "\n\n".FormatString(C('EmailConfirmEmail', self::DEFAULT_CONFIRM_EMAIL), $Data);
+         $Message .= "\n\n".FormatString(T('EmailConfirmEmail', self::DEFAULT_CONFIRM_EMAIL), $Data);
       }
       $Message = $this->_AddEmailHeaderFooter($Message, $Data);
 
