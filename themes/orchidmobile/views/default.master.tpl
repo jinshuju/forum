@@ -7,7 +7,7 @@
   <div id="Frame">
 	 <div class="Banner">
 		<ul>
-		  {home_link}
+		  <li><a href="/">Vanilla中文社区</a></li>
 		  {profile_link}
 		  {inbox_link}
 		  {custom_menu}
