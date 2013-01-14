@@ -349,7 +349,7 @@ $Definition['EmailStoryNotification'] = '%1$s
      祝你开心每一天!';
 $Definition['EmailWelcome'] = '你好 %1$s,
     
-    %2$s 已经为你创建了爱青大的账户 %3$s. 请使用以下信息登录:
+    %2$s 已经为你创建了账户 %3$s. 请使用以下信息登录:
 
 	  Email: %6$s
 	  Password: %5$s
@@ -435,7 +435,7 @@ $Definition['Give'] = '给';
 $Definition['Given'] = '给';
 $Definition['Go'] = '搜索';
 $Definition['Google+'] = 'Google+';
-$Definition['GuestModule.Message'] = '你好，新朋友。点击以下按钮加入我们！';
+$Definition['GuestModule.Message'] = '点击以下按钮加入我们！';
 
 $Definition['Hang on a sec while we sign you out.'] = '正在退出，请稍等';
 $Definition['HeadlineFormat.Badge'] = '{ActivityUserID,You} 获得了 <a href="{Url,html}">{Data.Name,text}</a> 徽章.';
@@ -453,7 +453,7 @@ $Definition['Hide signatures on my mobile device'] = '在手机上隐藏签名';
 $Definition['Hide signatures?'] = '隐藏签名？';
 $Definition['Home'] = '主页';
 $Definition['How long do you want this warning to last?'] = '你想让这个警告持续多久？';
-$Definition['Howdy, Stranger!'] = '你好，游客！';
+$Definition['Howdy, Stranger!'] = '你好，新朋友！';
 
 $Definition['I agree to the <a id="TermsOfService" class="Popup" target="terms" href="%s">terms of service</a>'] = '我同意 <a id="TermsOfService" class="Popup" target="terms" href="%s">服务条款</a>。';
 $Definition['I remember now!'] = '我现在想起来了！';
@@ -1683,7 +1683,7 @@ $Definition['Recently Active Users'] = '近期活跃的用户';
 $Definition['Record Content'] = '内容';
 $Definition['Redirecting...'] = '正在跳转...';
 $Definition['Refresh Comments'] = '刷新评论';
-$Definition['Register for Membership'] = '加入爱青大';
+$Definition['Register for Membership'] = '加入';
 $Definition['Registration'] = '注册';
 $Definition['Registration is currently closed.'] = '注册通道目前关闭。';
 $Definition['Remove'] = '删除';
