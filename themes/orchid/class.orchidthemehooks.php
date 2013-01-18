@@ -4,6 +4,11 @@ class OrchidThemeHooks extends Gdn_Plugin {
 	public function Base_AfterJsCdns_Handler($Sender,$Args){
 		$Args['Cdns'] = array('jquery.js' => 'http://lib.sinaapp.com/js/jquery/1.6.2/jquery.min.js');
 	}
+
+	public function HeadModule_BeforeToString_Handler($Sender,$Args)
+	{
+		if(Gdn::Request()->PathAndQuery()=='') $Sender->ClearTag('link','rel','canonical');
+	}
 }
 
 // if (!function_exists('UserPhotoDefaultUrl')) {
