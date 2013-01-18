@@ -7,9 +7,10 @@ Vanilla是一个结构良好、方便扩展的开源轻型论坛程序。vanilla
 ###主要特性：
 *   更完善的中文翻译
 *   支持中文用户名和中文#标签#
-*   增加一款主题orchid
+*   增加orchid主题和orchid mobile主题
 *   支持中文搜索（待改进）
+*   针对百度做了一些SEO相关调整
 
-这个版本是基于vanillaforums/Garden的master版本开发的，不是release版本，有众多新特性的同时，也有不稳定的风险
+这个版本是基于vanillaforums/Garden的master版本(2.1)开发的，不是release版本，有众多新特性的同时，也有不稳定的风险
 
 [Vanilla中文社区](http://vanillaforums.cn)
