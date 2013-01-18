@@ -825,6 +825,7 @@ $Definition['Twitter Settings'] = 'Twitter 设置';
 $Definition['Type'] = '类型';
 
 $Definition['Unannounce'] = '取消置顶';
+$Definition["Don't announce."] = '取消置顶';
 $Definition['Unanswered'] = '待回答';
 $Definition['Unanswered Questions'] = '待回答';
 $Definition['Unban User'] = '取消屏蔽用户';
