@@ -17,6 +17,10 @@ class UserModel extends Gdn_Model {
    const INC_PERMISSIONS_KEY = 'permissions.increment';
    const REDIRECT_APPROVE = 'REDIRECT_APPROVE';
    const USERNAME_REGEX_MIN = '^\/"\\\\#@\t\r\n';
+   const LOGIN_COOLDOWN_KEY = 'user.login.{Source}.cooldown';
+   const LOGIN_RATE_KEY = 'user.login.{Source}.rate';
+   
+   const LOGIN_RATE = 1;
    
    static $UserCache = array();
    
@@ -587,7 +591,6 @@ class UserModel extends Gdn_Model {
    }
 
    public function DefinePermissions($UserID, $Serialize = TRUE) {
-      
       if (Gdn::Cache()->ActiveEnabled()) {
          $PermissionsIncrement = $this->GetPermissionsIncrement();
          $UserPermissionsKey = FormatString(self::USERPERMISSIONS_KEY, array(
@@ -1016,7 +1019,7 @@ class UserModel extends Gdn_Model {
       //   ->Get()
       //   ->FirstRow();
 
-      if ($User && $User->Permissions == '')
+      if ($User && ($User->Permissions == '' || Gdn::Cache()->ActiveEnabled()))
          $User->Permissions = $this->DefinePermissions($UserID);
       
       // Remove secret info from session
@@ -3058,6 +3061,82 @@ class UserModel extends Gdn_Model {
       return $this->GetID($UserID);
    }
    
+   /**
+    * Check and apply login rate limiting
+    * 
+    * @param array $User
+    * @param boolean $PasswordOK
+    */
+   public static function RateLimit($User, $PasswordOK) {
+      if (!Gdn::Cache()->ActiveEnabled()) return FALSE;
+//      $CoolingDown = FALSE;
+//      
+//      // 1. Check if we're in userid cooldown
+//      $UserCooldownKey = FormatString(self::LOGIN_COOLDOWN_KEY, array('Source' => $User['UserID']));
+//      if (!$CoolingDown) {
+//         $InUserCooldown = Gdn::Cache()->Get($UserCooldownKey);
+//         if ($InUserCooldown) {
+//            $CoolingDown = $InUserCooldown;
+//            $CooldownError = T('LoginUserCooldown', "Your account is temporarily locked due to failed login attempts. Try again in %s.");
+//         }
+//      }
+//      
+//      // 2. Check if we're in source IP cooldown
+//      $SourceCooldownKey = FormatString(self::LOGIN_COOLDOWN_KEY, array('Source' => Gdn::Request()->IpAddress()));
+//      if (!$CoolingDown) {
+//         $InSourceCooldown = Gdn::Cache()->Get($SourceCooldownKey);
+//         if ($InSourceCooldown) {
+//            $CoolingDown = $InUserCooldown;
+//            $CooldownError = T('LoginSourceCooldown', "Your IP is temporarily blocked due to failed login attempts. Try again in %s.");
+//         }
+//      }
+//      
+//      // Block cooled down people
+//      if ($CoolingDown) {
+//         $Timespan = $InUserCooldown;
+//         $Timespan -= 3600 * ($Hours = (int) floor($Timespan / 3600));
+//         $Timespan -= 60 * ($Minutes = (int) floor($Timespan / 60));
+//         $Seconds = $Timespan;
+//      
+//         $TimeFormat = array();
+//         if ($Hours) $TimeFormat[] = "{$Hours} ".Plural($Hours, 'hour', 'hours');
+//         if ($Minutes) $TimeFormat[] = "{$Minutes} ".Plural($Minutes, 'minute', 'minutes');
+//         if ($Seconds) $TimeFormat[] = "{$Seconds} ".Plural($Seconds, 'second', 'seconds');
+//         $TimeFormat = implode(', ', $TimeFormat);
+//         throw new Exception(sprintf($CooldownError, $TimeFormat));
+//      }
+//      
+//      // Logged in OK
+//      if ($PasswordOK) {
+//         Gdn::Cache()->Remove($UserCooldownKey);
+//         Gdn::Cache()->Remove($SourceCooldownKey);
+//      }
+      
+      // Rate limiting
+      $UserRateKey = FormatString(self::LOGIN_RATE_KEY, array('Source' => $User->UserID));
+      $UserRate = (int)Gdn::Cache()->Get($UserRateKey);
+      $UserRate += 1;
+      Gdn::Cache()->Store($UserRateKey, 1, array(
+         Gdn_Cache::FEATURE_EXPIRY => self::LOGIN_RATE
+      ));
+      
+      $SourceRateKey = FormatString(self::LOGIN_RATE_KEY, array('Source' => Gdn::Request()->IpAddress()));
+      $SourceRate = (int)Gdn::Cache()->Get($SourceRateKey);
+      $SourceRate += 1;
+      Gdn::Cache()->Store($SourceRateKey, 1, array(
+         Gdn_Cache::FEATURE_EXPIRY => self::LOGIN_RATE
+      ));
+      
+      // Put user into cooldown mode
+      if ($UserRate > 1)
+         throw new Gdn_UserException(T('LoginUserCooldown', "You are trying to log in too often. Slow down!."));
+      
+      if ($SourceRate > 1)
+         throw new Gdn_UserException(T('LoginSourceCooldown', "Your IP is trying to log in too often. Slow down!"));
+      
+      return TRUE;
+   }
+   
 	public function SetField($RowID, $Property, $Value = FALSE) {
       if (!is_array($Property))
          $Property = array($Property => $Value);
@@ -3212,7 +3291,8 @@ class UserModel extends Gdn_Model {
    }
    
    public function ClearPermissions() {
-      $this->SQL->Put('User', array('Permissions' => ''), array('Permissions <>' => ''));
+      if (!Gdn::Cache()->ActiveEnabled())
+         $this->SQL->Put('User', array('Permissions' => ''), array('Permissions <>' => ''));
       
       $PermissionsIncrementKey = self::INC_PERMISSIONS_KEY;
       $PermissionsIncrement = $this->GetPermissionsIncrement();
