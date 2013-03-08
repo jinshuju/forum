@@ -42,6 +42,8 @@ class Gdn_PasswordHash extends PasswordHash {
                return crypt($Password, $Salt) == $Hash;
             case 'md5':
                return md5($Salt.$Password) == $Hash;
+            case 'sha256':
+               return hash('sha256', $Salt.$Password) == $Hash;
             case 'sha1':
             default:
                return sha1($Salt.$Password) == $Hash;
@@ -77,6 +79,9 @@ class Gdn_PasswordHash extends PasswordHash {
       $Result = FALSE;
       $ResetUrl = Url('entry/passwordrequest'.(Gdn::Request()->Get('display') ? '?display='.urlencode(Gdn::Request()->Get('display')) : ''));
       switch(strtolower($Method)) {
+         case 'crypt':
+            $Result = (crypt($Password, $StoredHash) === $StoredHash);
+            break;
          case 'django':
             $Result = $this->CheckDjango($Password, $StoredHash);
             break;
@@ -131,6 +136,21 @@ class Gdn_PasswordHash extends PasswordHash {
             
             $VbHash = md5(md5($Password).$Salt);
             $Result = $VbHash == $VbStoredHash;
+            break;
+         case 'xenforo':
+            $Data = @unserialize($StoredHash);
+            if (!is_array($Data))
+               $Result = FALSE;
+            else {
+               $Hash = GetValue('hash', $Data);
+               $Function = GetValue('hashFunc', $Data);
+               if (!$Function)
+                  $Function = strlen($Hash) == 32 ? 'md5' : 'sha1';
+               $Salt = GetValue('salt', $Data);
+               $ComputedHash = hash($Function, hash($Function, $Password).$Salt);
+               
+               $Result = $ComputedHash == $Hash;
+            }
             break;
          case 'yaf':
             $Result = $this->CheckYaf($Password, $StoredHash);

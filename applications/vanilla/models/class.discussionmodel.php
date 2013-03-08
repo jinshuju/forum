@@ -1411,7 +1411,7 @@ class DiscussionModel extends VanillaModel {
                
             } else {
                // Inserting.
-               if (!GetValue('Format', $Fields))
+               if (!GetValue('Format', $Fields) || C('Garden.ForceInputFormatter'))
                   $Fields['Format'] = C('Garden.InputFormatter', '');
                
                // Clear the cache if necessary.
@@ -1678,6 +1678,7 @@ class DiscussionModel extends VanillaModel {
          
          $CategoryModel = new CategoryModel();
          $CategoryModel->SetField($CategoryID, $CacheAmendment);
+         $CategoryModel->SetRecentPost($CategoryID);
       }
    }
 	
@@ -1792,7 +1793,7 @@ class DiscussionModel extends VanillaModel {
     * @param int $DiscussionID Unique ID of discussion to get +1 view.
     */
 	public function AddView($DiscussionID) {
-      
+      $IncrementBy = 0;
       if (C('Vanilla.Views.Denormalize', FALSE) && Gdn::Cache()->ActiveEnabled()) {
          $WritebackLimit = C('Vanilla.Views.DenormalizeWriteback', 10);
          $CacheKey = sprintf(DiscussionModel::CACHE_DISCUSSIONVIEWS, $DiscussionID);

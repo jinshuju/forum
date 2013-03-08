@@ -147,13 +147,13 @@ class PostController extends VanillaController {
 
             if (is_object($this->Category)) {
                // Check category permissions.
-               if ($this->Form->GetFormValue('Announce', '') != '' && !$Session->CheckPermission('Vanilla.Discussions.Announce', TRUE, 'Category', $this->Category->PermissionCategoryID))
+               if ($this->Form->GetFormValue('Announce', '') && !$Session->CheckPermission('Vanilla.Discussions.Announce', TRUE, 'Category', $this->Category->PermissionCategoryID))
                   $this->Form->AddError('You do not have permission to announce in this category', 'Announce');
 
-               if ($this->Form->GetFormValue('Close', '') != '' && !$Session->CheckPermission('Vanilla.Discussions.Close', TRUE, 'Category', $this->Category->PermissionCategoryID))
+               if ($this->Form->GetFormValue('Close', '') && !$Session->CheckPermission('Vanilla.Discussions.Close', TRUE, 'Category', $this->Category->PermissionCategoryID))
                   $this->Form->AddError('You do not have permission to close in this category', 'Close');
 
-               if ($this->Form->GetFormValue('Sink', '') != '' && !$Session->CheckPermission('Vanilla.Discussions.Sink', TRUE, 'Category', $this->Category->PermissionCategoryID))
+               if ($this->Form->GetFormValue('Sink', '') && !$Session->CheckPermission('Vanilla.Discussions.Sink', TRUE, 'Category', $this->Category->PermissionCategoryID))
                   $this->Form->AddError('You do not have permission to sink in this category', 'Sink');
                
                if (!isset($this->Discussion) && !$Session->CheckPermission('Vanilla.Discussions.Add', TRUE, 'Category', $this->Category->PermissionCategoryID))
@@ -392,11 +392,16 @@ class PostController extends VanillaController {
             $vanilla_category_id = $Category['CategoryID'];
          }
          
-         $SystemUserID = Gdn::UserModel()->GetSystemUserID();
+         $EmbedUserID = C('Garden.Embed.UserID');
+         if ($EmbedUserID)
+            $EmbedUser = Gdn::UserModel()->GetID($EmbedUserID);
+         if (!$EmbedUserID || !$EmbedUser)
+            $EmbedUserID = Gdn::UserModel()->GetSystemUserID();
+         
          $EmbeddedDiscussionData = array(
-            'InsertUserID' => $SystemUserID,
+            'InsertUserID' => $EmbedUserID,
             'DateInserted' => Gdn_Format::ToDateTime(),
-            'UpdateUserID' => $SystemUserID,
+            'UpdateUserID' => $EmbedUserID,
             'DateUpdated' => Gdn_Format::ToDateTime(),
             'CategoryID' => $vanilla_category_id,
             'ForeignID' => $vanilla_identifier,
