@@ -28,6 +28,7 @@ class FloorPlugin extends Gdn_Plugin {
 	}
 
 	public function DiscussionController_CommentInfo_Handler($Sender,$Args) {
+		if($this->number<=1) return;
 		$comment = $Args['Object'];
 		$this->showFloorNumber($comment->CommentID);
 	}
