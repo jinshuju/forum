@@ -1,0 +1,13 @@
+.MItem.Floor,.MItem.Floor a {
+	color: #ccc;
+	font-size: 18px;
+}
+
+.MItem.Floor a:hover {
+	color:#999;
+}
+
+.MItem.Floor {
+	margin-right: 20px;
+	float: right;
+}
