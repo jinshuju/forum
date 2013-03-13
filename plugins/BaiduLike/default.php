@@ -8,7 +8,7 @@ $PluginInfo['BaiduLike'] = array(
 	'RequiredTheme' => FALSE,
 	'RequiredPlugins' => FALSE,
 	'MobileFriendly' => TRUE,
-	// 'SettingsUrl' => '/dashboard/settings/emoji',
+	// 'SettingsUrl' => '/dashboard/settings/baidulike',
 	'SettingsPermission' => 'Garden.Settings.Manage',
 	// 'HasLocale' => TRUE,
 	'RegisterPermissions' => FALSE,
@@ -21,24 +21,5 @@ class BaiduLikePlugin extends Gdn_Plugin {
 	public function DiscussionController_BeforeDiscussionDisplay_Handler(&$Sender) {
 		$View = $Sender->FetchView('baidulike','','plugins/BaiduLike');
 		echo $View;
-		// $Sender->AddCssFile('emoji.css', 'plugins/Emoji');
 	}
-	
-	
-	
-	// public function CommentModel_BeforeSaveComment_Handler($Sender,$arg) {
-	// 	$arg['FormPostValues']['Body'] = $this->Emojify($arg['FormPostValues']['Body']);
-	// }
-	// 
-	// public function DiscussionModel_BeforeSaveDiscussion_Handler($Sender,$arg) {
-	// 	$arg['FormPostValues']['Body'] = $this->Emojify($arg['FormPostValues']['Body']);
-	// }
-	// 
-	// private function Emojify($data) {
-	// 	$data = emoji_docomo_to_unified($data);   # DoCoMo devices
-	//     $data = emoji_kddi_to_unified($data);     # KDDI & Au devices
-	//     $data = emoji_softbank_to_unified($data); # Softbank & (iPhone) Apple devices
-	//     $data = emoji_google_to_unified($data);   # Google Android devices
-	// 	return emoji_unified_to_html($data);	
-	// }
 }
