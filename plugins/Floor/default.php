@@ -3,7 +3,7 @@
 $PluginInfo['Floor'] = array(
 	'Name' => 'Floor 楼层',
 	'Description' => 'Show floor number in discussion',
-	'Version' => '0.1a',
+	'Version' => '1.0',
 	'RequiredApplications' => array('Vanilla' => '2.0.18.4'),
 	'RequiredTheme' => FALSE,
 	'RequiredPlugins' => FALSE,
