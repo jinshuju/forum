@@ -128,8 +128,11 @@ class PostController extends VanillaController {
             $this->Form->SetData($this->Discussion);
          } elseif (isset($this->Draft))
             $this->Form->SetData($this->Draft);
-         elseif ($this->Category !== NULL)
-            $this->Form->SetData(array('CategoryID' => $this->Category->CategoryID));
+         else {
+            if ($this->Category !== NULL)
+               $this->Form->SetData(array('CategoryID' => $this->Category->CategoryID));
+            $this->PopulateForm($this->Form);
+         }
             
       } else { // Form was submitted
          // Save as a draft?
@@ -725,6 +728,8 @@ class PostController extends VanillaController {
          $this->Form->SetModel($this->DraftModel);
          $this->Comment = $this->DraftModel->GetID($DraftID);
       }
+      
+      $this->Form->SetFormValue('Format', GetValue('Format', $this->Comment));
       $this->View = 'editcomment';
       $this->Comment($this->Comment->DiscussionID);
    }
@@ -741,5 +746,25 @@ class PostController extends VanillaController {
       parent::Initialize();
       $this->AddCssFile('vanilla.css');
 		$this->AddModule('NewDiscussionModule');
+   }
+   
+   /**
+    * Pre-populate the form with values from the query string.
+    * 
+    * @param Gdn_Form $Form
+    */
+   protected function PopulateForm($Form) {
+      $Get = $this->Request->Get();
+      $Get = array_change_key_case($Get);
+      $Values = ArrayTranslate($Get, array('name' => 'Name', 'tags' => 'Tags', 'body' => 'Body'));
+      foreach ($Values as $Key => $Value) {
+         $Form->SetValue($Key, $Value);
+      }
+      
+      if (isset($Get['category'])) {
+         $Category = CategoryModel::Categories($Get['category']);
+         if ($Category)
+            $Form->SetValue('CategoryID', $Category['CategoryID']);
+      }
    }
 }
