@@ -3,12 +3,11 @@
 $PluginInfo['Floor'] = array(
 	'Name' => 'Floor 楼层',
 	'Description' => 'Show floor number in discussion',
-	'Version' => '1.0',
+	'Version' => '1.1',
 	'RequiredApplications' => array('Vanilla' => '2.0.18.4'),
 	'RequiredTheme' => FALSE,
 	'RequiredPlugins' => FALSE,
 	'MobileFriendly' => TRUE,
-	// 'SettingsUrl' => '/dashboard/settings/baidulike',
 	'SettingsPermission' => 'Garden.Settings.Manage',
 	'HasLocale' => TRUE,
 	'RegisterPermissions' => FALSE,
@@ -18,32 +17,28 @@ $PluginInfo['Floor'] = array(
 );
 
 class FloorPlugin extends Gdn_Plugin {
-	public $number = 1;
-
 	public function DiscussionController_DiscussionInfo_Handler($Sender) {
 		if(C('Plugins.Floor.FirstFloor',true))
-			$this->showFloorNumber();
-		else
-			$this->number++;
+			$this->showFloorNumber(0);
 	}
 
 	public function DiscussionController_CommentInfo_Handler($Sender,$Args) {
-		if($this->number<=1) return;
-		$comment = $Args['Object'];
-		$this->showFloorNumber($comment->CommentID);
+		$number = $Args['CurrentOffset'];
+		if($number<=0) return;
+		$this->showFloorNumber($number,$comment->CommentID);
 	}
 
-	protected function showFloorNumber($fragment = null)
+	protected function showFloorNumber($number,$fragment = null)
 	{
 		echo ' <span class="MItem Floor">';
 		if($fragment)
-			echo '<a href="#Comment_'.$fragment.'">'.T('#'.$this->number++).'</a>';
+			echo '<a href="#Comment_'.$fragment.'">'.T('#'.$number).'</a>';
 		else
-			echo T('#'.$this->number++);
+			echo T('#'.$number);
 		echo '</span>';
 	}
 
-	public function DiscussionController_Render_Before(&$Sender) {
+	public function DiscussionController_Render_Before($Sender) {
 		$Sender->AddCssFile('floor.css', 'plugins/Floor');
 	}
 }
