@@ -3,7 +3,7 @@
 $PluginInfo['Floor'] = array(
 	'Name' => 'Floor 楼层',
 	'Description' => 'Show floor number in discussion',
-	'Version' => '1.1',
+	'Version' => '1.1.1',
 	'RequiredApplications' => array('Vanilla' => '2.0.18.4'),
 	'RequiredTheme' => FALSE,
 	'RequiredPlugins' => FALSE,
@@ -25,6 +25,7 @@ class FloorPlugin extends Gdn_Plugin {
 	public function DiscussionController_CommentInfo_Handler($Sender,$Args) {
 		$number = $Args['CurrentOffset'];
 		if($number<=0) return;
+		$comment = $Args['Object'];
 		$this->showFloorNumber($number,$comment->CommentID);
 	}
 
