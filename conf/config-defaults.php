@@ -155,6 +155,9 @@ $Configuration['Routes']['UpdateMode'] = 'dashboard/home/updatemode';
 //Chinese Username Validations
 $Configuration['Garden']['User']['ValidationRegex'] = '\d\w_\x{0800}-\x{9fa5}';
 $Configuration['Garden']['User']['ValidationLength'] = '{2,25}';
+//降低密码验证强度标准
+$Configuration['Garden']['Password']['MinScore'] = 1;
+$Configuration['Garden']['Password']['MinLength'] = 6;
 
 // $Configuration['Vanilla']['Profile']['ShowCounts'] = FALSE;
-$Configuration['DebugAssets'] = TRUE;
+// $Configuration['DebugAssets'] = TRUE;

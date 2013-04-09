@@ -883,6 +883,7 @@ $Definition['ValidateTime'] = '时间验证';
 $Definition['ValidateTimestamp'] = '时间标记验证';
 $Definition['ValidateUrlStringRelaxed'] = '%s 不能包含斜杠，引号或标签字符。';
 $Definition['ValidateUsername'] = '用户名必须是字母，数字或下划线，且必须是3-20个字符。';
+$Definition['ValidateStrength'] = '%s强度不足.';
 // $Definition['ValidateVersion'] = '';
 $Definition['Value'] = '值';
 $Definition['Vanilla'] = 'Vanilla';
