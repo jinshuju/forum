@@ -458,7 +458,8 @@ $Definition['Hide signatures?'] = '隐藏签名？';
 $Definition['Home'] = '主页';
 $Definition['How long do you want this warning to last?'] = '你想让这个警告持续多久？';
 $Definition['Howdy, Stranger!'] = '你好，新朋友！';
-
+$Definition['HtmlELementsAllowed.Notes'] = '在此填入允许在帖子中显示的html标签，多个请用逗号隔开。注意，这可能会导致安全隐患';
+$Definition['HTML elements allowed'] = '允许显示的HTML标签';
 $Definition['I agree to the <a id="TermsOfService" class="Popup" target="terms" href="%s">terms of service</a>'] = '我同意 <a id="TermsOfService" class="Popup" target="terms" href="%s">服务条款</a>。';
 $Definition['I remember now!'] = '我现在想起来了！';
 $Definition['In <b>%s.</b>'] = '在 <b>%s.</b>';
