@@ -3,7 +3,7 @@
 $PluginInfo['Noiseless'] = array(
 	'Name' => 'Noiseless 只看楼主',
 	'Description' => 'Only show comments by the discussion author',
-	'Version' => '0.1.1',
+	'Version' => '0.1.2',
 	'RequiredApplications' => array('Vanilla' => '2.0.18.4'),
 	'RequiredTheme' => FALSE,
 	'RequiredPlugins' => FALSE,
@@ -32,6 +32,7 @@ class NoiselessPlugin extends Gdn_Plugin {
 			$Sender->SetData('CommentData',$Result,TRUE);
 		$Sender->SetData('Comments', $Result);
 		$Sender->Pager->Configure(0,0,0,'',TRUE);
+		$Sender->Offset = 0;
 	}
 
 	public function DiscussionController_BeforeDiscussionOptions_Handler($Sender,$Args) {
