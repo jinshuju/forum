@@ -3,7 +3,7 @@
 $PluginInfo['Noiseless'] = array(
 	'Name' => 'Noiseless 只看楼主',
 	'Description' => 'Only show comments by the discussion author',
-	'Version' => '0.1.0',
+	'Version' => '0.1.1',
 	'RequiredApplications' => array('Vanilla' => '2.0.18.4'),
 	'RequiredTheme' => FALSE,
 	'RequiredPlugins' => FALSE,
@@ -25,7 +25,7 @@ class NoiselessPlugin extends Gdn_Plugin {
 			->From('Comment c')
 			->Where('c.DiscussionID', $Discussion->DiscussionID, TRUE, FALSE)
 			->Where('c.InsertUserID',$Discussion->InsertUserID,TRUE,FALSE)
-			->OrderBy('c.DateInserted', 'desc');
+			->OrderBy('c.DateInserted', 'asc');
 		$Result = $Sql->Get();
 		Gdn::UserModel()->JoinUsers($Result, array('InsertUserID', 'UpdateUserID'));
 		if(self::checkVersion('2.0'))
