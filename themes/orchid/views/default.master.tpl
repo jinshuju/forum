@@ -40,6 +40,7 @@
 			<div id="friend-links">
 					友情链接：
 					<a target="_blank" href="http://aiqingda.com">爱青大BBS</a>
+          <a target="_blank" href="http://www.54ux.com/">WP教程</a>
 			</div>
     </div>
   </div>
