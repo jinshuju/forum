@@ -27,21 +27,22 @@
       <div class="Column PanelColumn" id="Panel">
          {module name="MeModule"}
          {asset name="Panel"}
+         <div class="Box"><a href="http://www.linode.com/?r=b2e78eac35daef03f9b50901920de327260f7bba" title="本站部署于Linode" target="_blank"><img alt="本站部署于Linode" src="/themes/orchid/design/linode.png"/></a></div>
       </div>
       <div class="Column ContentColumn" id="Content">{asset name="Content"}</div>
     </div>
   </div>
   <div id="Foot">
     <div class="Row">
-			<div id="power-by">
+      <div id="power-by">
       powered by <a href="http://vanillaforums.org/" target="_blank">vanilla forums</a>
-			{asset name="Foot"}
-			</div>
-			<div id="friend-links">
-					友情链接：
-					<a target="_blank" href="http://aiqingda.com">爱青大BBS</a>
+      {asset name="Foot"}
+      </div>
+      <div id="friend-links">
+          友情链接：
+          <a target="_blank" href="http://aiqingda.com">爱青大BBS</a>
           <a target="_blank" href="http://www.54ux.com/">WP教程</a>
-			</div>
+      </div>
     </div>
   </div>
 </div>
