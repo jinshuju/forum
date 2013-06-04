@@ -148,7 +148,7 @@ class CategoryModel extends Gdn_Model {
          $Category['CountAllComments'] = $Category['CountComments'];
          $Category['Url'] = self::CategoryUrl($Category, FALSE, '//');
          $Category['ChildIDs'] = array();
-         if ($Category['Photo'])
+         if (GetValue('Photo', $Category))
             $Category['PhotoUrl'] = Gdn_Upload::Url($Category['Photo']);
          else
             $Category['PhotoUrl'] = '';
@@ -281,6 +281,39 @@ class CategoryModel extends Gdn_Model {
          if ($Category['CategoryID'] > 0)
             return $Category;
       }
+   }
+   
+   public static function GetByPermission($Permission = 'Discussions.Add', $CategoryID = NULL, $Filter = array()) {
+      static $Map = array('Discussions.Add' => 'PermsDiscussionsAdd', 'Discussions.View' => 'PermsDiscussionsView');
+      $Field = $Map[$Permission];
+      $DoHeadings = C('Vanilla.Categories.DoHeadings');
+      
+      $Result = array();
+      foreach (self::Categories() as $ID => $Category) {
+         if (!$Category[$Field])
+            continue;
+         
+         if ($CategoryID != $ID) {
+            if ($Category['CategoryID'] <= 0)
+               continue;
+
+            $Exclude = FALSE;
+            foreach ($Filter as $Key => $Value) {
+               if (isset($Category[$Key]) && $Category[$Key] != $Value) {
+                  $Exclude = TRUE;
+                  break;
+               }
+            }
+            if ($Exclude)
+               continue;
+            
+            if ($DoHeadings && $Permission == 'Discussions.Add' && $Category['Depth'] <= 1)
+               continue;
+         }
+
+         $Result[$ID] = $Category;
+      }
+      return $Result;
    }
    
    /**
