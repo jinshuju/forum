@@ -77,6 +77,12 @@ class Gdn_PluginManager extends Gdn_Pluggable {
     * @since 2.1 
     */
    public $Trace = FALSE;
+   
+   /**
+    * Whether to use APC for plugin cache storage
+    * @var type 
+    */
+   protected $Apc = FALSE;
 
    public function __construct() {
       parent::__construct();
@@ -91,6 +97,9 @@ class Gdn_PluginManager extends Gdn_Pluggable {
     * methods.
     */
    public function Start($Force = FALSE) {
+      
+      if (function_exists('apc_fetch') && C('Garden.Apc', FALSE))
+         $this->Apc = TRUE;
 
       // Build list of all available plugins
       $this->AvailablePlugins($Force);
@@ -126,7 +135,11 @@ class Gdn_PluginManager extends Gdn_Pluggable {
 
             // Check Cache
             $SearchPathCacheKey = 'Garden.Plugins.PathCache.'.$SearchPath;
-            $SearchPathCache = Gdn::Cache()->Get($SearchPathCacheKey, array(Gdn_Cache::FEATURE_NOPREFIX => TRUE));
+            if ($this->Apc) {
+               $SearchPathCache = apc_fetch($SearchPathCacheKey);
+            } else {
+               $SearchPathCache = Gdn::Cache()->Get($SearchPathCacheKey, array(Gdn_Cache::FEATURE_NOPREFIX => TRUE));
+            }
 
             $CacheHit = ($SearchPathCache !== Gdn_Cache::CACHEOP_FAILURE);
             $CacheIntegrityCheck = FALSE;
@@ -155,6 +168,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
             $PathIntegrityHash = md5(serialize($PathListing));
             $CacheIntegrityHash = GetValue('CacheIntegrityHash',$SearchPathCache);
             if ($CacheIntegrityHash != $PathIntegrityHash) {
+               Trace('Need to re-index plugin cache');
                // Need to re-index this folder
                
                // Since we're re-indexing this folder, need to unset all the plugins it was previously responsible for 
@@ -169,7 +183,11 @@ class Gdn_PluginManager extends Gdn_Pluggable {
                   continue;
 
                $SearchPathCache['CacheIntegrityHash'] = $PathIntegrityHash;
-               Gdn::Cache()->Store($SearchPathCacheKey, $SearchPathCache, array(Gdn_Cache::FEATURE_NOPREFIX => TRUE));
+               if ($this->Apc) {
+                  apc_store($SearchPathCacheKey, $SearchPathCache);
+               } else {
+                  Gdn::Cache()->Store($SearchPathCacheKey, $SearchPathCache, array(Gdn_Cache::FEATURE_NOPREFIX => TRUE));
+               }
             }
 
             $this->PluginCache = array_merge($this->PluginCache, $CachePluginInfo);
@@ -205,7 +223,11 @@ class Gdn_PluginManager extends Gdn_Pluggable {
       
       foreach ($SearchPaths as $SearchPath => $SearchPathName) {
          $SearchPathCacheKey = "Garden.Plugins.PathCache.{$SearchPath}";
-         $SearchPathCache = Gdn::Cache()->Remove($SearchPathCacheKey, array(Gdn_Cache::FEATURE_NOPREFIX => TRUE));
+         if ($this->Apc) {
+            apc_delete($SearchPathCacheKey);
+         } else {
+            Gdn::Cache()->Remove($SearchPathCacheKey, array(Gdn_Cache::FEATURE_NOPREFIX => TRUE));
+         }
       }
    }
 
@@ -362,6 +384,8 @@ class Gdn_PluginManager extends Gdn_Pluggable {
 
       // Loop through all declared classes looking for ones that implement Gdn_iPlugin.
       foreach (get_declared_classes() as $ClassName) {
+         if ($ClassName == 'Gdn_Plugin')
+            continue;
 
          // Only register the plugin if it implements the Gdn_IPlugin interface
          if (in_array('Gdn_IPlugin', class_implements($ClassName))) {
@@ -375,6 +399,10 @@ class Gdn_PluginManager extends Gdn_Pluggable {
 
          }
       }
+   }
+   
+   public function RegisteredPlugins() {
+      return $this->RegisteredPlugins;
    }
 
    public function RegisterPlugin($ClassName) {
@@ -392,6 +420,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
                case 'handler':
                case 'before':
                case 'after':
+               case 'render':
                   $this->RegisterHandler($ClassName, $MethodName);
                break;
                case 'override':
@@ -481,7 +510,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
 
       return $Handlers;
    }
-
+   
    public function GetPluginInfo($AccessName, $AccessType = self::ACCESS_PLUGINNAME) {
       $PluginName = FALSE;
 
@@ -531,6 +560,18 @@ class Gdn_PluginManager extends Gdn_Pluggable {
       }
 
       return $this->Instances[$ClassName];
+   }
+   
+   /**
+    * Returns whether or not a plugin is enabled.
+    * 
+    * @param string $Name The name of the plugin.
+    * @return bool Whether or not the plugin is enabled.
+    * @since 2.2
+    */
+   public function IsEnabled($Name) {
+      $Enabled = $this->EnabledPlugins;
+      return isset($Enabled[$Name]) && $Enabled[$Name];
    }
 
    /**
@@ -684,6 +725,8 @@ class Gdn_PluginManager extends Gdn_Pluggable {
                
                $Sender->Returns[$EventKey][$PluginKey] = $Return;
                $Return = TRUE;
+            } elseif (isset($Sender->EventArguments)) {
+               $this->GetPluginInstance($PluginClassName)->$PluginEventHandlerName($Sender, $Sender->EventArguments, $PassedEventKey);
             } else {
                $this->GetPluginInstance($PluginClassName)->$PluginEventHandlerName($Sender, array(), $PassedEventKey);
             }
@@ -964,7 +1007,6 @@ class Gdn_PluginManager extends Gdn_Pluggable {
    }
 
    public function EnablePlugin($PluginName, $Validation, $Setup = FALSE, $EnabledPluginValueIndex = 'Folder') {
-
       // Check that the plugin is in AvailablePlugins...
       $PluginInfo = $this->GetPluginInfo($PluginName);
 
@@ -989,6 +1031,10 @@ class Gdn_PluginManager extends Gdn_Pluggable {
       $this->RegisterPlugin($PluginClassName);
 
       Gdn::Locale()->Set(Gdn::Locale()->Current(), Gdn::ApplicationManager()->EnabledApplicationFolders(), $this->EnabledPluginFolders(), TRUE);
+      
+      $this->EventArguments['AddonName'] = $PluginName;
+      $this->FireEvent('AddonEnabled');
+      
       return TRUE;
    }
    
@@ -1019,6 +1065,10 @@ class Gdn_PluginManager extends Gdn_Pluggable {
 
       // Redefine the locale manager's settings $Locale->Set($CurrentLocale, $EnabledApps, $EnabledPlugins, TRUE);
       Gdn::Locale()->Refresh();
+      
+      $this->EventArguments['AddonName'] = $PluginName;
+      $this->FireEvent('AddonDisabled');
+      
       return TRUE;
    }
 

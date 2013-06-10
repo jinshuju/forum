@@ -170,6 +170,34 @@ class Gdn_Session {
       return GetValue(C('Garden.Cookie.Name').$Suffix, $_COOKIE, $Default);
    }
    
+   /**
+    * Return the timezone hour difference between the user and utc.
+    * @return int The hour offset.
+    */
+   public function HourOffset() {
+      static $GuestHourOffset;
+      
+      if ($this->UserID > 0) {
+         return $this->User->HourOffset;
+      } else {
+         if (!isset($GuestHourOffset)) {
+            $GuestTimeZone = C('Garden.GuestTimeZone');
+            if ($GuestTimeZone) {
+               try {
+                  $TimeZone = new DateTimeZone($GuestTimeZone);
+                  $Offset = $TimeZone->getOffset(new DateTime('now', new DateTimeZone('UTC')));
+                  $GuestHourOffset = floor($Offset / 3600);
+               } catch (Exception $Ex) {
+                  $GuestHourOffset = 0;
+                  LogException($Ex);
+               }
+            }
+         }
+         
+         return $GuestHourOffset;
+      }
+   }
+   
    public function SetCookie($Suffix, $Value, $Expires) {
       $Name = C('Garden.Cookie.Name').$Suffix;
       $Path = C('Garden.Cookie.Path');
@@ -457,29 +485,26 @@ class Gdn_Session {
       if (!$Session)
          return;
       
-      $Attributes = unserialize($Session->Attributes);
-      if (!is_array($Attributes))
-         $Attributes = array();
-
       // Stash or unstash the value depending on inputs
       if ($Name != '' && $Value != '') {
-         $Attributes[$Name] = $Value;
+         $Session->Attributes[$Name] = $Value;
       } else if ($Name != '') {
-         $Value = GetValue($Name, $Attributes);
+         $Value = GetValue($Name, $Session->Attributes);
 			if ($UnsetOnRetrieve)
-				unset($Attributes[$Name]);
+				unset($Session->Attributes[$Name]);
       }
       // Update the attributes
       if ($Name != '') {
-         Gdn::SQL()->Update(
+         Gdn::SQL()->Put(
             'Session',
             array(
-               'Attributes' => serialize($Attributes)
+               'DateUpdated' => Gdn_Format::ToDateTime(),
+               'Attributes' => serialize($Session->Attributes)
             ),
             array(
                'SessionID' => $Session->SessionID
             )
-         )->Put();
+         );
       }
       return $Value;
 	}
@@ -491,9 +516,10 @@ class Gdn_Session {
 	 */
    private function _GetStashSession($ValueToStash) {
       $CookieName = C('Garden.Cookie.Name', 'Vanilla');
+      $Name = $CookieName.'SessionID';
 
       // Grab the entire session record
-      $SessionID = GetValue($CookieName.'SessionID', $_COOKIE, '');
+      $SessionID = GetValue($Name, $_COOKIE, '');
       
       // If there is no session, and no value for saving, return;
       if ($SessionID == '' && $ValueToStash == '')
@@ -508,7 +534,7 @@ class Gdn_Session {
 
       if (!$Session) {
          $SessionID = md5(mt_rand());
-         $TransientKey = substr(md5(mt_rand()), 0, 12);
+         $TransientKey = substr(md5(mt_rand()), 0, 11).'!';
          // Save the session information to the database.
          Gdn::SQL()->Insert(
             'Session',
@@ -520,6 +546,8 @@ class Gdn_Session {
                'DateUpdated' => Gdn_Format::ToDateTime()
             )
          );
+         Trace("Inserting session stash $SessionID");
+         
          $Session = Gdn::SQL()
             ->Select()
             ->From('Session')
@@ -528,7 +556,6 @@ class Gdn_Session {
             ->FirstRow();
             
          // Save a session cookie
-         $Name = $CookieName.'SessionID';
          $Path = C('Garden.Cookie.Path', '/');
          $Domain = C('Garden.Cookie.Domain', '');
          $Expire = 0;
@@ -539,7 +566,12 @@ class Gdn_Session {
             $Domain = '';
          
          setcookie($Name, $SessionID, $Expire, $Path, $Domain);
+         $_COOKIE[$Name] = $SessionID;
       }
+      $Session->Attributes = @unserialize($Session->Attributes);
+      if (!$Session->Attributes)
+         $Session->Attributes = array();
+      
       return $Session;
    }
 

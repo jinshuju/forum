@@ -20,12 +20,14 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * @package Vanilla
  */
 class DiscussionModel extends VanillaModel {
-   /**
-    * @var array
-    */
+   /** @var array */
    protected static $_CategoryPermissions = NULL;
-
+   
+   /** @var bool */
    public $Watching = FALSE;
+   
+   /** @var array Column names to allow sorting by. */
+   protected static $AllowedSortFields = array('d.DateLastComment', 'd.DateInserted', 'd.DiscussionID');
    
    const CACHE_DISCUSSIONVIEWS = 'discussion.%s.countviews';
    
@@ -214,7 +216,10 @@ class DiscussionModel extends VanillaModel {
       if ($Offset !== FALSE && $Limit !== FALSE)
          $this->SQL->Limit($Limit, $Offset);
       
-      $this->EventArguments['SortField'] = C('Vanilla.Discussions.SortField', 'd.DateLastComment');
+      // Get preferred sort order
+      $SortField = self::GetSortField();
+
+      $this->EventArguments['SortField'] = &$SortField; 
       $this->EventArguments['SortDirection'] = C('Vanilla.Discussions.SortDirection', 'desc');
 		$this->EventArguments['Wheres'] = &$Wheres;
 		$this->FireEvent('BeforeGet'); // @see 'BeforeGetCount' for consistency in results vs. counts
@@ -228,10 +233,10 @@ class DiscussionModel extends VanillaModel {
       if (is_array($Wheres))
          $this->SQL->Where($Wheres);
       
-		// Get sorting options from config
-		$SortField = $this->EventArguments['SortField'];
-		if (!in_array($SortField, array('d.DiscussionID', 'd.DateLastComment', 'd.DateInserted')))
-			$SortField = 'd.DateLastComment';
+		// Whitelist sorting options
+		if (!in_array($SortField, array('d.DiscussionID', 'd.DateLastComment', 'd.DateInserted'))) {
+			trigger_error("You are sorting discussions by a possibly sub-optimal column.", E_USER_NOTICE);
+      }
 		
 		$SortDirection = $this->EventArguments['SortDirection'];
 		if ($SortDirection != 'asc')
@@ -274,21 +279,35 @@ class DiscussionModel extends VanillaModel {
       
       $Sql = $this->SQL;
       
-      // Build up the base query. Self-join for optimization.
-      $Sql->Select('d2.*')
-         ->From('Discussion d')
-         ->Join('Discussion d2', 'd.DiscussionID = d2.DiscussionID')
-         ->OrderBy('d.DateLastComment', 'desc')
-         ->Limit($Limit, $Offset);
-      
+      // Determine category watching
       if ($this->Watching && !isset($Where['d.CategoryID'])) {
          $Watch = CategoryModel::CategoryWatch();
          if ($Watch !== TRUE)
             $Where['d.CategoryID'] = $Watch;
       }
       
+      // Get preferred sort order
+      $SortField = self::GetSortField();
+
+      $this->EventArguments['SortField'] = &$SortField; 
+      $this->EventArguments['SortDirection'] = C('Vanilla.Discussions.SortDirection', 'desc');
       $this->EventArguments['Wheres'] =& $Where;
       $this->FireEvent('BeforeGet');
+      
+      // Whitelist sorting options
+      if (!in_array($SortField, self::AllowedSortFields()))
+         $SortField = 'd.DateLastComment';
+      
+      $SortDirection = $this->EventArguments['SortDirection'];
+      if ($SortDirection != 'asc')
+         $SortDirection = 'desc';
+      
+      // Build up the base query. Self-join for optimization.
+      $Sql->Select('d2.*')
+         ->From('Discussion d')
+         ->Join('Discussion d2', 'd.DiscussionID = d2.DiscussionID')
+         ->OrderBy($SortField, $SortDirection)
+         ->Limit($Limit, $Offset);
       
       // Verify permissions (restricting by category if necessary)
       $Perms = self::CategoryPermissions();
@@ -423,8 +442,9 @@ class DiscussionModel extends VanillaModel {
       
 		// Get sorting options from config
 		$SortField = $this->EventArguments['SortField'];
-		if (!in_array($SortField, array('d.DiscussionID', 'd.DateLastComment', 'd.DateInserted')))
-			$SortField = 'd.DateLastComment';
+		if (!in_array($SortField, array('d.DiscussionID', 'd.DateLastComment', 'd.DateInserted'))) {
+			trigger_error("You are sorting discussions by a possibly sub-optimal column.", E_USER_NOTICE);
+      }
 		
 		$SortDirection = $this->EventArguments['SortDirection'];
 		if ($SortDirection != 'asc')
@@ -498,23 +518,23 @@ class DiscussionModel extends VanillaModel {
     */
    public function AddDenormalizedViews(&$Discussions) {
       
-//      if ($Discussions instanceof Gdn_DataSet) {
-//         $Result = $Discussions->Result();
-//         foreach($Result as &$Discussion) {
-//            $CacheKey = sprintf(DiscussionModel::CACHE_DISCUSSIONVIEWS, $Discussion->DiscussionID);
-//            $CacheViews = Gdn::Cache()->Get($CacheKey);
-//            if ($CacheViews !== Gdn_Cache::CACHEOP_FAILURE)
-//               $Discussion->CountViews = $CacheViews;
-//         }
-//      } else {
-//         if (isset($Discussions->DiscussionID)) {
-//            $Discussion = $Discussions;
-//            $CacheKey = sprintf(DiscussionModel::CACHE_DISCUSSIONVIEWS, $Discussion->DiscussionID);
-//            $CacheViews = Gdn::Cache()->Get($CacheKey);
-//            if ($CacheViews !== Gdn_Cache::CACHEOP_FAILURE)
-//               $Discussion->CountViews += $CacheViews;
-//         }
-//      }
+      if ($Discussions instanceof Gdn_DataSet) {
+         $Result = $Discussions->Result();
+         foreach($Result as &$Discussion) {
+            $CacheKey = sprintf(DiscussionModel::CACHE_DISCUSSIONVIEWS, $Discussion->DiscussionID);
+            $CacheViews = Gdn::Cache()->Get($CacheKey);
+            if ($CacheViews !== Gdn_Cache::CACHEOP_FAILURE)
+               $Discussion->CountViews += $CacheViews;
+         }
+      } else {
+         if (isset($Discussions->DiscussionID)) {
+            $Discussion = $Discussions;
+            $CacheKey = sprintf(DiscussionModel::CACHE_DISCUSSIONVIEWS, $Discussion->DiscussionID);
+            $CacheViews = Gdn::Cache()->Get($CacheKey);
+            if ($CacheViews !== Gdn_Cache::CACHEOP_FAILURE)
+               $Discussion->CountViews += $CacheViews;
+         }
+      }
    }
 	
 	/**
@@ -586,7 +606,6 @@ class DiscussionModel extends VanillaModel {
 
       if (!property_exists($Discussion, 'Read')) {
          $Discussion->Read = !(bool)$Discussion->CountUnreadComments;
-         
          if ($Category && !is_null($Category['DateMarkedRead'])) {
             
             // If the category was marked explicitly read at some point, see if that applies here
@@ -642,6 +661,8 @@ class DiscussionModel extends VanillaModel {
 			}
 		}
 	}
+   
+   
 
    /**
     * Gets announced discussions.
@@ -711,7 +732,7 @@ class DiscussionModel extends VanillaModel {
       }
 
       $this->SQL
-         ->OrderBy('d.DateLastComment', 'desc')
+         ->OrderBy(self::GetSortField(), 'desc')
          ->Limit($Limit, $Offset);
 
       $Data = $this->SQL->Get();
@@ -1214,6 +1235,19 @@ class DiscussionModel extends VanillaModel {
       return $Result;
    }
    
+   /**
+    * Get discussions sort order based on config and optional user preference.
+    * 
+    * @return string Column name.
+    */
+   public static function GetSortField() {
+      $SortField = C('Vanilla.Discussions.SortField', 'd.DateLastComment');
+      if (C('Vanilla.Discussions.UserSortField'))
+         $SortField = Gdn::Session()->GetPreference('Discussions.SortField', $SortField);
+      
+      return $SortField;  
+   }
+   
    public static function GetViewsFallback($DiscussionID) {
       
       // Not found. Check main table.
@@ -1415,13 +1449,7 @@ class DiscussionModel extends VanillaModel {
                if (!GetValue('Format', $Fields) || C('Garden.ForceInputFormatter'))
                   $Fields['Format'] = C('Garden.InputFormatter', '');
                
-               // Clear the cache if necessary.
-               if (GetValue('Announce', $Fields)) {
-                  $CacheKeys = array('Announcements');
-                  $this->SQL->Cache($CacheKeys);
-               }
-               
-               // Check for spam
+               // Check for spam.
                $Spam = SpamModel::IsSpam('Discussion', $Fields);
             	if ($Spam)
                   return SPAM;
@@ -1448,7 +1476,15 @@ class DiscussionModel extends VanillaModel {
                      'LastUrl' => DiscussionUrl($Fields)
                   );
                   CategoryModel::SetCache($Fields['CategoryID'], $CategoryCache);
+                  
+                  // Clear the cache if necessary.
+                  if (GetValue('Announce', $Fields)) {
+                     Gdn::Cache()->Remove('Announcements');
+                  }
                }
+               
+               // Update the user's discussion count.
+               $this->UpdateUserDiscussionCount(Gdn::Session()->UserID);
                
                // Assign the new DiscussionID to the comment before saving.
                $FormPostValues['IsNewDiscussion'] = TRUE;
@@ -1685,6 +1721,17 @@ class DiscussionModel extends VanillaModel {
          $CategoryModel->SetField($CategoryID, $CacheAmendment);
          $CategoryModel->SetRecentPost($CategoryID);
       }
+   }
+   
+   public function UpdateUserDiscussionCount($UserID) {
+      $CountDiscussions = $this->SQL
+         ->Select('DiscussionID', 'count', 'CountDiscussions')
+         ->From('Discussion')
+         ->Where('InsertUserID', $UserID)
+         ->Get()->Value('CountDiscussions', 0);
+      
+      // Save the count to the user table
+      Gdn::UserModel()->SetField($UserID, 'CountDiscussions', $CountDiscussions);
    }
 	
 	/**
@@ -2004,19 +2051,8 @@ class DiscussionModel extends VanillaModel {
 		$this->SQL->Delete('UserDiscussion', array('DiscussionID' => $DiscussionID));
       $this->UpdateDiscussionCount($CategoryID);
       
-      // Get the user's discussion count
-      $CountDiscussions = $this->SQL
-         ->Select('DiscussionID', 'count', 'CountDiscussions')
-         ->From('Discussion')
-         ->Where('InsertUserID', $UserID)
-         ->Get()->Value('CountDiscussions', 0);
-      
-      // Save the count to the user table
-      $this->SQL
-         ->Update('User')
-         ->Set('CountDiscussions', $CountDiscussions)
-         ->Where('UserID', $UserID)
-         ->Put();
+      // Get the user's discussion count.
+      $this->UpdateUserDiscussionCount($UserID);
 
 		// Update bookmark counts for users who had bookmarked this discussion
 		foreach ($BookmarkData->Result() as $User) {
@@ -2052,5 +2088,16 @@ class DiscussionModel extends VanillaModel {
       
       // Send back an comma-separated string
       return implode(',', $TagsArray);
+   }
+   
+   /**
+    * Getter/setter for protected $AllowedSortFields array.
+    */
+   public static function AllowedSortFields($Allowed = NULL) {
+      if (is_array($Allowed)) {
+         self::$AllowedSortFields = $Allowed;
+      }
+      
+      return self::$AllowedSortFields;
    }
 }

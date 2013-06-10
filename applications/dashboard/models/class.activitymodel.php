@@ -1213,10 +1213,19 @@ class ActivityModel extends Gdn_Model {
             
             $this->EventArguments['Activity'] =& $Activity;
             $this->EventArguments['ActivityID'] = NULL;
+            
+            $Handled = FALSE;
+            $this->EventArguments['Handled'] =& $Handled;
+            
             $this->FireEvent('BeforeSave');
             
             if (count($this->ValidationResults()) > 0)
                return FALSE;
+            
+            if ($Handled) {
+               // A plugin handled this activity so don't save it.
+               return $Activity;
+            }
             
             if (GetValue('CheckSpam', $Options)) {
                // Check for spam
@@ -1263,7 +1272,7 @@ class ActivityModel extends Gdn_Model {
       }
       
       // If this is a wall post then we need to notify on that.
-      if ($Activity['ActivityType'] == 'WallPost' && $Activity['NotifyUserID'] == self::NOTIFY_PUBLIC) {
+      if (GetValue('Name', $ActivityType) == 'WallPost' && $Activity['NotifyUserID'] == self::NOTIFY_PUBLIC) {
          $this->NotifyWallPost($Activity);
       }
       

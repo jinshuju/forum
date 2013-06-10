@@ -74,11 +74,11 @@ class SearchController extends Gdn_Controller {
     * @param int $Page Page number.
     */
 	public function Index($Page = '') {
-		$this->AddJsFile('jquery.gardenmorepager.js');
 		$this->AddJsFile('search.js');
 		$this->Title(T('Search'));
       
       SaveToConfig('Garden.Format.EmbedSize', '160x90', FALSE);
+      Gdn_Theme::Section('SearchResults');
       
       list($Offset, $Limit) = OffsetLimit($Page, C('Garden.Search.PerPage', 20));
       $this->SetData('_Limit', $Limit);
@@ -98,6 +98,14 @@ class SearchController extends Gdn_Controller {
          $ResultSet = array();
       }
       Gdn::UserModel()->JoinUsers($ResultSet, array('UserID'));
+      
+      // Fix up the summaries.
+      $SearchTerms = explode(' ', Gdn_Format::Text($Search));
+      foreach ($ResultSet as &$Row) {
+         $Row['Summary'] = SearchExcerpt(Gdn_Format::PlainText($Row['Summary'], $Row['Format']), $SearchTerms);
+         $Row['Format'] = 'Html';
+      }
+      
 		$this->SetData('SearchResults', $ResultSet, TRUE);
 		$this->SetData('SearchTerm', Gdn_Format::Text($Search), TRUE);
 		if($ResultSet)
@@ -120,11 +128,11 @@ class SearchController extends Gdn_Controller {
 			'dashboard/search/%1$s/%2$s/?Search='.Gdn_Format::Url($Search)
 		);
 		
-		if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
-         $this->SetJson('LessRow', $this->Pager->ToString('less'));
-         $this->SetJson('MoreRow', $this->Pager->ToString('more'));
-         $this->View = 'results';
-      }
+//		if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
+//         $this->SetJson('LessRow', $this->Pager->ToString('less'));
+//         $this->SetJson('MoreRow', $this->Pager->ToString('more'));
+//         $this->View = 'results';
+//      }
 		
       $this->CanonicalUrl(Url('search', TRUE));
 

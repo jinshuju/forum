@@ -102,9 +102,6 @@ body {
 	clear: both;
 	height: 0;
 }
-.Hidden {
-   display: none;
-}
 .Invisible {
    opacity: 0;
 }
@@ -442,6 +439,10 @@ select {
    border-color: #666;
 }
 
+.Button.Disabled {
+   opacity: .5;
+}
+
 div.FileUpload .CurrentImage {
    display: block;
    margin: 5px 0;
@@ -488,6 +489,7 @@ div.FileUpload .CurrentImage {
   direction: ltr;
   cursor: pointer;
 }
+
 .Button.FileInput {
    position: relative;
    overflow: hidden;
@@ -667,14 +669,7 @@ div.FileUpload .CurrentImage {
 	background: url('images/progress_sm.gif') center center no-repeat;
 }
 .InProgress {
-   color: transparent !Important;
-   background: url('images/progress_sm.gif') center center no-repeat !important;
-   border-color: transparent !important;
-   -moz-box-shadow: none !important;
-   -webkit-box-shadow: none !important;
-   box-shadow: none !important;
-   color: transparent !important;
-   text-shadow: none !important;
+   opacity: .5;
 }
 .Conversations .Deleted {
    text-decoration: line-through;
@@ -766,12 +761,6 @@ div.Warning {
    padding: 0 20px !important;
    background: url('images/progress.gif') center center no-repeat !important;
 }
-.PagerWrap {
-   overflow: hidden;
-}
-.PageDescription .PagerWrap {
-   overflow: visible;
-}
 .Pager {
    font-weight: bold;
    float: right;
@@ -785,6 +774,9 @@ div.Warning {
 }
 .Pager .Highlight {
 	color: #000;
+}
+.MoreWrap {
+   float: right;
 }
 
 .PagerNub {
@@ -1047,6 +1039,9 @@ div.Discussion:hover .OptionsTitle:hover,
    text-decoration: none;
    background-color: #004D9F !Important;
 }
+.MenuItems a:hover .Gloss {
+   color: #ffffff !important;
+}
 .MenuItems li > strong {
    font-size: 12px;
    padding: 3px 10px;
@@ -1096,6 +1091,27 @@ div.Discussion:hover .OptionsTitle:hover,
 .FlyoutLeft .Flyout {
     right: inherit;
 }
+.DropHandle {
+   display: inline-block;
+   height: 0px;
+   width: 0px;
+   border-style: solid;
+   border-width: 4px;
+   border-color: #000 transparent transparent transparent;
+   position: relative;
+   bottom: -2px;
+}
+
+.SelectFlyout {
+   display: inline-block;
+   cursor: pointer;
+}
+
+.SelectFlyout .Flyout:before,
+.SelectFlyout .Flyout:after {
+   display: none;
+}
+
 .MeBox .Flyout {
     right: inherit;
     left: -4px;
@@ -1139,6 +1155,9 @@ a.Bookmarking:hover {
 .AdminCheck {
    vertical-align: top;
 	line-height: 1;
+}
+td.CheckBoxColumn {
+   text-align: center;
 }
 .HomepageTitle .AdminCheck {
     padding-left: 8px;
@@ -1352,7 +1371,8 @@ overflow: hidden;
 
 
 #Panel .FilterMenu .Aside,
-.PanelInfo .Aside {
+.PanelInfo .Aside,
+.Item .Aside {
    float: right;
 }
 .PanelInfo .Heading {
@@ -1948,6 +1968,11 @@ pre code {
    border: none;
    padding: 0;
 }
+mark {
+    padding: 0 2px;
+    color: inherit;
+    background: #ff6;
+}
 .Message strong, .Message b {
    font-weight: bold;
 }
@@ -2032,7 +2057,7 @@ a.ChangePicuture:hover {
    position: relative;
 }
 /* Hiding form headings with CSS in case the forms get popped */
-body.Profile.picture .SmallPopup h1 {
+div.Popup .SmallPopup h1 {
 	display: none;
 }
 /* BGColor on profile forms */
@@ -2181,15 +2206,6 @@ form.Thumbnail .Warning {
    text-align: right; 
 	margin: 0;
 	padding: 6px 0;
-}
-.EditCommentForm .Buttons .Cancel,
-.CommentForm .Buttons .Cancel,
-.CommentForm .Buttons .Back {
-	float: left;
-	line-height: 2.2;
-}
-.Reactions .Bullet {
-   font-size: 10px;
 }
 .CommentForm .WriteButton,
 .CommentForm .PreviewButton,
@@ -2526,6 +2542,46 @@ tr.CategoryHeading td {
 	font-size: 11px;
 }
 
+/* Discussion Sorter */
+.DiscussionSorter {
+   float: right;
+   margin-right: 24px;
+   font-size: 11px; 
+}
+.DiscussionSorter:hover {
+   cursor: pointer;
+   background: #f3f3f3;
+}
+.DiscussionSorter .MenuItems { 
+   padding: 0; 
+   width: 130px;
+   border-top: none;
+   border-radius: 0; 
+}
+.DiscussionSorter .Selected {
+   padding: 0 0 0 15px;
+   display: inline-block;
+   width: 115px;
+   border: 1px solid transparent;
+   border-bottom: none;
+}
+.DiscussionSorter .Open .Selected {
+   border: 1px solid #999;
+   border-bottom: none;  
+}
+.DiscussionSorter .SpMenu { 
+   background-position: -32px -20px;
+   height: 8px; 
+   width: 12px; 
+   margin-top: 8px;
+}
+.DiscussionSorter .Flyout:before, .DiscussionSorter .Flyout:after { 
+   border: none; 
+}
+.DiscussionSorter .ToggleFlyout .Flyout { 
+   top: 18px; 
+}
+
 /* ======================================= Blocks */
 .Block {
    line-height: 1;
@@ -2627,6 +2683,9 @@ Obselete in favour of .FilterMenu for style and .ToggleMenu for functionality.
    margin: 0;
    padding: 13px 20px;
 }
+label.B {
+   font-weight: bold;
+}
 .FormWrapper-Condensed {
    padding: 5px;
 }
@@ -2652,7 +2711,6 @@ Obselete in favour of .FilterMenu for style and .ToggleMenu for functionality.
    display: inline;
    font-weight: normal;
    font-size: 95%;
-   color: #555;
 }
 
 .FormWrapper.StructuredForm {
@@ -2681,6 +2739,10 @@ Obselete in favour of .FilterMenu for style and .ToggleMenu for functionality.
    background-repeat: no-repeat;
    background-position: center right;
    padding-right: 24px;
+}
+
+.List.Inline {
+   display: inline;
 }
 
 .List.Inline * {
@@ -3708,7 +3770,7 @@ body.embed .InformMessages {
 	width: 200px;
 }
 .PhotoGrid {
-   line-height: 1;
+   line-height: 32px;
    margin: 2px -2px;
 }
 .PhotoGrid img {
@@ -3718,7 +3780,7 @@ body.embed .InformMessages {
    width: 32px;
 }
 .PhotoGridSmall {
-   line-height: 1;
+   line-height: 24px;
    margin: 1px -1px;
 }
 .PhotoGridSmall img {
@@ -3729,6 +3791,23 @@ body.embed .InformMessages {
 }
 .CategoryPhoto {
    max-height: 64px;
+}
+
+.PhotoGrid .UserPicture {
+   display: inline-block;
+}
+
+.PhotoGrid .UserPicture * {
+   vertical-align: bottom;
+}
+
+.PhotoGrid .Username {
+   display: inline-block;
+   line-height: 32px;
+}
+
+.PhotoGridSmall .Username {
+   line-height: 24px;
 }
 
 /* Reaction Buttons */
@@ -3763,25 +3842,16 @@ body.embed .InformMessages {
 /* === Reaction Sprites === */
 .ReactSprite {
   display: inline-block;
-  width: 14px;
-  height: 14px;
+  width: 16px;
+  height: 16px;
   *margin-right: .3em;
-  line-height: 14px;
-  vertical-align: text-top;
+  line-height: 18px;
+  vertical-align: top;
   background-image: url("images/sprites-14-000000.png");
-  background-position: 14px 14px;
+  background-position: 16px 16px;
   background-repeat: no-repeat;
 }
 
-.ReactLabel {
-   display: inline-block;
-   line-height: 14px;
-   vertical-align: top;
-}
-
-.InProgress .ReactSprite {
-   background-image: none !important;
-}
 .ReactEverything { background-position: -197px -53px; }
 .ReactAwesome { background-position: -269px -6px; }
 .ReactFlag { background-position: -54px -52px; }
@@ -3809,7 +3879,7 @@ body.embed .InformMessages {
 .ReactMessage { background-position: -101px -102px; }
 
 /* Switch to the white icons when hovering over a menuitem sprite */
-.Reactions .MenuItems a:hover .ReactSprite,
+.MenuItems a:hover .ReactSprite,
 .MenuItems a:hover .Sprite {
    background-image: url('http://cdn.vanillaforums.com/images/sprites-14-fff.png');
 }
@@ -3845,4 +3915,37 @@ body.embed .InformMessages {
 }
 .Video.YouTube .VideoPreview:hover:after {
     background-position: 0 0;
+}
+
+/* Media */
+
+.Media {
+  margin: 5px 0 10px;
+}
+.Media, .Media .Media-Body {
+  overflow: hidden;
+  _overflow: visible;
+  zoom: 1;
+}
+.Media .Img {
+  float: left;
+  margin-right: 10px;
+}
+.Media .Img img {
+  display: block;
+}
+.Media .ImgExt {
+  float: right;
+  margin-left: 10px;
+}
+
+.Item h2 + .Media,
+.Item h3 + .Media  {
+   margin-top: 0;
+}
+
+/* Overrides */
+
+.Hidden {
+   display: none;
 }

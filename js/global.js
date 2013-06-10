@@ -1,15 +1,47 @@
 // This file contains javascript that is global to the entire Garden application
+
+
+// Global vanilla library function.
+(function(window, $) {
+
+var Vanilla = function() { };
+
+Vanilla.fn = Vanilla.prototype;
+
+if (!window.console)
+   window.console = { log: function() {} };
+
+// Add a stub for embedding.
+Vanilla.parent = function() {};
+Vanilla.parent.callRemote = function(func, args, success, failure) { console.log("callRemote stub: "+func, args); };
+
+window.Vanilla = Vanilla;
+
+})(window, jQuery);
+
+
+// Stuff to fire on document.ready().
 jQuery(document).ready(function($) {
    if ($.browser.msie) {
       $('body').addClass('MSIE');
    }
    
-   var d = new Date();
-   var clientDate = d.getFullYear()+'-'+(d.getMonth() + 1)+'-'+d.getDate()+' '+d.getHours()+':'+d.getMinutes();
+   var d = new Date()
+   var hourOffset = -Math.round(d.getTimezoneOffset() / 60);
 
    // Set the ClientHour if there is an input looking for it.
-   $('input:hidden[name$=ClientHour]').livequery(function() {
-      $(this).val(clientDate);
+   $('input:hidden[name$=HourOffset]').livequery(function() {
+      $(this).val(hourOffset);
+   });
+   
+   // Ajax/Save the ClientHour if it is different from the value in the db.
+   $('input:hidden[id$=SetHourOffset]').livequery(function() {
+      if (hourOffset != $(this).val()) {
+         $.post(
+            gdn.url('/utility/sethouroffset.json'),
+            { HourOffset: hourOffset, TransientKey: gdn.definition('TransientKey') }
+         );
+      }
    });
    
    // Add "checked" class to item rows if checkboxes are checked within.
@@ -22,16 +54,6 @@ jQuery(document).ready(function($) {
    }
    $('.Item :checkbox').each(checkItems);
    $('.Item :checkbox').change(checkItems);
-
-   // Ajax/Save the ClientHour if it is different from the value in the db.
-   $('input:hidden[id$=SetClientHour]').livequery(function() {
-      if (d.getHours() != $(this).val()) {
-         $.get(
-            gdn.url('/utility/setclienthour'),
-            {'ClientDate': clientDate, 'TransientKey': gdn.definition('TransientKey'), 'DeliveryType': 'BOOL'}
-         );
-      }
-   });
    
    // Hide/Reveal the "forgot your password" form if the ForgotPassword button is clicked.
    $(document).delegate('a.ForgotPassword', 'click', function() {
@@ -53,18 +75,19 @@ jQuery(document).ready(function($) {
    }
    
    // Reveal youtube player when preview clicked.
-   function Youtube(Container) {
-      var $preview = Container.find('.VideoPreview');
-      var $player = Container.find('.VideoPlayer');
-      var width = $preview.width(), height = $preview.height(), videoid = Container.attr('id').replace('youtube-', '');
+   function Youtube($container) {
+      var $preview = $container.find('.VideoPreview');
+      var $player = $container.find('.VideoPlayer');
+      
+      $container.addClass('Open').closest('.ImgExt').addClass('Open');
+      
+      var width = $preview.width(), height = $preview.height(), videoid = $container.attr('id').replace('youtube-', '');
 
+      
+      var html = '<iframe width="'+width+'" height="'+height+'" src="http://www.youtube.com/embed/'+videoid+'?autoplay=1" frameborder="0" allowfullscreen></iframe>';
+      $player.html(html);
+      
       $preview.hide();
-      $player.html('<object width="'+width+'" height="'+height+'">'
-         + '<param name="movie" value="http://www.youtube.com/v/'+videoid+'&amp;hl=en_US&amp;fs=1&amp;autoplay=1"></param>'
-         + '<param name="allowFullScreen" value="true"></param>'
-         + '<param name="allowscriptaccess" value="always"></param>'
-         + '<embed src="http://www.youtube.com/v/'+videoid+'&amp;hl=en_US&amp;fs=1&amp;autoplay=1" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="'+width+'" height="'+height+'"></embed>'
-         + '</object>');
       $player.show();
       
       return false;
@@ -831,7 +854,9 @@ jQuery(document).ready(function($) {
    if (window.location.hash == '') {
       // Jump to the hash if desired.
       if (gdn.definition('LocationHash', 0) != 0) {
-         window.location.hash = gdn.definition('LocationHash');
+         $(window).load(function() {
+            window.location.hash = gdn.definition('LocationHash');
+         });
       }
       if (gdn.definition('ScrollTo', 0) != 0) {
          var scrollTo = $(gdn.definition('ScrollTo'));
@@ -1064,7 +1089,7 @@ jQuery(document).ready(function($) {
       if (message == '')
          message = 'There was an error performing your request. Please try again.';
       
-      gdn.informMessage('<span class="InformSprite Lightbulb Error'+code+'"></span>'+message, 'HasSprite Dismissable AutoDismiss');
+      gdn.informMessage('<span class="InformSprite Lightbulb Error'+code+'"></span>'+message, 'HasSprite Dismissable');
    }
    
 	// Pick up the inform message stack and display it on page load

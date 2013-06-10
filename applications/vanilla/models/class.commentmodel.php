@@ -917,8 +917,13 @@ class CommentModel extends VanillaModel {
          );
          
          // Allow simple fulltext notifications
-         if (C('Vanilla.Activity.ShowCommentBody', FALSE))
+         if (C('Vanilla.Activity.ShowCommentBody', FALSE)) {
             $Activity['Story'] = GetValue('Body', $Fields);
+            $Activity['Format'] = GetValue('Format', $Fields);
+         }
+         
+         // Pass generic activity to events.
+         $this->EventArguments['Activity'] = $Activity;
          
          // Pass generic activity to events.
          $this->EventArguments['Activity'] = $Activity;

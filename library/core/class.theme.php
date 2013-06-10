@@ -31,7 +31,7 @@ class Gdn_Theme {
       Gdn::Controller()->AddAsset($AssetInfo['AssetContainer'], $Asset);
    }
 
-   public static function Breadcrumbs($Data, $HomeLink = TRUE) {
+   public static function Breadcrumbs($Data, $HomeLink = TRUE, $Options = array()) {
       $Format = '<a href="{Url,html}" itemprop="url"><span itemprop="title">{Name,html}</span></a>';
       
       $Result = '';
@@ -41,11 +41,20 @@ class Gdn_Theme {
 
       
       if ($HomeLink) {
-         $Row = array('Name' => $HomeLink, 'Url' => Url('/', TRUE), 'CssClass' => 'CrumbLabel HomeCrumb');
+         $HomeUrl = GetValue('HomeUrl', $Options);
+         if (!$HomeUrl)
+            $HomeUrl = Url('/', TRUE);
+         
+         $Row = array('Name' => $HomeLink, 'Url' => $HomeUrl, 'CssClass' => 'CrumbLabel HomeCrumb');
          if (!is_string($HomeLink))
             $Row['Name'] = T('Home');
          
          array_unshift($Data, $Row);
+      }
+      
+      if (GetValue('HideLast', $Options)) {
+         // Remove the last item off the list.
+         array_pop($Data);
       }
       
       $DefaultRoute = ltrim(GetValue('Destination', Gdn::Router()->GetRoute('DefaultController'), ''), '/');

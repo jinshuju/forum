@@ -82,13 +82,13 @@ jQuery(document).ready(function($) {
          
       postValues += '&' + prefix + 'LastCommentID=' + lastCommentID;
       var action = $(frm).attr('action');
-      if (action.indexOf('?') >= 0)
-         action = action.substr(0, action.indexOf('?'));
+      if (action.indexOf('?') < 0)
+         action += '?';
+      else
+         action += '&';
+      
       if (discussionID > 0) {
-         if (action.substr(-1,1) != '/')
-            action += '/';
-         
-         action += discussionID;
+         action += 'discussionid='+discussionID;
       }
       
       $(frm).find(':submit').attr('disabled', 'disabled');
@@ -185,11 +185,11 @@ jQuery(document).ready(function($) {
                   gdn.definition('LastCommentID', commentID, true);
                   // If adding a new comment, show all new comments since the page last loaded, including the new one.
                   if (gdn.definition('PrependNewComments') == '1') {
-                     $(json.Data).prependTo('ul.Comments');
+                     $(json.Data).prependTo('ul.Comments,.DiscussionTable');
                      $('ul.Comments li:first').effect("highlight", {}, "slow");
                   } else {
-                     $(json.Data).appendTo('ul.Comments');
-                     $('ul.Comments li:last').effect("highlight", {}, "slow");
+                     $(json.Data).appendTo('ul.Comments,.DiscussionTable').effect("highlight", {}, "slow");
+//                     $('ul.Comments li:last,.DiscussionTable li:last').effect("highlight", {}, "slow");
                   }
                }
                // Remove any "More" pager links (because it is typically replaced with the latest comment by this function)
@@ -231,7 +231,7 @@ jQuery(document).ready(function($) {
 
    // Utility function to clear out the comment form
    function clearCommentForm(sender) {
-      var container = $(sender).parents('li.Editing');
+      var container = $(sender).parents('.Editing');
       $(container).removeClass('Editing');
       $('div.Popup,.Overlay').remove();
       var frm = $(sender).parents('div.CommentForm, .EditCommentForm');
@@ -250,7 +250,7 @@ jQuery(document).ready(function($) {
       draftInp.val('');
       frm.find('div.Errors').remove();
       $('div.Information').fadeOut('fast', function() {$(this).remove();});
-      $(frm).trigger('clearCommentForm');
+      $(sender).closest('form').trigger('clearCommentForm');
    }
    
    // Set up paging
@@ -272,10 +272,10 @@ jQuery(document).ready(function($) {
    // Edit comment
    $('a.EditComment').livequery('click', function() {
       var btn = this;
-      var container = $(btn).parents('li.ItemComment');
+      var container = $(btn).closest('.ItemComment');
       $(container).addClass('Editing');
       var parent = $(container).find('div.Comment');
-      var msg = $(parent).find('div.Message');
+      var msg = $(parent).find('div.Message').first();
       $(parent).find('div.Meta span:last').after('<span class="TinyProgress">&#160;</span>');
       if ($(msg).is(':visible')) {
          $.ajax({
@@ -308,16 +308,21 @@ jQuery(document).ready(function($) {
       return false;
    });
    // Reveal the original message when cancelling an in-place edit.
-   $('.Comment .Cancel a').livequery('click', function() {
+   $('.Comment .Cancel a,.Comment a.Cancel').livequery('click', function() {
       var btn = this;
-      $(btn).parents('.Comment').find('div.Message').show();
-      $(btn).parents('.CommentForm, .EditCommentForm').remove();
+      var $container = $(btn).closest('.ItemComment');
+      
+      $(btn).closest('.Comment').find('div.Message').show();
+      $(btn).closest('.CommentForm, .EditCommentForm').remove();
+      $container.removeClass('Editing');
       return false;
    });
 
    // Delete comment
    $('a.DeleteComment').popup({
       confirm: true,
+      confirmHeading: gdn.definition('ConfirmDeleteCommentHeading', 'Delete Comment'),
+      confirmText: gdn.definition('ConfirmDeleteCommentText', 'Are you sure you want to delete this comment?'),
       followConfirm: false,
       deliveryType: 'BOOL', // DELIVERY_TYPE_BOOL
       afterConfirm: function(json, sender) {

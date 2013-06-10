@@ -145,6 +145,7 @@ class Gdn_Form extends Gdn_Pluggable {
       $this->SetValue('Format', $Attributes['format']);
       
       $this->EventArguments['Table'] = GetValue('Table', $Attributes);
+      $this->EventArguments['Column'] = $Column;
       
       $this->FireEvent('BeforeBodyBox');
       
@@ -270,6 +271,8 @@ class Gdn_Form extends Gdn_Pluggable {
       $IncludeNull = GetValue('IncludeNull', $Options);
       if ($IncludeNull === TRUE)
          $Return .= '<option value="">'.T('Select a category...').'</option>';
+      elseif (is_array($IncludeNull))
+         $Return .= "<option value=\"{$IncludeNull[0]}\">{$IncludeNull[1]}</option>\n";
       elseif ($IncludeNull)
          $Return .= "<option value=\"\">$IncludeNull</option>\n";
       elseif (!$HasValue)
@@ -302,8 +305,8 @@ class Gdn_Form extends Gdn_Pluggable {
             
             $Name = htmlspecialchars(GetValue('Name', $Category, 'Blank Category Name'));
             if ($Depth > 1) {
-               $Name = str_pad($Name, strlen($Name)+$Depth-1, ' ', STR_PAD_LEFT);
-               $Name = str_replace(' ', '&#160;', $Name);
+               $Name = str_repeat('&#160;', 4*($Depth-1)).$Name;
+//               $Name = str_replace(' ', '&#160;', $Name);
             }
                
             $Return .= '>' . $Name . "</option>\n";
@@ -956,6 +959,24 @@ class Gdn_Form extends Gdn_Pluggable {
       return $Return;
    }
    
+   public function ErrorString() {
+      $Return = '';
+      if (is_array($this->_ValidationResults) && count($this->_ValidationResults) > 0) {
+         foreach($this->_ValidationResults as $FieldName => $Problems) {
+            $Count = count($Problems);
+            for($i = 0; $i < $Count; ++$i) {
+               if (substr($Problems[$i], 0, 1) == '@')
+                  $Return .= rtrim(substr($Problems[$i], 1), '.').'. ';
+               else
+                  $Return .= rtrim(sprintf(
+                     T($Problems[$i]),
+                     T($FieldName)), '.').'. ';
+            }
+         }
+      }
+      return trim($Return);
+   }
+   
    /**
     * Encodes the string in a php-form safe-encoded format.
     *
@@ -1149,6 +1170,17 @@ class Gdn_Form extends Gdn_Pluggable {
          $Return .= '<div class="TextBoxWrapper">';
       }
       
+      if (strtolower($Type) == 'checkbox') {
+         if (isset($Attributes['nohidden'])) {
+            unset($Attributes['nohidden']);
+         } else {
+            $Return .= '<input type="hidden" name="Checkboxes[]" value="'.
+               (substr($FieldName, -2) === '[]' ? substr($FieldName, 0, -2) : $FieldName).
+                '" />';
+         }
+      }
+      
+      
       $Return .= '<input type="' . $Type . '"';
       $Return .= $this->_IDAttribute($FieldName, $Attributes);
       if ($Type == 'file') $Return .= Attribute('name',
@@ -1160,12 +1192,7 @@ class Gdn_Form extends Gdn_Pluggable {
       $Return .= $this->_ValueAttribute($FieldName, $Attributes);
       $Return .= $this->_AttributesToString($Attributes);
       $Return .= ' />';
-      if (strtolower($Type) == 'checkbox') {
-         if (substr($FieldName, -2) == '[]') $FieldName = substr($FieldName, 0, -2);
-
-         $Return .= '<input type="hidden" name="Checkboxes[]" value="' . $FieldName .
-             '" />';
-      }
+   
       
       // Append validation error message
       if ($ShowErrors && ArrayValueI('InlineErrors', $Attributes, TRUE))  

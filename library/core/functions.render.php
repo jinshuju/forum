@@ -37,8 +37,17 @@ if (!function_exists('BigPlural')) {
 }
 
 if (!function_exists('Bullet')):
-   function Bullet() {
-      return '<span class="Bullet">&bull;</span>';
+   /**
+    * Return a bullet character in html.
+    * @param string $Pad A string used to pad either side of the bullet.
+    * @return string
+    * 
+    * @changes
+    *    2.2 Added the $Pad parameter.
+    */
+   function Bullet($Pad = '') {
+      //·
+      return $Pad.'<span class="Bullet">&middot;</span>'.$Pad;
    }
 endif;
 
@@ -258,6 +267,8 @@ function CssClass($Row, $InList = TRUE) {
    // Category list classes
    if (array_key_exists('UrlCode', $Row))
       $CssClass .= ' Category-'.Gdn_Format::AlphaNumeric($Row['UrlCode']);
+   if (GetValue('CssClass', $Row))
+      $CssClass .= ' Item-'.$Row['CssClass'];
 
    if (array_key_exists('Depth', $Row))
       $CssClass .= " Depth{$Row['Depth']} Depth-{$Row['Depth']}";
@@ -314,6 +325,35 @@ function CssClass($Row, $InList = TRUE) {
 
    return trim($CssClass);
 }
+endif;
+
+if (!function_exists('DateUpdated')):
+
+function DateUpdated($Row, $Wrap = NULL) {
+   $Result = '';
+   $DateUpdated = GetValue('DateUpdated', $Row);
+   $UpdateUserID = GetValue('UpdateUserID', $Row);
+   
+   if ($DateUpdated) {
+      $Result = '';
+      
+      $UpdateUser = Gdn::UserModel()->GetID($UpdateUserID);
+      if ($UpdateUser)
+         $Title = sprintf(T('Edited %s by %s.'), Gdn_Format::DateFull($DateUpdated), GetValue('Name', $UpdateUser));
+      else
+         $Title = sprintf(T('Edited %s.'), Gdn_Format::DateFull($DateUpdated));
+      
+      $Result = ' <span title="'.htmlspecialchars($Title).'" class="DateUpdated">'.
+              sprintf(T('edited %s'), Gdn_Format::Date($DateUpdated)).
+              '</span> ';
+      
+      if ($Wrap)
+         $Result = $Wrap[0].$Result.$Wrap[1];
+   }
+   
+   return $Result;
+}
+   
 endif;
 
 /**
@@ -476,7 +516,7 @@ if (!function_exists('Img')) {
       if ($Attributes == '')
          $Attributes = array();
 
-      if ($Image != '' && substr($Image, 0, 7) != 'http://' && substr($Image, 0, 8) != 'https://')
+      if (!IsUrl($Image))
          $Image = SmartAsset($Image, $WithDomain);
 
       return '<img src="'.$Image.'"'.Attribute($Attributes).' />';
@@ -566,6 +606,95 @@ if (!function_exists('PluralTranslate')) {
    }
 }
 
+if (!function_exists('SearchExcerpt')):
+   
+function SearchExcerpt($PlainText, $SearchTerms, $Length = 200, $Mark = true) {
+   if (empty($SearchTerms))
+      return substrWord($PlainText, 0, $Length);
+   
+   if (is_string($SearchTerms))
+      $SearchTerms = preg_split('`[\s|-]+`i', $SearchTerms);
+   
+   // Split the string into lines.
+   $Lines = explode("\n", $PlainText);
+   // Find the first line that includes a search term.
+   foreach ($Lines as $i => &$Line) {
+      $Line = trim($Line);
+      if (!$Line)
+         continue;
+      
+      foreach ($SearchTerms as $Term) {
+         if (($Pos = mb_stripos($Line, $Term)) !== FALSE) {
+            $Line = substrWord($Line, $Term, $Length);
+            
+//            if ($Pos + mb_strlen($Term) > $Length) {
+//               $St = -(strlen($Line) - ($Pos - $Length / 4));
+//               $Pos2 = strrpos($Line, ' ', $St);
+//               if ($Pos2 !== FALSE)
+//                  $Line = '…'.substrWord($Line, $Pos2, $Length, "!!!");
+//               else
+//                  $Line = '…!'.mb_substr($Line, $St, $Length);
+//            } else {
+//               $Line = substrWord($Line, 0, $Length, '---');
+//            }
+            
+            return MarkString($SearchTerms, $Line);
+         }
+      }
+   }
+   
+   // No line was found so return the first non-blank line.
+   foreach ($Lines as $Line) {
+      if ($Line)
+         return SliceString($Line, $Length);
+   }
+}
+
+function substrWord($str, $start, $length, $fix = '…') {
+   // If we are offsetting on a word then find it.
+   if (is_string($start)) {
+      $pos = mb_stripos($str, $start);
+      
+      $p = $pos + strlen($start);
+      
+      if ($pos !== false && (($pos + strlen($start)) <= $length))
+         $start = 0;
+      else
+         $start = $pos - $length / 4;
+   }
+   
+   // Find the word break from the offset.
+   if ($start > 0) {
+      $pos = mb_strpos($str, ' ', $start);
+      if ($pos !== false)
+         $start = $pos;
+   } elseif ($start < 0) {
+      $pos = mb_strrpos($str, ' ', $start);
+      if ($pos !== false)
+         $start = $pos;
+      else
+         $start = 0;
+   }
+   
+   $len = strlen($str);
+   
+   if ($start + $length > $len) {
+      if ($length - $start <= 0)
+         $start = 0;
+      else {
+         // Zoom the offset back a bit.
+         $pos = mb_strpos($str, ' ', max(0, $len - $length));
+         if ($pos === false)
+            $pos = $len - $length;
+      }
+   }
+   
+   $result = mb_substr($str, $start, $length);
+   return $result;
+}
+
+endif;
+
 /**
  * Takes a user object, and writes out an achor of the user's name to the user's profile.
  */
@@ -591,6 +720,8 @@ if (!function_exists('UserAnchor')) {
           'class' => $CssClass,
           'rel' => GetValue('Rel', $Options)
           );
+      if (isset($Options['title']))
+         $Attributes['title'] = $Options['title'];
       $UserUrl = UserUrl($User,$Px);
       return '<a href="'.htmlspecialchars(Url($UserUrl)).'"'.Attribute($Attributes).'>'.$Text.'</a>';
    }
@@ -662,7 +793,7 @@ if (!function_exists('UserPhoto')) {
          $Photo = UserPhotoDefaultUrl($User, $ImgClass);
 
       if ($Photo) {
-         if (!isUrl($Photo, '//')) {
+         if (!isUrl($Photo)) {
             $PhotoUrl = Gdn_Upload::Url(ChangeBasename($Photo, 'n%s'));
          } else {
             $PhotoUrl = $Photo;
@@ -770,6 +901,16 @@ if (!function_exists('RegisterUrl')) {
 
 if (!function_exists('SignInUrl')) {
    function SignInUrl($Target = '') {
+      // See if there is a default authentication provider.
+//      $Provider = Gdn_AuthenticationProviderModel::GetDefault();
+//      if ($Provider) {
+//         $SignInUrl = $Provider['SignInUrl'];
+//         if ($SignInUrl) {
+//            $SignInUrl = str_ireplace('{target}', rawurlencode($Target), $SignInUrl);
+//            return $SignInUrl;
+//         }
+//      }
+         
       return '/entry/signin'.($Target ? '?Target='.urlencode($Target) : '');
    }
 }
@@ -787,6 +928,27 @@ if (!function_exists('SignOutUrl')) {
       }
       
       return '/entry/signout?TransientKey='.urlencode(Gdn::Session()->TransientKey()).($Target ? '&Target='.urlencode($Target) : '');
+   }
+}
+
+if (!function_exists('SocialSignInButton')) {
+   function SocialSignInButton($Name, $Url, $Type = 'button', $Attributes = array()) {
+      TouchValue('title', $Attributes, sprintf(T('Sign In with %s'), $Name));
+      $Title = $Attributes['title'];
+      
+      switch ($Type) {
+         case 'icon':
+            $Result = Anchor('<span class="Icon"></span>',
+               $Url, 'SocialIcon SocialIcon-'.$Name, $Attributes);
+            break;
+         case 'button':
+         default:
+            $Result = Anchor('<span class="Icon"></span><span class="Text">'.$Title.'</span>',
+               $Url, 'SocialIcon SocialIcon-'.$Name.' HasText', $Attributes);
+            break;
+      }
+      
+      return $Result;
    }
 }
 

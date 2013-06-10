@@ -16,7 +16,7 @@ echo $this->Form->Errors();
 		<?php
 		echo Wrap(T('Category Url:'), 'strong');
 		echo ' ';
-		echo Gdn::Request()->Url('category', TRUE);
+		echo Gdn::Request()->Url('categories', TRUE);
 		echo '/';
 		echo Wrap(htmlspecialchars($this->Form->GetValue('UrlCode')));
 		echo $this->Form->TextBox('UrlCode');
@@ -57,9 +57,22 @@ echo $this->Form->Errors();
    ?>
    <li>
       <?php
+         echo $this->Form->Label('Display As', 'DisplayAs');
+         echo $this->Form->DropDown('DisplayAs', array('Default' => 'Default', 'Categories' => 'Categories', 'Discussions' => 'Discussions'));
+      ?>
+   </li>
+   <li>
+      <?php
       echo $this->Form->CheckBox('HideAllDiscussions', 'Hide from the recent discussions page.');
       ?>
    </li>
+   <?php if ($this->ShowCustomPoints): ?>
+   <li>
+      <?php
+      echo $this->Form->CheckBox('CustomPoints', 'Track points for this category separately.');
+      ?>
+   </li>
+   <?php endif; ?>
    <li>
       <?php
       echo $this->Form->CheckBox('Archived', 'This category is archived.');

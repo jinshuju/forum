@@ -184,16 +184,55 @@ function WriteDiscussion($Discussion, &$Sender, &$Session) {
                echo '</span> ';
             }
          
-            if (C('Vanilla.Categories.Use') && $Category)
+            if ($Sender->Data('_ShowCategoryLink', TRUE) && C('Vanilla.Categories.Use') && $Category)
                echo Wrap(Anchor(htmlspecialchars($Discussion->Category), CategoryUrl($Discussion->CategoryUrlCode)), 'span', array('class' => 'MItem Category '.$Category['CssClass']));
                
             $Sender->FireEvent('DiscussionMeta');
          ?>
       </div>
    </div>
+   <?php $Sender->FireEvent('AfterDiscussionContent'); ?>
 </li>
 <?php
 }
+endif;
+
+if (!function_exists('DiscussionSorter')):
+
+function WriteDiscussionSorter($Selected = NULL, $Options = NULL) {
+   if ($Selected === NULL) {
+      $Selected = Gdn::Session()->GetPreference('Discussions.SortField', 'DateLastComment');
+   }
+   $Selected = StringBeginsWith($Selected, 'd.', TRUE, TRUE);
+   
+   $Options = array(
+      'DateLastComment' => T('Sort by Last Comment', 'by Last Comment'),
+      'DateInserted' => T('Sort by Start Date', 'by Start Date')
+   );
+   
+   ?>
+   <span class="ToggleFlyout SelectFlyout">
+   <?php
+      if (isset($Options[$Selected])) {
+         $Text = $Options[$Selected];
+      } else {
+         $Text = reset($Options);
+      }
+      echo Wrap($Text.' '.Sprite('', 'DropHandle'), 'span', array('class' => 'Selected'));
+   ?>
+   <div class="Flyout MenuItems">
+      <ul>
+         <?php 
+            foreach ($Options as $SortField => $SortText) {
+               echo Wrap(Anchor($SortText, '#', array('class' => 'SortDiscussions', 'data-field' => $SortField)), 'li'); 
+            }
+         ?>
+      </ul>
+   </div>
+   </span>
+   <?php
+}
+
 endif;
 
 if (!function_exists('WriteMiniPager')):
@@ -256,7 +295,7 @@ function Tag($Discussion, $Column, $Code, $CssClass = FALSE) {
    if (!$CssClass)
       $CssClass = "Tag-$Code";
 
-   return ' <span class="Tag '.$CssClass.'">'.T($Code).'</span> ';
+   return ' <span class="Tag '.$CssClass.'" title="'.htmlspecialchars(T($Code)).'">'.T($Code).'</span> ';
 }
 endif;
 
@@ -383,7 +422,8 @@ function OptionsList($Discussion) {
       if ($Session->CheckPermission('Vanilla.Discussions.Delete', TRUE, 'Category', $Discussion->PermissionCategoryID))
          $Sender->Options .= '<li>'.Anchor(T('Delete'), '/discussion/delete?discussionid='.$Discussion->DiscussionID, 'DeleteDiscussion Popup') . '</li>';
       
-      // Allow plugins to add options
+      // Allow plugins to add options.
+      $Sender->EventArguments['Discussion'] = $Discussion;
       $Sender->FireEvent('DiscussionOptions');
       
       if ($Sender->Options != '') {
