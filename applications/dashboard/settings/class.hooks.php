@@ -94,7 +94,7 @@ class DashboardHooks implements Gdn_IPlugin {
             $Sender->AddDefinition('RemoteUrl', $RemoteUrl);
 
          // Force embedding?
-         if (!IsSearchEngine() && !IsMobile()) {
+         if (!IsSearchEngine() && !IsMobile() && strtolower($Sender->ControllerName) != 'entry') {
             $Sender->AddDefinition('ForceEmbedForum', C('Garden.Embed.ForceForum') ? '1' : '0');
             $Sender->AddDefinition('ForceEmbedDashboard', C('Garden.Embed.ForceDashboard') ? '1' : '0');
          }
@@ -205,8 +205,11 @@ class DashboardHooks implements Gdn_IPlugin {
     * @param string $Target The url to redirect to after sso.
     */
    public function RootController_SSO_Create($Sender, $Target = '') {
-      if (!$Target)
-         $Target = '/';
+      if (!$Target) {
+         $Target = $Sender->Request->Get('redirect');
+         if (!$Target)
+            $Target = '/';
+      }
       
       // TODO: Make sure the target is a safe redirect.
       

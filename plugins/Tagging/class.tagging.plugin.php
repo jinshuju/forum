@@ -11,6 +11,7 @@
  *  1.6     Add tag permissions
  *  1.6.1   Add tag permissions to UI
  *  1.7     Change the styling of special tags and prevent them from being edited/deleted.
+ *  1.8     Add show existing tags
  * 
  * @author Mark O'Sullivan <mark@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
@@ -21,7 +22,7 @@
 $PluginInfo['Tagging'] = array(
    'Name' => 'Tagging',
    'Description' => 'Users may add tags to each discussion they create. Existing tags are shown in the sidebar for navigation by tag.',
-   'Version' => '1.7',
+   'Version' => '1.8.2',
    'SettingsUrl' => '/dashboard/settings/tagging',
    'SettingsPermission' => 'Garden.Settings.Manage',
    'Author' => "Mark O'Sullivan",
@@ -440,10 +441,33 @@ class TaggingPlugin extends Gdn_Plugin {
     * @param Gdn_Controller $Sender
     */
    public function PostController_AfterDiscussionFormOptions_Handler($Sender) {
-      if (in_array($Sender->RequestMethod, array('discussion', 'editdiscussion', 'question'))) {         
+      if (in_array($Sender->RequestMethod, array('discussion', 'editdiscussion', 'question'))) {
+         // Setup, get most popular tags
+         $TagModel = new TagModel;
+         $Tags = $TagModel->GetWhere(array('Type' => NULL), 'CountDiscussions', 'desc', C('Plugins.Tagging.ShowLimit', 100))->Result(DATASET_TYPE_ARRAY);
+         $TagsHtml = (count($Tags)) ? '' : T('No tags have been created yet.');
+         $ShowTags = array();
+         if (is_array($Tags)) {
+            foreach ($Tags as $Tag) {
+               $ShowTags[] = $Tag['Name'];
+            }
+            unset($Tags);
+            asort($ShowTags);
+         }
+
          echo '<div class="Form-Tags P">';
+
+         // Tag text box
          echo $Sender->Form->Label('Tags', 'Tags');
          echo $Sender->Form->TextBox('Tags', array('maxlength' => 255));
+
+         // Available tags
+         echo Wrap(Anchor(T('Show popular tags'), '#'), 'span', array('class' => 'ShowTags'));
+         foreach ($ShowTags as $Tag) {
+            $TagsHtml .= Anchor($Tag, '#', 'AvailableTag', array('data-name' => $Tag)).' ';
+         }
+         echo Wrap($TagsHtml, 'div', array('class' => 'Hidden AvailableTags'));
+
          echo '</div>';
       }
    }
@@ -452,8 +476,7 @@ class TaggingPlugin extends Gdn_Plugin {
     * Add javascript to the post/edit discussion page so that tagging autocomplete works.
     */
    public function PostController_Render_Before($Sender) {
-      $Sender->AddCSSFile('token-input.css', 'plugins/Tagging');
-      $Sender->AddJsFile('jquery.tokeninput.vanilla.js', 'plugins/Tagging');
+      $Sender->AddJsFile('jquery.tokeninput.js');
       $Sender->AddJsFile('tagging.js', 'plugins/Tagging');
       $Sender->AddDefinition('PluginsTaggingAdd', Gdn::Session()->CheckPermission('Plugins.Tagging.Add'));
       $Sender->AddDefinition('PluginsTaggingSearchUrl', Gdn::Request()->Url('plugin/tagsearch'));

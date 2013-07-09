@@ -337,7 +337,7 @@ class CategoryModel extends Gdn_Model {
       if ($CategoryID) {
          $Category = self::Categories($CategoryID);
          if ($Category)
-            $CategoryID = $Category['PointsCategoryID'];
+            $CategoryID = GetValue('PointsCategoryID', $Category);
          else
             $CategoryID = 0;
       }
@@ -991,6 +991,28 @@ class CategoryModel extends Gdn_Model {
    }
    
    /**
+    * A simplified version of GetWhere that polls the cache instead of the database.
+    * @param array $Where
+    * @return array
+    * @since 2.2.2
+    */
+   public function GetWhereCache($Where) {
+      $Result = array();
+      
+      foreach (self::Categories() as $Index => $Row) {
+         foreach ($Where as $Column => $Value) {
+            $RowValue = GetValue($Column, $Row, NULL);
+            
+            if ($RowValue == $Value || (is_array($Value) && in_array($RowValue, $Value))) {
+               $Result[$Index] = $Row;
+            }
+         }
+      }
+      
+      return $Result;
+   }
+   
+   /**
     * Check whether category has any children categories.
     * 
     * @since 2.0.0
@@ -1053,7 +1075,8 @@ class CategoryModel extends Gdn_Model {
       if ($Root) {
          $Root = (array)$Root;
          // Make the tree out of this category as a subtree.
-         $Result = self::_MakeTreeChildren($Root, $Categories, -$Root['Depth']);
+         $DepthAdjust = C('Vanilla.Categories.DoHeadings') ? -$Root['Depth'] : 0;
+         $Result = self::_MakeTreeChildren($Root, $Categories, $DepthAdjust);
       } else {
          // Make a tree out of all categories.
          foreach ($Categories as $Category) {
@@ -1067,7 +1090,9 @@ class CategoryModel extends Gdn_Model {
       return $Result;
    }
    
-   protected static function _MakeTreeChildren($Category, $Categories, $DepthAdj = -1) {
+   protected static function _MakeTreeChildren($Category, $Categories, $DepthAdj = null) {
+      if (is_null($DepthAdj))
+         $DepthAdjust = C('Vanilla.Categories.DoHeadings') ? -1 : 0;
       $Result = array();
       foreach ($Category['ChildIDs'] as $ID) {
          if (!isset($Categories[$ID]))

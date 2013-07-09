@@ -656,8 +656,11 @@ jQuery(document).ready(function($) {
    
    // Always find new button bars and handle their events
    $('.ButtonBar').livequery(function(){
-      var TextArea = $(this).closest('form').find('div.TextBoxWrapper textarea')[0];
-      ButtonBar.AttachTo(TextArea);
+      var TextAreas = $(this).closest('form').find('div.TextBoxWrapper textarea');
+      $.each(TextAreas, function(i,TextArea){
+         if ($(TextArea).hasClass('BodyBox'))
+            ButtonBar.AttachTo(TextArea);
+      });
    });
    
 });
