@@ -32,7 +32,8 @@ class AssetModel extends Gdn_Model {
       $this->EventArguments['ETag'] = $ETag;
       $this->FireEvent('BeforeServeCss');
       
-      header_remove('Set-Cookie');
+      if (function_exists('header_remove'))
+         header_remove('Set-Cookie');
       header("Content-Type: text/css");
       if (!in_array($Basename, array('Style', 'Admin'))) {
          header("HTTP/1.0 404", TRUE, 404);
@@ -156,7 +157,7 @@ class AssetModel extends Gdn_Model {
             break;
       }
 		
-      $this->FireEvent('AfterGetCssFiles');
+		$this->FireEvent('AfterGetCssFiles');
       
       // Hunt the css files down.
       $Paths = array();
@@ -252,7 +253,7 @@ class AssetModel extends Gdn_Model {
          $Data[strtolower("{$Info['Index']}-app-{$Info['Version']}")] = TRUE;
       }
       
-      $Info = Gdn::ThemeManager()->EnabledThemeInfo();
+      $Info = Gdn::ThemeManager()->GetThemeInfo(Gdn::ThemeManager()->CurrentTheme());
       if (!empty($Info)) {
          $Version = GetValue('Version', $Info, 'v0');
          $Data[strtolower("{$Info['Index']}-theme-{$Version}")] = TRUE;

@@ -81,6 +81,10 @@ class DiscussionController extends VanillaController {
       $this->Permission('Vanilla.Discussions.View', TRUE, 'Category', $this->Discussion->PermissionCategoryID);
       $this->SetData('CategoryID', $this->CategoryID = $this->Discussion->CategoryID, TRUE);
       
+      if (strcasecmp(GetValue('Type', $this->Discussion), 'redirect') === 0) {
+         $this->RedirectDiscussion($this->Discussion);
+      }
+      
       $Category = CategoryModel::Categories($this->Discussion->CategoryID);
       $this->SetData('Category', $Category);
       
@@ -132,7 +136,7 @@ class DiscussionController extends VanillaController {
       $this->SetData('_LatestItem', $LatestItem);
       
       // Set the canonical url to have the proper page title.
-      $this->CanonicalUrl(DiscussionUrl($this->Discussion, PageNumber($this->Offset, $Limit, FALSE)));
+      $this->CanonicalUrl(DiscussionUrl($this->Discussion, PageNumber($this->Offset, $Limit, 0, FALSE)));
       
 //      Url(ConcatSep('/', 'discussion/'.$this->Discussion->DiscussionID.'/'. Gdn_Format::Url($this->Discussion->Name), PageNumber($this->Offset, $Limit, TRUE, Gdn::Session()->UserID != 0)), TRUE), Gdn::Session()->UserID == 0);
       
@@ -470,7 +474,7 @@ class DiscussionController extends VanillaController {
       $this->Render();         
    }
    
-   protected function SendOptions($Discussion) {
+   public function SendOptions($Discussion) {
       require_once $this->FetchViewLocation('helper_functions', 'Discussion');
       ob_start();
       WriteDiscussionOptions($Discussion);
@@ -847,6 +851,18 @@ body { background: transparent !important; }
       
       $this->FireEvent('BeforeDiscussionRender');
       $this->Render();
+   }
+   
+   /**
+    * Redirect to the url specified by the discussion.
+    * @param array|object $Discussion
+    */
+   protected function RedirectDiscussion($Discussion) {
+      $Body = Gdn_Format::To(GetValue('Body', $Discussion), GetValue('Format', $Discussion));
+      if (preg_match('`href="([^"]+)"`i', $Body, $Matches)) {
+         $Url = $Matches[1];
+         Redirect($Url, 301);
+      }
    }
    
    /**

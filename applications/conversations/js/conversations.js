@@ -62,6 +62,11 @@ jQuery(document).ready(function($) {
                   if (target.offset()) {
                      $('html,body').animate({scrollTop: target.offset().top}, 'fast');
                   }
+
+                  // Let listeners know that the message was added.
+                  $(document).trigger('MessageAdded');
+                  $(frm).triggerHandler('complete');
+
                   gdn.inform(json);
                }
             },
@@ -82,21 +87,36 @@ jQuery(document).ready(function($) {
       $('div.Popup').remove();
       var frm = $('#Form_ConversationMessage');
       frm.find('textarea').val('');
+      frm.trigger('clearCommentForm');
       frm.find('div.Errors').remove();
       $('div.Information').fadeOut('fast', function() { $(this).remove(); });
    }
    
    // Enable multicomplete on selected inputs
-   $('.MultiComplete').livequery(function() {
-      $(this).autocomplete(
-         gdn.url('/dashboard/user/autocomplete/'),
-         {
+   $('.MultiComplete').each(function() {
+      /// Author tag token input.
+        var $author = $(this);
+
+        var author = $author.val();
+        if (author && author.length) {
+            author = author.split(",");
+            for (i = 0; i < author.length; i++) {
+                author[i] = { id: i, name: author[i] };
+            }
+        } else {
+            author = [];
+        }
+
+        $author.tokenInput(gdn.url('/user/tagsearch'), {
+            hintText: gdn.definition("TagHint", "Start to type..."),
+            tokenValue: 'name',
+            searchingText: '', // search text gives flickery ux, don't like
+            searchDelay: 300,
             minChars: 1,
-            multiple: true,
-            scrollHeight: 220,
-            selectFirst: true
-         }
-      ).autogrow();
+            maxLength: 25,
+            prePopulate: author,
+            animateDropdown: false
+        });
    });
    
    $('#Form_AddPeople :submit').click(function() {

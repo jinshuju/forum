@@ -119,7 +119,7 @@ class ProfileController extends Gdn_Controller {
       $UserID = $this->User->UserID;
       $Username = $this->User->Name;
       
-      $this->_SetBreadcrumbs(T('Activity'), '/profile/activity');
+      $this->_SetBreadcrumbs(T('Activity'), UserUrl($this->User, '', 'activity'));
       
       $this->SetTabView('Activity');
       $Comment = $this->Form->GetFormValue('Comment');
@@ -211,7 +211,7 @@ class ProfileController extends Gdn_Controller {
       $this->Permission('Garden.SignIn.Allow');
       $this->GetUserInfo($UserReference, $Username, '', TRUE);
       $UserID = GetValueR('User.UserID', $this);
-      $this->_SetBreadcrumbs(T('Social'), '/profile/connections');
+      $this->_SetBreadcrumbs(T('Social'), UserUrl($this->User, '', 'connections'));
       
       $PModel = new Gdn_AuthenticationProviderModel();
       $Providers = $PModel->GetProviders();
@@ -303,23 +303,35 @@ class ProfileController extends Gdn_Controller {
       $UserID = GetValueR('User.UserID', $this);
       $Settings = array();
       
-      // Decide if they have ability to edit the username
-      $this->CanEditUsername = C("Garden.Profile.EditUsernames");
-      
-      if ($this->CanEditUsername < 0)
-         $this->CanEditUsername = FALSE;
-      else
-         $this->CanEditUsername = $this->CanEditUsername || Gdn::Session()->CheckPermission('Garden.Users.Edit');
-      
-      $this->CanEditEmail = C('Garden.Profile.EditEmails', TRUE);
-      
-      if ($this->CanEditEmail < 0)
-         $this->CanEditEmail = FALSE;
-      else
-         $this->CanEditEmail = $this->CanEditEmail || Gdn::Session()->CheckPermission('Garden.Users.Edit');
-         
+      // Set up form
       $User = Gdn::UserModel()->GetID($UserID, DATASET_TYPE_ARRAY);
       $this->Form->SetModel(Gdn::UserModel());
+      $this->Form->SetData($User);
+      
+      // Decide if they have ability to edit the username
+      $CanEditUsername = (bool)C("Garden.Profile.EditUsernames") || Gdn::Session()->CheckPermission('Garden.Users.Edit');
+      $this->SetData('_CanEditUsername', $CanEditUsername);
+      
+      // Decide if they have ability to edit the email
+      $CanEditEmail = (
+              (bool)C('Garden.Profile.EditEmails', TRUE) && 
+              !UserModel::NoEmail() && 
+              $UserID == Gdn::Session()->UserID
+           ) || (
+              Gdn::Session()->CheckPermission('Garden.Users.Edit') && 
+              Gdn::Session()->CheckPermission('Garden.PersonalInfo.View')
+           );
+      $this->SetData('_CanEditEmail', $CanEditEmail);
+      
+      // Decide if they have ability to confirm users
+      $Confirmed = (bool)GetValueR('User.Confirmed', $this);
+      $CanConfirmEmail = (
+              UserModel::RequireConfirmEmail() &&
+              Gdn::Session()->CheckPermission('Garden.Users.Edit') && 
+              Gdn::Session()->CheckPermission('Garden.PersonalInfo.View'));
+      $this->SetData('_CanConfirmEmail', $CanConfirmEmail);
+      $this->SetData('_EmailConfirmed', $Confirmed);
+      $this->Form->SetValue('ConfirmEmail', (int)$Confirmed);
       
       // Define gender dropdown options
       $this->GenderOptions = array(
@@ -328,15 +340,13 @@ class ProfileController extends Gdn_Controller {
          'f' => T('Female')
       );
       
-      $this->Form->SetData($User);
-      
       $this->FireEvent('BeforeEdit');
       
       // If seeing the form for the first time...
       if ($this->Form->IsPostBack()) {
          $this->Form->SetFormValue('UserID', $UserID);
          
-         if (!$this->CanEditUsername)
+         if (!$CanEditUsername)
             $this->Form->SetFormValue("Name", $User['Name']);
          else {
             $UsernameError = T('UsernameError', 'Username can only contain letters, numbers, underscores, and must be between 3 and 20 characters long.');
@@ -379,6 +389,13 @@ class ProfileController extends Gdn_Controller {
             }
          }
          
+         // Allow mods to confirm emails
+         $this->Form->RemoveFormValue('Confirmed');
+         $Confirmation = $this->Form->GetFormValue('ConfirmEmail', null);
+         $Confirmation = !is_null($Confirmation) ? (bool)$Confirmation : null;
+         
+         if ($CanConfirmEmail && is_bool($Confirmation))
+            $this->Form->SetFormValue('Confirmed', (int)$Confirmation);
          
          if ($this->Form->Save($Settings) !== FALSE) {
             $User = Gdn::UserModel()->GetID($UserID, DATASET_TYPE_ARRAY);
@@ -387,7 +404,7 @@ class ProfileController extends Gdn_Controller {
             $this->InformMessage(Sprite('Check', 'InformSprite').T('Your changes have been saved.'), 'Dismissable AutoDismiss HasSprite');
          }
          
-         if (!$this->CanEditEmail)
+         if (!$CanEditEmail)
             $this->Form->SetFormValue("Email", $User['Email']);
          
       }
@@ -703,7 +720,7 @@ class ProfileController extends Gdn_Controller {
          $this->DeliveryType(DELIVERY_TYPE_ALL);
 
       $this->Title(T('Change Picture'));
-      $this->_SetBreadcrumbs(T('Change My Picture'), '/profile/picture');
+      $this->_SetBreadcrumbs(T('Change My Picture'), UserUrl($this->User, '', 'picture'));
       $this->Render();
    }
    
@@ -765,7 +782,7 @@ class ProfileController extends Gdn_Controller {
       );
       
       // Allow email notification of applicants (if they have permission & are using approval registration)
-      if (CheckPermission('Garden.Applicants.Manage') && C('Garden.Registration.Method') == 'Approval')
+      if (CheckPermission('Garden.Users.Approve') && C('Garden.Registration.Method') == 'Approval')
          $this->Preferences['Notifications']['Email.Applicant'] = array(T('NotifyApplicant', 'Notify me when anyone applies for membership.'), 'Meta');
       
       $this->FireEvent('AfterPreferencesDefined');
@@ -818,6 +835,7 @@ class ProfileController extends Gdn_Controller {
          }
       }
       $CurrentPrefs = array_merge($CurrentPrefs, $MetaPrefs);
+      $CurrentPrefs = array_map('intval', $CurrentPrefs);
       $this->SetData('Preferences', $CurrentPrefs);
       
       if (UserModel::NoEmail()) {
@@ -857,6 +875,8 @@ class ProfileController extends Gdn_Controller {
          
          $this->UserModel->SavePreference($this->User->UserID, $UserPrefs);
          UserModel::SetMeta($this->User->UserID, $NewMetaPrefs, 'Preferences.');
+         
+         $this->SetData('Preferences', array_merge($this->Data('Preferences', array()), $UserPrefs, $NewMetaPrefs));
          
          if (count($this->Form->Errors() == 0))
             $this->InformMessage(Sprite('Check', 'InformSprite').T('Your preferences have been saved.'), 'Dismissable AutoDismiss HasSprite');
@@ -1223,7 +1243,7 @@ class ProfileController extends Gdn_Controller {
          // password in Vanilla, they will then be able to log into Vanilla using 
          // Vanilla's login form regardless of the state of their membership in the 
          // external app.
-         if (Gdn::Config('Garden.UserAccount.AllowEdit') && C('Garden.Registration.Method') != 'Connect') {
+         if (C('Garden.UserAccount.AllowEdit') && C('Garden.Registration.Method') != 'Connect') {
             $Module->AddLink('Options', Sprite('SpEdit').' '.T('Edit Profile'), '/profile/edit', FALSE, array('class' => 'Popup EditAccountLink'));
                
             // No password may have been set if they have only signed in with a connect plugin

@@ -9,12 +9,12 @@ $DashboardCount = 0;
 // Spam & Moderation Queue
 if ($Session->CheckPermission('Garden.Settings.Manage') || $Session->CheckPermission('Garden.Moderation.Manage')) {
    $LogModel = new LogModel();
-   $SpamCount = $LogModel->GetOperationCount('spam');
+   //$SpamCount = $LogModel->GetOperationCount('spam');
    $ModerationCount = $LogModel->GetOperationCount('moderate');
-   $DashboardCount += $SpamCount + $ModerationCount;
+   $DashboardCount += $ModerationCount;
 }
 // Applicant Count
-if ($Session->CheckPermission('Garden.Applicants.Manage')) {
+if ($Session->CheckPermission('Garden.Users.Approve')) {
    $RoleModel = new RoleModel();
    $ApplicantCount = $RoleModel->GetApplicantCount();
    $DashboardCount += $ApplicantCount;
@@ -62,12 +62,16 @@ if ($Session->IsValid()):
             echo '<ul>';
                // echo Wrap(Wrap(T('My Account'), 'strong'), 'li');
                // echo Wrap('<hr />', 'li');
-               echo Wrap(Anchor(Sprite('SpEditProfile').' '.T('Edit Profile'), 'profile/edit'), 'li');
+               if (C('Garden.UserAccount.AllowEdit') && C('Garden.Registration.Method') != 'Connect') {
+                  echo Wrap(Anchor(Sprite('SpEditProfile').' '.T('Edit Profile'), 'profile/edit', 'EditProfileLink'), 'li', array('class' => 'EditProfileWrap'));
+               } else {
+                  echo Wrap(Anchor(Sprite('SpEditProfile').' '.T('Preferences'), 'profile/preferences', 'EditProfileLink'), 'li', array('class' => 'EditProfileWrap'));
+               }
                
                if ($Session->CheckPermission('Garden.Settings.Manage') || $Session->CheckPermission('Garden.Moderation.Manage')) {
                   echo Wrap('<hr />', 'li');
                   $CApplicant = $ApplicantCount > 0 ? ' '.Wrap($ApplicantCount, 'span class="Alert"') : '';
-                  $CSpam = $SpamCount > 0 ? ' '.Wrap($SpamCount, 'span class="Alert"') : '';
+                  $CSpam = ''; //$SpamCount > 0 ? ' '.Wrap($SpamCount, 'span class="Alert"') : '';
                   $CModeration = $ModerationCount > 0 ? ' '.Wrap($ModerationCount, 'span class="Alert"') : '';
                   echo Wrap(Anchor(Sprite('SpApplicants').' '.T('Applicants').$CApplicant, '/dashboard/user/applicants'), 'li');
                   echo Wrap(Anchor(Sprite('SpSpam').' '.T('Spam Queue').$CSpam, '/dashboard/log/spam'), 'li');
@@ -76,8 +80,7 @@ if ($Session->IsValid()):
                }
                
                $this->FireEvent('FlyoutMenu');
-               echo Wrap('<hr />', 'li');
-               echo Wrap(Anchor(Sprite('SpSignOut').' '.T('Sign Out'), SignOutUrl()), 'li');
+               echo Wrap('<hr />'.Anchor(Sprite('SpSignOut').' '.T('Sign Out'), SignOutUrl()), 'li', array('class' => 'SignInOutWrap SignOutWrap'));
          echo '</div>';
          echo '</span>';
 
@@ -95,7 +98,7 @@ else:
    echo Anchor(T('Sign In'), SignInUrl($this->_Sender->SelfUrl), (SignInPopup() ? ' SignInPopup' : ''), array('rel' => 'nofollow'));
    $Url = RegisterUrl($this->_Sender->SelfUrl);
       if(!empty($Url))
-         echo ' <span class="Bullet">•</span> '.Anchor(T('Register'), $Url, 'ApplyButton', array('rel' => 'nofollow')).' ';
+         echo Bullet(' ').Anchor(T('Register'), $Url, 'ApplyButton', array('rel' => 'nofollow')).' ';
    echo '</div>';
       
    echo ' <div class="SignInIcons">';

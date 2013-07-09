@@ -138,6 +138,9 @@ class ActivityController extends Gdn_Controller {
       // Page meta.
       $this->AddJsFile('activity.js');
       
+      if ($this->Head)
+         $this->Head->AddRss(Url('/activity/feed.rss', TRUE), $this->Head->Title());
+      
       // Comment submission 
       $Session = Gdn::Session();
       $Comment = $this->Form->GetFormValue('Comment');
@@ -302,7 +305,9 @@ class ActivityController extends Gdn_Controller {
       if ($this->Form->IsPostBack()) {
          $Data = $this->Form->FormValues();
          $Data = $this->ActivityModel->FilterForm($Data);
-         $Data['Format'] = C('Garden.InputFormatter');
+         if (!isset($Data['Format']) || strcasecmp($Data['Format'], 'Raw') == 0)
+            $Data['Format'] = C('Garden.InputFormatter');
+         
          if ($UserID != Gdn::Session()->UserID) {
             // This is a wall post.
             $Activity = array(

@@ -6,10 +6,12 @@
  * Users may add tags to discussions as they're being created. Tags are shown
  * in the panel and on the OP.
  * 
- * Changes: 
+ * @changes
  *  1.5     Fix TagModule usage
  *  1.6     Add tag permissions
  *  1.6.1   Add tag permissions to UI
+ *  1.7     Change the styling of special tags and prevent them from being edited/deleted.
+ *  1.8     Add show existing tags
  * 
  * @author Mark O'Sullivan <mark@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
@@ -20,7 +22,7 @@
 $PluginInfo['Tagging'] = array(
    'Name' => 'Tagging',
    'Description' => 'Users may add tags to each discussion they create. Existing tags are shown in the sidebar for navigation by tag.',
-   'Version' => '1.6.2',
+   'Version' => '1.8.2',
    'SettingsUrl' => '/dashboard/settings/tagging',
    'SettingsPermission' => 'Garden.Settings.Manage',
    'Author' => "Mark O'Sullivan",
@@ -109,15 +111,18 @@ class TaggingPlugin extends Gdn_Plugin {
       $Sender->SetData('Tag', $Tag, TRUE);
       $Sender->Title(T('Tagged with ').htmlspecialchars($Tag));
       $Sender->Head->Title($Sender->Head->Title());
+      $UrlTag = rawurlencode($Tag);
       if (urlencode($Tag) == $Tag) {
-         $Sender->CanonicalUrl(Url(ConcatSep('/', 'discussions/tagged/'.urlencode($Tag), PageNumber($Offset, $Limit, TRUE)), TRUE));
+         $Sender->CanonicalUrl(Url(ConcatSep('/', "/discussions/tagged/$UrlTag", PageNumber($Offset, $Limit, TRUE)), TRUE));
+         $FeedUrl = Url(ConcatSep('/', "/discussions/tagged/$UrlTag/feed.rss", PageNumber($Offset, $Limit, TRUE, FALSE)), '//');
       } else {
-         $Sender->CanonicalUrl(Url(ConcatSep('/', 'discussions/tagged', PageNumber($Offset, $Limit, TRUE)).'?Tag='.urlencode($Tag), TRUE));
+         $Sender->CanonicalUrl(Url(ConcatSep('/', 'discussions/tagged', PageNumber($Offset, $Limit, TRUE)).'?Tag='.$UrlTag, TRUE));
+         $FeedUrl = Url(ConcatSep('/', 'discussions/tagged', PageNumber($Offset, $Limit, TRUE, FALSE), 'feed.rss').'?Tag='.$UrlTag, '//');
       }
 
       if ($Sender->Head) {
          $Sender->AddJsFile('discussions.js');
-         $Sender->Head->AddRss($Sender->SelfUrl.'/feed.rss', $Sender->Head->Title());
+         $Sender->Head->AddRss($FeedUrl, $Sender->Head->Title());
       }
       
       if (!is_numeric($Offset) || $Offset < 0)
@@ -164,15 +169,6 @@ class TaggingPlugin extends Gdn_Plugin {
          $Sender->SetJson('LessRow', $Sender->Pager->ToString('less'));
          $Sender->SetJson('MoreRow', $Sender->Pager->ToString('more'));
          $Sender->View = 'discussions';
-      }
-      
-      // Set a definition of the user's current timezone from the db. jQuery
-      // will pick this up, compare to the browser, and update the user's
-      // timezone if necessary.
-      $CurrentUser = Gdn::Session()->User;
-      if (is_object($CurrentUser)) {
-         $ClientHour = $CurrentUser->HourOffset + date('G', time());
-         $Sender->AddDefinition('SetClientHour', $ClientHour);
       }
       
       // Render the controller
@@ -233,8 +229,7 @@ class TaggingPlugin extends Gdn_Plugin {
 
             if ($CategorySearch)
                $NewTag['CategoryID'] = $CategoryID;
-
-            $TagID = $Sender->SQL->Insert('Tag', $NewTag);
+            $TagID = $Sender->SQL->Options('Ignore', TRUE)->Insert('Tag', $NewTag);
             $Tags[$TagID] = $NewTag;
          }
       }
@@ -262,7 +257,7 @@ class TaggingPlugin extends Gdn_Plugin {
 
       // Associate the ones that weren't already associated
       foreach ($NonAssociatedTagIDs as $TagID) {
-         $Sender->SQL->Insert('TagDiscussion', array(
+         $Sender->SQL->Options('Ignore', TRUE)->Insert('TagDiscussion', array(
             'TagID' => $TagID,
             'DiscussionID' => $DiscussionID, 
             'CategoryID' => $CategoryID
@@ -339,14 +334,14 @@ class TaggingPlugin extends Gdn_Plugin {
    /**
     * Search results for tagging autocomplete.
     */
-   public function PluginController_TagSearch_Create($Sender) {
+   public function PluginController_TagSearch_Create($Sender, $q, $id = false) {
       
       // Allow per-category tags
       $CategorySearch = C('Plugins.Tagging.CategorySearch', FALSE);
       if ($CategorySearch)
          $CategoryID = GetIncomingValue('CategoryID');
       
-      $Query = GetIncomingValue('q');
+      $Query = $q;
       $Data = array();
       $Database = Gdn::Database();
       if ($Query) {
@@ -358,7 +353,7 @@ class TaggingPlugin extends Gdn_Plugin {
          $TagQuery = Gdn::SQL()
             ->Select('TagID, Name')
             ->From('Tag')
-            ->Like('Name', $Query)
+            ->Like('Name', str_replace(array('%', '_'), array('\%', '_'), $Query), strlen($Query) > 2 ? 'both' : 'right')
             ->Limit(20);
          
          // Allow per-category tags
@@ -369,7 +364,7 @@ class TaggingPlugin extends Gdn_Plugin {
          $TagData = $TagQuery->Get();
          
          foreach ($TagData as $Tag) {
-            $Data[] = array('id' => $Tag->Name, 'name' => $Tag->Name);
+            $Data[] = array('id' => $id ? $Tag->TagID : $Tag->Name, 'name' => $Tag->Name);
          }
       }
       // Close the db before exiting.
@@ -446,10 +441,33 @@ class TaggingPlugin extends Gdn_Plugin {
     * @param Gdn_Controller $Sender
     */
    public function PostController_AfterDiscussionFormOptions_Handler($Sender) {
-      if (in_array($Sender->RequestMethod, array('discussion', 'editdiscussion', 'question'))) {         
+      if (in_array($Sender->RequestMethod, array('discussion', 'editdiscussion', 'question'))) {
+         // Setup, get most popular tags
+         $TagModel = new TagModel;
+         $Tags = $TagModel->GetWhere(array('Type' => NULL), 'CountDiscussions', 'desc', C('Plugins.Tagging.ShowLimit', 100))->Result(DATASET_TYPE_ARRAY);
+         $TagsHtml = (count($Tags)) ? '' : T('No tags have been created yet.');
+         $ShowTags = array();
+         if (is_array($Tags)) {
+            foreach ($Tags as $Tag) {
+               $ShowTags[] = $Tag['Name'];
+            }
+            unset($Tags);
+            asort($ShowTags);
+         }
+
          echo '<div class="Form-Tags P">';
+
+         // Tag text box
          echo $Sender->Form->Label('Tags', 'Tags');
          echo $Sender->Form->TextBox('Tags', array('maxlength' => 255));
+
+         // Available tags
+         echo Wrap(Anchor(T('Show popular tags'), '#'), 'span', array('class' => 'ShowTags'));
+         foreach ($ShowTags as $Tag) {
+            $TagsHtml .= Anchor($Tag, '#', 'AvailableTag', array('data-name' => $Tag)).' ';
+         }
+         echo Wrap($TagsHtml, 'div', array('class' => 'Hidden AvailableTags'));
+
          echo '</div>';
       }
    }
@@ -458,8 +476,7 @@ class TaggingPlugin extends Gdn_Plugin {
     * Add javascript to the post/edit discussion page so that tagging autocomplete works.
     */
    public function PostController_Render_Before($Sender) {
-      $Sender->AddCSSFile('token-input.css', 'plugins/Tagging');
-      $Sender->AddJsFile('jquery.tokeninput.vanilla.js', 'plugins/Tagging');
+      $Sender->AddJsFile('jquery.tokeninput.js');
       $Sender->AddJsFile('tagging.js', 'plugins/Tagging');
       $Sender->AddDefinition('PluginsTaggingAdd', Gdn::Session()->CheckPermission('Plugins.Tagging.Add'));
       $Sender->AddDefinition('PluginsTaggingSearchUrl', Gdn::Request()->Url('plugin/tagsearch'));
@@ -491,7 +508,7 @@ class TaggingPlugin extends Gdn_Plugin {
       
       $Sender->Form->Method = 'get';
       $Sender->Form->InputPrefix = '';
-      $Sender->Form->Action = '/settings/tagging';
+      //$Sender->Form->Action = '/settings/tagging';
 
       list($Offset, $Limit) = OffsetLimit($Sender->Request->Get('Page'), 100);
       $Sender->SetData('_Limit', $Limit);
@@ -608,7 +625,7 @@ class TaggingPlugin extends Gdn_Plugin {
          $SQL->Delete('Tag', array('TagID' => $TagID));
          
          $Sender->InformMessage(FormatString(T('<b>{Name}</b> deleted.'), $Tag));
-         $Sender->JsonTarget("#Tag-{$Tag['TagID']}", NULL, 'Remove');
+         $Sender->JsonTarget("#Tag_{$Tag['TagID']}", NULL, 'Remove');
       }
 
       $Sender->SetData('Title', T('Delete Tag'));

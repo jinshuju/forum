@@ -20,3 +20,4 @@ _notes
 .project
 .settings
 .buildpath
+.idea/*

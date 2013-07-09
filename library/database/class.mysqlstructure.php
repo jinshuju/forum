@@ -511,14 +511,10 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
       if($Explicit) {
          foreach($IndexesDb as $Name => $Sql) {
             if($Name == 'PRIMARY')
-               $IndexSql[$Name] = $AlterSqlPrefix."drop primary key;\n";
+               $IndexSql[$Name][] = $AlterSqlPrefix."drop primary key;\n";
             else
-               $IndexSql[$Name] = $AlterSqlPrefix.'drop index '.$Name.";\n";
+               $IndexSql[$Name][] = $AlterSqlPrefix.'drop index '.$Name.";\n";
          }
-      }
-      
-      if ($this->_TableName == 'UserPoints') {
-         $Foo = 'Bar';
       }
       
       // Modify all of the indexes.
@@ -546,7 +542,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
     * @todo This method and $Column need descriptions.
     */
    protected function _DefineColumn($Column) {
-      if (!is_array($Column->Type) && !in_array($Column->Type, array('tinyint', 'smallint', 'mediumint', 'int', 'bigint', 'char', 'varchar', 'varbinary', 'date', 'datetime', 'mediumtext', 'text', 'decimal', 'numeric', 'float', 'double', 'enum', 'timestamp', 'tinyblob', 'blob', 'mediumblob', 'longblob')))
+      if (!is_array($Column->Type) && !in_array($Column->Type, array('tinyint', 'smallint', 'mediumint', 'int', 'bigint', 'char', 'varchar', 'varbinary', 'date', 'datetime', 'mediumtext', 'longtext', 'text', 'decimal', 'numeric', 'float', 'double', 'enum', 'timestamp', 'tinyblob', 'blob', 'mediumblob', 'longblob')))
          throw new Exception(sprintf(T('The specified data type (%1$s) is not accepted for the MySQL database.'), $Column->Type));
       
       $Return = '`'.$Column->Name.'` '.$Column->Type;

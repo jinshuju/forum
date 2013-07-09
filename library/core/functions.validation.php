@@ -329,6 +329,28 @@ if (!function_exists('ValidateMatch')) {
    }
 }
 
+if (!function_exists('ValidateMinTextLength')) {
+   function ValidateMinTextLength($Value, $Field, $Post) {
+      if (isset($Post['Format'])) {
+         $Value = Gdn_Format::To($Value, $Post['Format']);
+      }
+      
+      $Value = html_entity_decode(trim(strip_tags($Value)));
+      $MinLength = GetValue('MinLength', $Field, 0);
+      
+      if (function_exists('mb_strlen'))
+         $Diff = $MinLength - mb_strlen($Value, 'UTF-8');
+      else
+         $Diff = $MinLength - strlen($Value);
+         
+      if ($Diff <= 0) {
+         return TRUE;
+      } else {
+         return sprintf(T('ValidateMinLength'), T($Field->Name), $Diff);
+      }
+   }
+}
+
 if (!function_exists('ValidateStrength')) {
    /**
     * Validate a password's strength

@@ -40,7 +40,9 @@ $Construct->PrimaryKey('CategoryID')
    ->Column('CssClass', 'varchar(50)', TRUE)
    ->Column('Photo', 'varchar(255)', TRUE)
    ->Column('PermissionCategoryID', 'int', '-1') // default to root.
+   ->Column('PointsCategoryID', 'int', '0') // default to global.
    ->Column('HideAllDiscussions', 'tinyint(1)', '0')
+   ->Column('DisplayAs', array('Categories', 'Discussions', 'Default'), 'Default')
    ->Column('InsertUserID', 'int', FALSE, 'key')
    ->Column('UpdateUserID', 'int', TRUE)
    ->Column('DateInserted', 'datetime')
@@ -93,7 +95,7 @@ $Construct
    ->Column('Name', 'varchar(100)', FALSE, 'fulltext')
 	->Column('Body', 'text', FALSE, 'fulltext')
 	->Column('Format', 'varchar(20)', TRUE)
-   ->Column('Tags', 'varchar(255)', NULL)
+   ->Column('Tags', 'text', NULL)
    ->Column('CountComments', 'int', '0')
    ->Column('CountBookmarks', 'int', NULL)
    ->Column('CountViews', 'int', '1')

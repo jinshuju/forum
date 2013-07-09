@@ -21,6 +21,12 @@ class SettingsController extends Gdn_Controller {
    public $Uses = array('Database', 'Form', 'CategoryModel');
    
    /**
+    *
+    * @var bool 
+    */
+   public $ShowCustomPoints = FALSE;
+   
+   /**
     * Advanced settings.
     *
     * Allows setting configuration values via form elements.
@@ -43,7 +49,9 @@ class SettingsController extends Gdn_Controller {
          'Vanilla.Archive.Date',
          'Vanilla.Archive.Exclude',
          'Garden.EditContentTimeout',
-         'Vanilla.AdminCheckboxes.Use'
+         'Vanilla.AdminCheckboxes.Use',
+         'Vanilla.Discussions.SortField' => 'd.DateLastComment',
+         'Vanilla.Discussions.UserSortField'
       ));
       
       // Set the model on the form.
@@ -175,7 +183,8 @@ class SettingsController extends Gdn_Controller {
          'Vanilla.Comment.SpamCount',
          'Vanilla.Comment.SpamTime',
          'Vanilla.Comment.SpamLock',
-         'Vanilla.Comment.MaxLength'
+         'Vanilla.Comment.MaxLength',
+         'Vanilla.Comment.MinLength'
       ));
       
       // Set the model on the form.
@@ -244,6 +253,7 @@ class SettingsController extends Gdn_Controller {
          // Form was validly submitted
          $IsParent = $this->Form->GetFormValue('IsParent', '0');
          $this->Form->SetFormValue('AllowDiscussions', $IsParent == '1' ? '0' : '1');
+         $this->Form->SetFormValue('CustomPoints', (bool)$this->Form->GetFormValue('CustomPoints'));
          $CategoryID = $this->Form->Save();
          if ($CategoryID) {
             $Category = CategoryModel::Categories($CategoryID);
@@ -432,6 +442,7 @@ class SettingsController extends Gdn_Controller {
       
       if ($this->Form->IsPostBack() == FALSE) {
          $this->Form->SetData($this->Category);
+         $this->Form->SetValue('CustomPoints', $this->Category->PointsCategoryID == $this->Category->CategoryID);
       } else {
          $Upload = new Gdn_Upload();
          $TmpImage = $Upload->ValidateUpload('PhotoUpload', FALSE);
@@ -448,6 +459,7 @@ class SettingsController extends Gdn_Controller {
             );
             $this->Form->SetFormValue('Photo', $Parts['SaveName']);
          }
+         $this->Form->SetFormValue('CustomPoints', (bool)$this->Form->GetFormValue('CustomPoints'));
          
          if ($this->Form->Save()) {
             $Category = CategoryModel::Categories($CategoryID);
@@ -479,8 +491,12 @@ class SettingsController extends Gdn_Controller {
       // Check permission
       $this->Permission('Garden.Settings.Manage');
       
-      // Set up head
       $this->AddSideMenu('vanilla/settings/managecategories');
+      
+      // Nested sortable always breaks when we update jQuery so we give it it's own old version of jquery.
+      $this->RemoveJsFile('jquery.js');
+      $this->AddJsFile('js/library/nestedSortable.1.3.4/jquery-1.7.2.min.js', '', array('Sort' => 0));
+      
       $this->AddJsFile('categories.js');
       $this->AddJsFile('js/library/jquery.alphanumeric.js');
       $this->AddJsFile('js/library/nestedSortable.1.3.4/jquery-ui-1.8.11.custom.min.js');

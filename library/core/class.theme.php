@@ -31,7 +31,7 @@ class Gdn_Theme {
       Gdn::Controller()->AddAsset($AssetInfo['AssetContainer'], $Asset);
    }
 
-   public static function Breadcrumbs($Data, $HomeLink = TRUE) {
+   public static function Breadcrumbs($Data, $HomeLink = TRUE, $Options = array()) {
       $Format = '<a href="{Url,html}" itemprop="url"><span itemprop="title">{Name,html}</span></a>';
       
       $Result = '';
@@ -41,17 +41,30 @@ class Gdn_Theme {
 
       
       if ($HomeLink) {
-         $Row = array('Name' => $HomeLink, 'Url' => Url('/', TRUE), 'CssClass' => 'CrumbLabel HomeCrumb');
+         $HomeUrl = GetValue('HomeUrl', $Options);
+         if (!$HomeUrl)
+            $HomeUrl = Url('/', TRUE);
+         
+         $Row = array('Name' => $HomeLink, 'Url' => $HomeUrl, 'CssClass' => 'CrumbLabel HomeCrumb');
          if (!is_string($HomeLink))
             $Row['Name'] = T('Home');
          
          array_unshift($Data, $Row);
       }
       
+      if (GetValue('HideLast', $Options)) {
+         // Remove the last item off the list.
+         array_pop($Data);
+      }
+      
       $DefaultRoute = ltrim(GetValue('Destination', Gdn::Router()->GetRoute('DefaultController'), ''), '/');
 
       $Count = 0;
+      $DataCount = 0;
+      
       foreach ($Data as $Row) {
+         $DataCount++;
+         
          if (ltrim($Row['Url'], '/') == $DefaultRoute && $HomeLink)
             continue; // don't show default route twice.
          
@@ -61,7 +74,10 @@ class Gdn_Theme {
          }
          
          $Row['Url'] = Url($Row['Url']);
-         $CssClass = GetValue('CssClass', $Row, 'CrumbLabel');
+         $CssClass = 'CrumbLabel '.GetValue('CssClass', $Row);
+         if ($DataCount == count($Data))
+            $CssClass .= ' Last';
+         
          $Label = '<span class="'.$CssClass.'">'.FormatString($Format, $Row).'</span> ';
          $Result = ConcatSep('<span class="Crumb">'.T('Breadcrumbs Crumb', '›').'</span> ', $Result, $Label);
          
@@ -69,7 +85,7 @@ class Gdn_Theme {
       }
       
       // Close the stack.
-      for ($Count--;$Count > 0; $Count--) {
+      for ($Count--; $Count > 0; $Count--) {
          $Result .= '</span>';
       }
 
