@@ -307,6 +307,7 @@ class ProfileController extends Gdn_Controller {
       $User = Gdn::UserModel()->GetID($UserID, DATASET_TYPE_ARRAY);
       $this->Form->SetModel(Gdn::UserModel());
       $this->Form->SetData($User);
+      $this->SetData('User', $User);
       
       // Decide if they have ability to edit the username
       $CanEditUsername = (bool)C("Garden.Profile.EditUsernames") || Gdn::Session()->CheckPermission('Garden.Users.Edit');
@@ -439,7 +440,7 @@ class ProfileController extends Gdn_Controller {
       //    return $this->Notifications($Page);
       // elseif (C('Garden.Profile.ShowActivities', TRUE))
       if (C('Garden.Profile.ShowActivities', TRUE))
-         return $this->Activity($User, $Username, $UserID);
+         return $this->Activity($User, $Username, $UserID, $Page);
       else
          return Gdn::Dispatcher()->Dispatch(UserUrl($this->User, '', 'discussions'));
    }
