@@ -21,3 +21,5 @@ _notes
 .settings
 .buildpath
 .idea/*
+cache/Smarty/empty
+cache/Smarty/compile/empty
