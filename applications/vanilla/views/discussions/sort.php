@@ -1462,7 +1462,7 @@ $Definition['Guest'] = '访客';
 $Definition['Guest roles'] = '检查所有适用于游客的角色。';
 
 $Definition['HeadlineFormat.AddUser'] = '{ActivityUserID,user} 为 {RegardingUserID,user} 添加了一个账户。';
-$Definition['HeadlineFormat.PictureChange'] = '{RegardingUserID,You} 修改了 {ActivityUserID,your} 的头像。';
+$Definition['HeadlineFormat.PictureChange'] = '{RegardingUserID,You} 修改了头像。';
 // $Definition['HeadlineFormat.RegistrationApproval'] = '';
 $Definition['HeadlineFormat.Status'] = '{ActivityUserID,user}';
 $Definition['HeadlineFormat.WallPost'] = '{RegardingUserID,you} &rarr; {ActivityUserID,you}';
