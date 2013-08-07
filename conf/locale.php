@@ -533,6 +533,7 @@ $Definition['My Discussions'] = '我的话题';
 $Definition['My Drafts'] = '我的草稿';
 $Definition['My Forums'] = '我的社区';
 $Definition['My Preferences'] = '通知设置';
+$Definition['Preferences'] = '个人设置';
 $Definition['MyBadgesModuleTitle'] = '我的徽章';
 
 // $Definition['Name Dropper'] = '';
