@@ -448,7 +448,7 @@ $Definition['HeadlineFormat.Ban'] = '{RegardingUserID,You} 屏蔽 {ActivityUserI
 $Definition['HeadlineFormat.Comment'] = '{ActivityUserID,user} 回复了 <a href="{Url,html}">{Data.Name,text}</a>';
 $Definition['HeadlineFormat.Discussion'] = '{ActivityUserID,user} <a href="{Url,html}">{Data.Name,text}</a>';
 $Definition['HeadlineFormat.Mention'] = '{ActivityUserID,user} 在 <a href="{Url,html}">{Data.Name,text}</a> 中提到你。';
-$Definition['HeadlineFormat.PictureChange.ForUser'] = '{RegardingUserID,You} 更换了 {ActivityUserID,user} 的个人资料图片。';
+$Definition['HeadlineFormat.PictureChange.ForUser'] = '{RegardingUserID,You} 更换了个人资料图片。';
 $Definition['HeadlineFormat.Registration'] = '{ActivityUserID,You} 已加入。';
 $Definition['HeadlineFormat.Unban'] = '{RegardingUserID,You} 取消屏蔽 {ActivityUserID,you}。';
 $Definition['HeadlineFormat.Warning'] = '{ActivityUserID,You} 警告了 {RegardingUserID,you}。';
@@ -1465,7 +1465,7 @@ $Definition['Guest'] = '访客';
 $Definition['Guest roles'] = '检查所有适用于游客的角色。';
 
 $Definition['HeadlineFormat.AddUser'] = '{ActivityUserID,user} 为 {RegardingUserID,user} 添加了一个账户。';
-$Definition['HeadlineFormat.PictureChange'] = '{RegardingUserID,You} 修改了 {ActivityUserID,your} 的头像。';
+$Definition['HeadlineFormat.PictureChange'] = '{RegardingUserID,You} 修改了头像。';
 // $Definition['HeadlineFormat.RegistrationApproval'] = '';
 $Definition['HeadlineFormat.Status'] = '{ActivityUserID,user}';
 $Definition['HeadlineFormat.WallPost'] = '{RegardingUserID,you} &rarr; {ActivityUserID,you}';
